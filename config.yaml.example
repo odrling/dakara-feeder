@@ -1,0 +1,22 @@
+# Parameters for the server
+server:
+  # Server address
+  address: 127.0.0.1:8000
+
+  # Credentials for server authentication
+  login: login
+  password: pass
+
+  # Use a secured connection
+  # ssl: false
+
+# Path of the karaoke folder
+kara_folder: /path/to/folder
+
+# Other parameters
+
+# Minimal level of messages to log
+# For debug level, you can call `feeder.py` with the `−d` flag to show
+# traceback on exceptions.
+# Default is 'info'
+loglevel: info
