@@ -2,6 +2,8 @@ import json
 import logging
 import urllib.parse
 
+from path import Path
+
 import requests
 
 # enforce loglevel warning for requests log messages
@@ -178,6 +180,36 @@ class ServerHTTPConnection:
         return {
             'Authorization': 'Token ' + self.token
         }
+
+
+class DakaraServer(ServerHTTPConnection):
+    def get_songs(self):
+        """Retreive the songs of the library containing their path
+
+        Returns:
+            list: list of path on the songs.
+        """
+        url = self.server_url + "/feeder/retrieve"
+        response = self.get(url)
+
+        # join the directory and the filename
+        return [Path(song["directory"]) / song["filename"] for song in response.json()]
+
+    def post_songs_diff(self, added_songs, deleted_songs):
+        """Post the lists of added and deleted songs
+
+        Args:
+            added_songs (list): list of new songs.
+            deleted_songs (list): list of deleted songs.
+        """
+        url = self.server_url + "/feeder"
+        data = {
+            "added": added_songs,
+            "deleted": deleted_songs,
+        }
+
+        self.post(url, data=data)
+
 
 
 def display_message(message, limit=100):

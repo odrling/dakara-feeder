@@ -2,6 +2,7 @@ from unittest import TestCase
 from unittest.mock import patch, MagicMock, ANY
 
 from requests.exceptions import RequestException
+from path import Path
 
 import dakara_server
 
@@ -293,3 +294,87 @@ class AuthenticatedTestCase(TestCase):
         # call a protected method
         with self.assertRaises(dakara_server.AuthenticationError):
             instance.dummy()
+
+
+class DakaraServerTestCase(TestCase):
+    """Test the `DakaraServer` class
+    """
+
+    def setUp(self):
+        # create a server address
+        self.address = "www.example.com"
+
+        # create a server URL
+        self.url = "http://www.example.com/api/"
+
+        # create a login and password
+        self.login = "test"
+        self.password = "test"
+
+        # create config
+        self.config = {
+            "login": self.login,
+            "password": self.password,
+            "address": self.address
+        }
+
+    @patch.object(dakara_server.DakaraServer, "get")
+    def test_get_songs(self, mocked_get):
+        """Test to obtain the list of song paths
+        """
+        # create the mock
+        mocked_get.return_value.json.return_value = [
+            {
+                "filename": "song_0.mp4",
+                "directory": "directory_0",
+            },
+            {
+                "filename": "song_1.mp4",
+                "directory": "directory_1",
+            },
+        ]
+
+        # create the object
+        server = dakara_server.DakaraServer(self.config)
+
+        # call the method
+        songs_list = server.get_songs()
+
+        # assert the songs are present and filename and directory is joined
+        self.assertCountEqual(songs_list, [
+            Path("directory_0/song_0.mp4").normpath(),
+            Path("directory_1/song_1.mp4").normpath(),
+        ])
+
+        # assert the mock
+        mocked_get.assert_called_with(self.url + "/feeder/retrieve")
+
+    @patch.object(dakara_server.DakaraServer, "post")
+    def test_post_songs_diff(self, mocked_post):
+        """Test to post the list of diff songs
+        """
+        # create lists of songs
+        added_songs = [{
+            "title": "title_0",
+            "filename": "song_0.mp4",
+            "directory": "directory_0",
+        }]
+        deleted_songs = [{
+            "filename": "song_1.mp4",
+            "directory": "directory_1",
+        }]
+
+        # create the object
+        server = dakara_server.DakaraServer(self.config)
+
+        # call the method
+        server.post_songs_diff(added_songs, deleted_songs)
+
+        # assert the mock
+        mocked_post.assert_called_with(
+            self.url + "/feeder",
+            data={
+                "added": added_songs,
+                "deleted": deleted_songs,
+            }
+        )
