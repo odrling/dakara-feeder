@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from argparse import ArgumentParser
 
+from path import Path
+
 from dakara_feeder.dakara_feeder import DakaraFeeder
 
 
@@ -27,7 +29,7 @@ def get_parser():
 
 
 def feed(args):
-    feeder = DakaraFeeder(args.config, args.debug)
+    feeder = DakaraFeeder(Path(args.config), args.debug)
     feeder.feed()
 
 

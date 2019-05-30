@@ -1,3 +1,5 @@
+import logging
+
 import yaml
 import coloredlogs
 from path import Path
@@ -6,6 +8,9 @@ from dakara_feeder.dakara_server import DakaraServer
 from dakara_feeder.diff_generator import generate_diff
 from dakara_feeder.directory_lister import list_directory
 from dakara_feeder.song import Song
+
+
+logger = logging.getLogger(__name__)
 
 
 class DakaraFeeder:
@@ -53,7 +58,7 @@ class DakaraFeeder:
         """Load the config from config file
 
         Args:
-            config_path (str): path to the config file.
+            config_path (path.Path): path to the config file.
             debug (bool): run in debug mode.
 
         Returns:
@@ -62,7 +67,7 @@ class DakaraFeeder:
         logger.info("Reading config file '{}'".format(config_path))
 
         # check the config file is present
-        if not os.path.isfile(config_path):
+        if not config_path.exists():
             raise IOError("No config file found")
 
         # load and parse the file

@@ -1,4 +1,3 @@
-import json
 import logging
 import urllib.parse
 
@@ -21,6 +20,7 @@ def authenticated(fun):
     Returns:
         function: decorated function.
     """
+
     def call(self, *args, **kwargs):
         if self.token is None:
             raise AuthenticationError("No connection established")
@@ -36,24 +36,30 @@ class ServerHTTPConnection:
     Args:
         config (dict): config of the server.
     """
+
     def __init__(self, config):
         try:
             # setting config
-            self.server_url = urllib.parse.urlunparse((
-                'https' if config.get('ssl') else 'http',
-                config['address'],
-                '/api/',
-                '', '', ''
-            ))
+            self.server_url = urllib.parse.urlunparse(
+                (
+                    "https" if config.get("ssl") else "http",
+                    config["address"],
+                    "/api/",
+                    "",
+                    "",
+                    "",
+                )
+            )
 
             # authentication
             self.token = None
-            self.login = config['login']
-            self.password = config['password']
+            self.login = config["login"]
+            self.password = config["password"]
 
         except KeyError as error:
-            raise ValueError("Missing parameter in server config: {}"
-                             .format(error)) from error
+            raise ValueError(
+                "Missing parameter in server config: {}".format(error)
+            ) from error
 
     @authenticated
     def send_request(self, method, *args, message_on_error="", **kwargs):
@@ -80,11 +86,9 @@ class ServerHTTPConnection:
             message_on_error = "Unable to request the server"
 
         try:
-            response = send_method(*args,
-                                   headers=self.get_token_header(),
-                                   **kwargs)
+            response = send_method(*args, headers=self.get_token_header(), **kwargs)
 
-        except requests.exceptions.RequestException as error:
+        except requests.exceptions.RequestException:
             logger.error("{}, network error".format(message_on_error))
             return None
 
@@ -92,32 +96,33 @@ class ServerHTTPConnection:
             return response
 
         logger.error(message_on_error)
-        logger.debug("Error {code}: {message}".format(
-            code=response.status_code,
-            message=display_message(response.text)
-        ))
+        logger.debug(
+            "Error {code}: {message}".format(
+                code=response.status_code, message=display_message(response.text)
+            )
+        )
 
         return None
 
     def get(self, *args, **kwargs):
         """Generic method to get data on server
         """
-        return self.send_request('get', *args, **kwargs)
+        return self.send_request("get", *args, **kwargs)
 
     def post(self, *args, **kwargs):
         """Generic method to post data on server
         """
-        return self.send_request('post', *args, **kwargs)
+        return self.send_request("post", *args, **kwargs)
 
     def put(self, *args, **kwargs):
         """Generic method to put data on server
         """
-        return self.send_request('put', *args, **kwargs)
+        return self.send_request("put", *args, **kwargs)
 
     def patch(self, *args, **kwargs):
         """Generic method to patch data on server
         """
-        return self.send_request('patch', *args, **kwargs)
+        return self.send_request("patch", *args, **kwargs)
 
     def authenticate(self):
         """Connect to the server
@@ -125,43 +130,33 @@ class ServerHTTPConnection:
         The authentication process relies on login/password which gives an
         authentication token. This token is stored in the instance.
         """
-        data = {
-            'username': self.login,
-            'password': self.password,
-        }
+        data = {"username": self.login, "password": self.password}
 
         # connect to the server with login/password
         try:
-            response = requests.post(
-                self.server_url + "token-auth/",
-                data=data
-            )
+            response = requests.post(self.server_url + "token-auth/", data=data)
 
         except requests.exceptions.RequestException as error:
-            raise NetworkError((
-                "Network error, unable to talk "
-                "to the server for authentication"
-            )) from error
+            raise NetworkError(
+                ("Network error, unable to talk " "to the server for authentication")
+            ) from error
 
         # manage sucessful connection response
         # store token
         if response.ok:
-            self.token = response.json().get('token')
+            self.token = response.json().get("token")
             logger.info("Login to server successful")
             logger.debug("Token: %s", self.token)
             return
 
         # manage failed connection response
         if response.status_code == 400:
-            raise AuthenticationError(
-                "Login to server failed, check the config file"
-            )
+            raise AuthenticationError("Login to server failed, check the config file")
 
         # manage any other error
         raise AuthenticationError(
             "Unable to connect to server, error {code}: {message}".format(
-                code=response.status_code,
-                message=display_message(response.text)
+                code=response.status_code, message=display_message(response.text)
             )
         )
 
@@ -174,9 +169,7 @@ class ServerHTTPConnection:
         Returns:
             dict: formatted token.
         """
-        return {
-            'Authorization': 'Token ' + self.token
-        }
+        return {"Authorization": "Token " + self.token}
 
 
 class DakaraServer(ServerHTTPConnection):
@@ -200,13 +193,9 @@ class DakaraServer(ServerHTTPConnection):
             deleted_songs (list): list of deleted songs.
         """
         url = self.server_url + "/feeder"
-        data = {
-            "added": added_songs,
-            "deleted": deleted_songs,
-        }
+        data = {"added": added_songs, "deleted": deleted_songs}
 
         self.post(url, data=data)
-
 
 
 def display_message(message, limit=100):
@@ -215,7 +204,7 @@ def display_message(message, limit=100):
     if len(message) <= limit:
         return message
 
-    return message[:limit - 3].strip() + "..."
+    return message[: limit - 3].strip() + "..."
 
 
 class AuthenticationError(Exception):

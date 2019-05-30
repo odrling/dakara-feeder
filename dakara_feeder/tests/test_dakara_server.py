@@ -10,6 +10,7 @@ from dakara_feeder import dakara_server
 class ServerHTTPConnectionTestCase(TestCase):
     """Test the HTTP connection with a server
     """
+
     def setUp(self):
         # create a token
         self.token = "token value"
@@ -25,11 +26,9 @@ class ServerHTTPConnectionTestCase(TestCase):
         self.password = "test"
 
         # create a ServerHTTPConnection instance
-        self.dakara_server = dakara_server.ServerHTTPConnection({
-            'address': self.address,
-            'login': self.login,
-            'password': self.password,
-        })
+        self.dakara_server = dakara_server.ServerHTTPConnection(
+            {"address": self.address, "login": self.login, "password": self.password}
+        )
 
     def test_init(self):
         """Test the created object
@@ -39,7 +38,7 @@ class ServerHTTPConnectionTestCase(TestCase):
         self.assertEqual(self.dakara_server.password, self.password)
         self.assertIsNone(self.dakara_server.token)
 
-    @patch('dakara_feeder.dakara_server.requests.post')
+    @patch("dakara_feeder.dakara_server.requests.post")
     def test_send_request_successful(self, mock_post):
         """Test to send a request with the generic method
         """
@@ -48,17 +47,14 @@ class ServerHTTPConnectionTestCase(TestCase):
 
         # call the method
         self.dakara_server.send_request(
-            'post',
-            self.url,
-            data={'content': 'test'},
-            message_on_error='error message'
+            "post", self.url, data={"content": "test"}, message_on_error="error message"
         )
 
         # assert the call
         mock_post.assert_called_with(
             self.url,
-            headers={'Authorization': 'Token token value'},
-            data={'content': 'test'}
+            headers={"Authorization": "Token token value"},
+            data={"content": "test"},
         )
 
     def test_send_request_error_method(self):
@@ -71,13 +67,13 @@ class ServerHTTPConnectionTestCase(TestCase):
         with self.assertRaises(ValueError):
             with self.assertLogs("dakara_feeder.dakara_server", "DEBUG"):
                 self.dakara_server.send_request(
-                    'invalid',
+                    "invalid",
                     self.url,
-                    data={'content': 'test'},
-                    message_on_error='error message'
+                    data={"content": "test"},
+                    message_on_error="error message",
                 )
 
-    @patch('dakara_feeder.dakara_server.requests.post')
+    @patch("dakara_feeder.dakara_server.requests.post")
     def test_send_request_error_network(self, mock_post):
         """Test to send a request when there is a network error
         """
@@ -90,13 +86,13 @@ class ServerHTTPConnectionTestCase(TestCase):
         # call the method
         with self.assertLogs("dakara_feeder.dakara_server", "DEBUG"):
             self.dakara_server.send_request(
-                'post',
+                "post",
                 self.url,
-                data={'content': 'test'},
-                message_on_error='error message'
+                data={"content": "test"},
+                message_on_error="error message",
             )
 
-    @patch('dakara_feeder.dakara_server.requests.get')
+    @patch("dakara_feeder.dakara_server.requests.get")
     def test_get(self, mock_get):
         """Test the get method
         """
@@ -109,20 +105,15 @@ class ServerHTTPConnectionTestCase(TestCase):
         mock_get.return_value = response
 
         # call the method
-        response_obtained = self.dakara_server.get(
-            self.url,
-        )
+        response_obtained = self.dakara_server.get(self.url)
 
         # assert the call
-        mock_get.assert_called_with(
-            self.url,
-            headers=ANY,
-        )
+        mock_get.assert_called_with(self.url, headers=ANY)
 
         # assert the result
-        self.assertEqual(response_obtained.data, 'data')
+        self.assertEqual(response_obtained.data, "data")
 
-    @patch('dakara_feeder.dakara_server.requests.post')
+    @patch("dakara_feeder.dakara_server.requests.post")
     def test_post(self, mock_post):
         """Test the post method
         """
@@ -130,19 +121,12 @@ class ServerHTTPConnectionTestCase(TestCase):
         self.dakara_server.token = self.token
 
         # call the method
-        self.dakara_server.post(
-            self.url,
-            data={'content': 'content'}
-        )
+        self.dakara_server.post(self.url, data={"content": "content"})
 
         # assert the call
-        mock_post.assert_called_with(
-            self.url,
-            headers=ANY,
-            data={'content': 'content'}
-        )
+        mock_post.assert_called_with(self.url, headers=ANY, data={"content": "content"})
 
-    @patch('dakara_feeder.dakara_server.requests.patch')
+    @patch("dakara_feeder.dakara_server.requests.patch")
     def test_patch(self, mock_patch):
         """Test the patch method
         """
@@ -150,19 +134,14 @@ class ServerHTTPConnectionTestCase(TestCase):
         self.dakara_server.token = self.token
 
         # call the method
-        self.dakara_server.patch(
-            self.url,
-            data={'content': 'content'}
-        )
+        self.dakara_server.patch(self.url, data={"content": "content"})
 
         # assert the call
         mock_patch.assert_called_with(
-            self.url,
-            headers=ANY,
-            data={'content': 'content'}
+            self.url, headers=ANY, data={"content": "content"}
         )
 
-    @patch('dakara_feeder.dakara_server.requests.put')
+    @patch("dakara_feeder.dakara_server.requests.put")
     def test_put(self, mock_put):
         """Test the put method
         """
@@ -170,25 +149,18 @@ class ServerHTTPConnectionTestCase(TestCase):
         self.dakara_server.token = self.token
 
         # call the method
-        self.dakara_server.put(
-            self.url,
-            data={'content': 'content'}
-        )
+        self.dakara_server.put(self.url, data={"content": "content"})
 
         # assert the call
-        mock_put.assert_called_with(
-            self.url,
-            headers=ANY,
-            data={'content': 'content'}
-        )
+        mock_put.assert_called_with(self.url, headers=ANY, data={"content": "content"})
 
-    @patch('dakara_feeder.dakara_server.requests.post')
+    @patch("dakara_feeder.dakara_server.requests.post")
     def test_authenticate_successful(self, mock_post):
         """Test a successful authentication with the server
         """
         # mock the response of the server
         mock_post.return_value.ok = True
-        mock_post.return_value.json.return_value = {'token': self.token}
+        mock_post.return_value.json.return_value = {"token": self.token}
 
         # pre assertions
         self.assertFalse(self.dakara_server.token)
@@ -200,17 +172,14 @@ class ServerHTTPConnectionTestCase(TestCase):
         # call assertions
         mock_post.assert_called_with(
             self.url + "token-auth/",
-            data={
-                'username': self.login,
-                'password': self.password,
-            }
+            data={"username": self.login, "password": self.password},
         )
 
         # post assertions
         self.assertTrue(self.dakara_server.token)
         self.assertEqual(self.dakara_server.token, self.token)
 
-    @patch('dakara_feeder.dakara_server.requests.post')
+    @patch("dakara_feeder.dakara_server.requests.post")
     def test_authenticate_error_network(self, mock_post):
         """Test a network error when authenticating
         """
@@ -222,7 +191,7 @@ class ServerHTTPConnectionTestCase(TestCase):
             with self.assertLogs("dakara_feeder.dakara_server", "DEBUG"):
                 self.dakara_server.authenticate()
 
-    @patch('dakara_feeder.dakara_server.requests.post')
+    @patch("dakara_feeder.dakara_server.requests.post")
     def test_authenticate_error_authentication(self, mock_post):
         """Test an authentication error when authenticating
         """
@@ -235,14 +204,14 @@ class ServerHTTPConnectionTestCase(TestCase):
             with self.assertLogs("dakara_feeder.dakara_server", "DEBUG"):
                 self.dakara_server.authenticate()
 
-    @patch('dakara_feeder.dakara_server.requests.post')
+    @patch("dakara_feeder.dakara_server.requests.post")
     def test_authenticate_error_other(self, mock_post):
         """Test a server error when authenticating
         """
         # mock the response of the server
         mock_post.return_value.ok = False
         mock_post.return_value.status_code = 999
-        mock_post.return_value.test = 'error'
+        mock_post.return_value.test = "error"
 
         # call the method
         with self.assertRaises(dakara_server.AuthenticationError):
@@ -259,14 +228,13 @@ class ServerHTTPConnectionTestCase(TestCase):
         result = self.dakara_server.get_token_header()
 
         # call assertions
-        self.assertEqual(result, {
-            'Authorization': 'Token ' + self.token
-        })
+        self.assertEqual(result, {"Authorization": "Token " + self.token})
 
 
 class AuthenticatedTestCase(TestCase):
     """Test the `authenticated` decorator
     """
+
     class Authenticated:
         def __init__(self):
             self.token = None
@@ -315,7 +283,7 @@ class DakaraServerTestCase(TestCase):
         self.config = {
             "login": self.login,
             "password": self.password,
-            "address": self.address
+            "address": self.address,
         }
 
     @patch.object(dakara_server.DakaraServer, "get")
@@ -324,14 +292,8 @@ class DakaraServerTestCase(TestCase):
         """
         # create the mock
         mocked_get.return_value.json.return_value = [
-            {
-                "filename": "song_0.mp4",
-                "directory": "directory_0",
-            },
-            {
-                "filename": "song_1.mp4",
-                "directory": "directory_1",
-            },
+            {"filename": "song_0.mp4", "directory": "directory_0"},
+            {"filename": "song_1.mp4", "directory": "directory_1"},
         ]
 
         # create the object
@@ -341,10 +303,13 @@ class DakaraServerTestCase(TestCase):
         songs_list = server.get_songs()
 
         # assert the songs are present and filename and directory is joined
-        self.assertCountEqual(songs_list, [
-            Path("directory_0/song_0.mp4").normpath(),
-            Path("directory_1/song_1.mp4").normpath(),
-        ])
+        self.assertCountEqual(
+            songs_list,
+            [
+                Path("directory_0/song_0.mp4").normpath(),
+                Path("directory_1/song_1.mp4").normpath(),
+            ],
+        )
 
         # assert the mock
         mocked_get.assert_called_with(self.url + "/feeder/retrieve")
@@ -354,15 +319,10 @@ class DakaraServerTestCase(TestCase):
         """Test to post the list of diff songs
         """
         # create lists of songs
-        added_songs = [{
-            "title": "title_0",
-            "filename": "song_0.mp4",
-            "directory": "directory_0",
-        }]
-        deleted_songs = [{
-            "filename": "song_1.mp4",
-            "directory": "directory_1",
-        }]
+        added_songs = [
+            {"title": "title_0", "filename": "song_0.mp4", "directory": "directory_0"}
+        ]
+        deleted_songs = [{"filename": "song_1.mp4", "directory": "directory_1"}]
 
         # create the object
         server = dakara_server.DakaraServer(self.config)
@@ -372,9 +332,5 @@ class DakaraServerTestCase(TestCase):
 
         # assert the mock
         mocked_post.assert_called_with(
-            self.url + "/feeder",
-            data={
-                "added": added_songs,
-                "deleted": deleted_songs,
-            }
+            self.url + "/feeder", data={"added": added_songs, "deleted": deleted_songs}
         )
