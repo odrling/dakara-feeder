@@ -14,6 +14,18 @@ logger = logging.getLogger(__name__)
 
 
 class DakaraFeeder:
+    """Class for the Dakara feeder
+
+    Args:
+        config_name (path.Path): path to the config file.
+        debug (bool): run in debug mode.
+
+    Attributes:
+        config (dict): config of the feeder.
+        dakara_server (dakara_server.DakaraServer): connection to the Dakara server.
+        kara_folder (path.Path): path to the folder containing karaoke files.
+    """
+
     def __init__(self, config_name, debug):
         # get config values
         config = self.load_config(config_name, debug)

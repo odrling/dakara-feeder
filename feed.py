@@ -10,6 +10,11 @@ CONFIG_FILE_PATH = "config.yaml"
 
 
 def get_parser():
+    """Get a parser
+
+    Returns:
+        argparse.ArgumentParser: parser.
+    """
     parser = ArgumentParser(description="Feeder for the Dakara project")
 
     parser.add_argument(
@@ -29,6 +34,8 @@ def get_parser():
 
 
 def feed(args):
+    """Execute the feed action
+    """
     feeder = DakaraFeeder(Path(args.config), args.debug)
     feeder.feed()
 
