@@ -1,5 +1,3 @@
-from argparse import ArgumentParser
-
 import yaml
 import coloredlogs
 from path import Path
@@ -10,10 +8,7 @@ from dakara_feeder.directory_lister import list_directory
 from dakara_feeder.song import Song
 
 
-CONFIG_FILE_PATH = "config.yaml"
-
-
-class Feeder:
+class DakaraFeeder:
     def __init__(self, config_name, debug):
         # get config values
         config = self.load_config(config_name, debug)
@@ -100,32 +95,3 @@ class Feeder:
             raise ValueError("Invalid loglevel in config file: '{}'".format(loglevel))
 
         coloredlogs.set_level(loglevel_numeric)
-
-
-def get_parser():
-    parser = ArgumentParser(description="Feeder for the Dakara project")
-
-    parser.add_argument(
-        "-d",
-        "--debug",
-        action="store_true",
-        help="enable debug output, increase verbosity",
-    )
-
-    parser.add_argument(
-        "--config",
-        help="path to the config file, default: '{}'".format(CONFIG_FILE_PATH),
-        default=CONFIG_FILE_PATH,
-    )
-
-    return parser
-
-
-def feed(args):
-    feeder = Feeder(args.config, args.debug)
-    feeder.feed()
-
-
-if __name__ == "__main__":
-    parser = get_parser()
-    args = parser.parse_args()
