@@ -15,7 +15,7 @@ class DakaraFeeder:
 
         # create objects
         self.dakara_server = DakaraServer(config["server"])
-        self.kara_folder = config["kara_folder"]
+        self.kara_folder = Path(config["kara_folder"])
 
         # side-effect actions
         self.dakara_server.authenticate()
@@ -30,14 +30,20 @@ class DakaraFeeder:
         new_songs_path = list_directory(self.kara_folder)
 
         # compute the diffs
-        added_songs_path, deleted_songs_path = generate_diff(old_songs_path, new_songs_path)
+        added_songs_path, deleted_songs_path = generate_diff(
+            old_songs_path, new_songs_path
+        )
 
         # songs to add
-        added_songs = [Song(song_path).get_representation() for song_path in added_songs_path]
+        added_songs = [
+            Song(song_path).get_representation() for song_path in added_songs_path
+        ]
 
         # songs to delete
-        deleted_songs_path_object = [Path(song_path) for song_path in deleted_songs_path]
-        deleted_songs = [{"filename": song_path.basename(), "directory": song_path.dirname()} for song_path in deleted_songs_path_object]
+        deleted_songs = [
+            {"filename": song_path.basename(), "directory": song_path.dirname()}
+            for song_path in deleted_songs_path
+        ]
 
         # send the two lists to server
         self.dakara_server.post_songs_diff(added_songs, deleted_songs)
