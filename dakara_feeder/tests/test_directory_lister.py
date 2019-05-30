@@ -1,9 +1,9 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-import directory_lister
+from dakara_feeder import directory_lister
 
-@patch("directory_lister.os.walk")
+@patch("dakara_feeder.directory_lister.os.walk")
 class ListDirectoryTestCase(TestCase):
     def test_list_directory(self, mocked_walk):
         # mock directory structure

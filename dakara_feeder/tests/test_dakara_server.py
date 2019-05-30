@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock, ANY
 from requests.exceptions import RequestException
 from path import Path
 
-import dakara_server
+from dakara_feeder import dakara_server
 
 
 class ServerHTTPConnectionTestCase(TestCase):
@@ -39,7 +39,7 @@ class ServerHTTPConnectionTestCase(TestCase):
         self.assertEqual(self.dakara_server.password, self.password)
         self.assertIsNone(self.dakara_server.token)
 
-    @patch('dakara_server.requests.post')
+    @patch('dakara_feeder.dakara_server.requests.post')
     def test_send_request_successful(self, mock_post):
         """Test to send a request with the generic method
         """
@@ -69,7 +69,7 @@ class ServerHTTPConnectionTestCase(TestCase):
 
         # call the method
         with self.assertRaises(ValueError):
-            with self.assertLogs("dakara_server", "DEBUG"):
+            with self.assertLogs("dakara_feeder.dakara_server", "DEBUG"):
                 self.dakara_server.send_request(
                     'invalid',
                     self.url,
@@ -77,7 +77,7 @@ class ServerHTTPConnectionTestCase(TestCase):
                     message_on_error='error message'
                 )
 
-    @patch('dakara_server.requests.post')
+    @patch('dakara_feeder.dakara_server.requests.post')
     def test_send_request_error_network(self, mock_post):
         """Test to send a request when there is a network error
         """
@@ -88,7 +88,7 @@ class ServerHTTPConnectionTestCase(TestCase):
         mock_post.side_effect = RequestException()
 
         # call the method
-        with self.assertLogs("dakara_server", "DEBUG"):
+        with self.assertLogs("dakara_feeder.dakara_server", "DEBUG"):
             self.dakara_server.send_request(
                 'post',
                 self.url,
@@ -96,7 +96,7 @@ class ServerHTTPConnectionTestCase(TestCase):
                 message_on_error='error message'
             )
 
-    @patch('dakara_server.requests.get')
+    @patch('dakara_feeder.dakara_server.requests.get')
     def test_get(self, mock_get):
         """Test the get method
         """
@@ -122,7 +122,7 @@ class ServerHTTPConnectionTestCase(TestCase):
         # assert the result
         self.assertEqual(response_obtained.data, 'data')
 
-    @patch('dakara_server.requests.post')
+    @patch('dakara_feeder.dakara_server.requests.post')
     def test_post(self, mock_post):
         """Test the post method
         """
@@ -142,7 +142,7 @@ class ServerHTTPConnectionTestCase(TestCase):
             data={'content': 'content'}
         )
 
-    @patch('dakara_server.requests.patch')
+    @patch('dakara_feeder.dakara_server.requests.patch')
     def test_patch(self, mock_patch):
         """Test the patch method
         """
@@ -162,7 +162,7 @@ class ServerHTTPConnectionTestCase(TestCase):
             data={'content': 'content'}
         )
 
-    @patch('dakara_server.requests.put')
+    @patch('dakara_feeder.dakara_server.requests.put')
     def test_put(self, mock_put):
         """Test the put method
         """
@@ -182,7 +182,7 @@ class ServerHTTPConnectionTestCase(TestCase):
             data={'content': 'content'}
         )
 
-    @patch('dakara_server.requests.post')
+    @patch('dakara_feeder.dakara_server.requests.post')
     def test_authenticate_successful(self, mock_post):
         """Test a successful authentication with the server
         """
@@ -194,7 +194,7 @@ class ServerHTTPConnectionTestCase(TestCase):
         self.assertFalse(self.dakara_server.token)
 
         # call the method
-        with self.assertLogs("dakara_server", "DEBUG"):
+        with self.assertLogs("dakara_feeder.dakara_server", "DEBUG"):
             self.dakara_server.authenticate()
 
         # call assertions
@@ -210,7 +210,7 @@ class ServerHTTPConnectionTestCase(TestCase):
         self.assertTrue(self.dakara_server.token)
         self.assertEqual(self.dakara_server.token, self.token)
 
-    @patch('dakara_server.requests.post')
+    @patch('dakara_feeder.dakara_server.requests.post')
     def test_authenticate_error_network(self, mock_post):
         """Test a network error when authenticating
         """
@@ -219,10 +219,10 @@ class ServerHTTPConnectionTestCase(TestCase):
 
         # call the method
         with self.assertRaises(dakara_server.NetworkError):
-            with self.assertLogs("dakara_server", "DEBUG"):
+            with self.assertLogs("dakara_feeder.dakara_server", "DEBUG"):
                 self.dakara_server.authenticate()
 
-    @patch('dakara_server.requests.post')
+    @patch('dakara_feeder.dakara_server.requests.post')
     def test_authenticate_error_authentication(self, mock_post):
         """Test an authentication error when authenticating
         """
@@ -232,10 +232,10 @@ class ServerHTTPConnectionTestCase(TestCase):
 
         # call the method
         with self.assertRaises(dakara_server.AuthenticationError):
-            with self.assertLogs("dakara_server", "DEBUG"):
+            with self.assertLogs("dakara_feeder.dakara_server", "DEBUG"):
                 self.dakara_server.authenticate()
 
-    @patch('dakara_server.requests.post')
+    @patch('dakara_feeder.dakara_server.requests.post')
     def test_authenticate_error_other(self, mock_post):
         """Test a server error when authenticating
         """
@@ -246,7 +246,7 @@ class ServerHTTPConnectionTestCase(TestCase):
 
         # call the method
         with self.assertRaises(dakara_server.AuthenticationError):
-            with self.assertLogs("dakara_server", "DEBUG"):
+            with self.assertLogs("dakara_feeder.dakara_server", "DEBUG"):
                 self.dakara_server.authenticate()
 
     def test_get_token_header(self):

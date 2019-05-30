@@ -1,15 +1,15 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock, ANY
 
-from feeder import Feeder
+from dakara_feeder.feeder import Feeder
 
 
 class FeederTestCase(TestCase):
     """Test the `Feeder` class
     """
 
-    @patch("feeder.list_directory")
-    @patch("feeder.DakaraServer")
+    @patch("dakara_feeder.feeder.list_directory")
+    @patch("dakara_feeder.feeder.DakaraServer")
     @patch.object(Feeder, "load_config")
     def test_feed(self, mocked_load_config, mocked_dakara_server_class, mocked_list_directory):
         """Test to feed

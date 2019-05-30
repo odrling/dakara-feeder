@@ -6,9 +6,6 @@ from path import Path
 
 import requests
 
-# enforce loglevel warning for requests log messages
-logging.getLogger("requests").setLevel(logging.WARNING)
-
 
 logger = logging.getLogger(__name__)
 

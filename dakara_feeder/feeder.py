@@ -4,10 +4,10 @@ import yaml
 import coloredlogs
 from path import Path
 
-from dakara_server import DakaraServer
-from diff_generator import generate_diff
-from directory_lister import list_directory
-from song import Song
+from dakara_feeder.dakara_server import DakaraServer
+from dakara_feeder.diff_generator import generate_diff
+from dakara_feeder.directory_lister import list_directory
+from dakara_feeder.song import Song
 
 
 CONFIG_FILE_PATH = "config.yaml"
