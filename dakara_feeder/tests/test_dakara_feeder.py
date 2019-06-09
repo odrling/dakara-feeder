@@ -32,7 +32,8 @@ class DakaraFeederTestCase(TestCase):
         feeder = DakaraFeeder(MagicMock(), MagicMock())
 
         # call the method
-        feeder.feed()
+        with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger:
+            feeder.feed()
 
         # assert the mocked calls
         mocked_dakara_server_class.return_value.get_songs.assert_called_with()
@@ -47,4 +48,14 @@ class DakaraFeederTestCase(TestCase):
                 }
             ],
             [{"filename": "song_1.mp4", "directory": "directory_1"}],
+        )
+
+        self.assertListEqual(
+            logger.output,
+            [
+                "DEBUG:dakara_feeder.dakara_feeder:Found 2 songs in server",
+                "DEBUG:dakara_feeder.dakara_feeder:Found 2 songs in local directory",
+                "DEBUG:dakara_feeder.dakara_feeder:Found 1 songs to add",
+                "DEBUG:dakara_feeder.dakara_feeder:Found 1 songs to delete",
+            ],
         )

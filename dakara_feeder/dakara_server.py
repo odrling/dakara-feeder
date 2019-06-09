@@ -87,7 +87,6 @@ class ServerHTTPConnection:
 
         try:
             response = send_method(*args, headers=self.get_token_header(), **kwargs)
-            logger.debug(response.request.body)
 
         except requests.exceptions.RequestException:
             logger.error("{}, network error".format(message_on_error))

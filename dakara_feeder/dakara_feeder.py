@@ -43,14 +43,18 @@ class DakaraFeeder:
         """
         # get list of songs on the server
         old_songs_path = self.dakara_server.get_songs()
+        logger.debug("Found %i songs in server", len(old_songs_path))
 
         # get list of songs on the local directory
         new_songs_path = list_directory(self.kara_folder)
+        logger.debug("Found %i songs in local directory", len(new_songs_path))
 
         # compute the diffs
         added_songs_path, deleted_songs_path = generate_diff(
             old_songs_path, new_songs_path
         )
+        logger.debug("Found %i songs to add", len(added_songs_path))
+        logger.debug("Found %i songs to delete", len(deleted_songs_path))
 
         # songs to add
         added_songs = [

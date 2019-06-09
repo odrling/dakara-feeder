@@ -26,7 +26,8 @@ class ListDirectoryTestCase(TestCase):
         )
 
         # call the function
-        listing = directory_lister.list_directory(Path("directory"))
+        with self.assertLogs("dakara_feeder.directory_lister", "DEBUG") as logger:
+            listing = directory_lister.list_directory(Path("directory"))
 
         # check the structure
         self.assertCountEqual(
@@ -37,6 +38,15 @@ class ListDirectoryTestCase(TestCase):
                 Path("subdirectory/file3.mkv"),
             ],
             listing,
+        )
+
+        # check the logger was called
+        self.assertListEqual(
+            logger.output,
+            [
+                "DEBUG:dakara_feeder.directory_lister:Listing directory",
+                "DEBUG:dakara_feeder.directory_lister:Listed 4 files",
+            ],
         )
 
     @patch.object(Path, "walkfiles")
@@ -55,7 +65,8 @@ class ListDirectoryTestCase(TestCase):
         )
 
         # call the function
-        listing = directory_lister.list_directory(Path("directory"))
+        with self.assertLogs("dakara_feeder.directory_lister", "DEBUG"):
+            listing = directory_lister.list_directory(Path("directory"))
 
         # check the structure
         self.assertCountEqual(
