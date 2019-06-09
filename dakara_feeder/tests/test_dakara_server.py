@@ -154,6 +154,21 @@ class ServerHTTPConnectionTestCase(TestCase):
         # assert the call
         mock_put.assert_called_with(self.url, headers=ANY, data={"content": "content"})
 
+    @patch("dakara_feeder.dakara_server.requests.delete")
+    def test_delete(self, mock_delete):
+        """Test the delete method
+        """
+        # set the token
+        self.dakara_server.token = self.token
+
+        # call the method
+        self.dakara_server.delete(self.url, data={"content": "content"})
+
+        # assert the call
+        mock_delete.assert_called_with(
+            self.url, headers=ANY, data={"content": "content"}
+        )
+
     @patch("dakara_feeder.dakara_server.requests.post")
     def test_authenticate_successful(self, mock_post):
         """Test a successful authentication with the server
@@ -312,7 +327,48 @@ class DakaraServerTestCase(TestCase):
         )
 
         # assert the mock
-        mocked_get.assert_called_with(self.url + "library/feeder/retrieve/")
+        mocked_get.assert_called_with(
+            "http://www.example.com/api/library/feeder/retrieve/"
+        )
+
+    @patch.object(dakara_server.DakaraServer, "post")
+    def test_post_song(self, mocked_post):
+        """Test to create one song on the server
+        """
+        # create song
+        song = {
+            "title": "title_0",
+            "filename": "song_0.mp4",
+            "directory": "directory_0",
+            "duration": 42,
+        }
+
+        # create the object
+        server = dakara_server.DakaraServer(self.config)
+
+        # call the method
+        server.post_song(song)
+
+        # assert the mock
+        mocked_post.assert_called_with(
+            "http://www.example.com/api/library/songs/", json=song
+        )
+
+    @patch.object(dakara_server.DakaraServer, "delete")
+    def test_delete_song(self, mocked_delete):
+        """Test to delete one song on the server
+        """
+        # create song ID
+        song_id = 42
+
+        # create the object
+        server = dakara_server.DakaraServer(self.config)
+
+        # call the method
+        server.delete_song(song_id)
+
+        # assert the mock
+        mocked_delete.assert_called_with("http://www.example.com/api/library/songs/42/")
 
     @patch.object(dakara_server.DakaraServer, "post")
     def test_post_songs_diff(self, mocked_post):
@@ -320,7 +376,12 @@ class DakaraServerTestCase(TestCase):
         """
         # create lists of songs
         added_songs = [
-            {"title": "title_0", "filename": "song_0.mp4", "directory": "directory_0"}
+            {
+                "title": "title_0",
+                "filename": "song_0.mp4",
+                "directory": "directory_0",
+                "duration": 42,
+            }
         ]
         deleted_songs = [{"filename": "song_1.mp4", "directory": "directory_1"}]
 
@@ -332,6 +393,6 @@ class DakaraServerTestCase(TestCase):
 
         # assert the mock
         mocked_post.assert_called_with(
-            self.url + "library/feeder/",
+            "http://www.example.com/api/library/feeder/",
             json={"added": added_songs, "deleted": deleted_songs},
         )

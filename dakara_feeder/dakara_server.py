@@ -194,10 +194,20 @@ class DakaraServer(ServerHTTPConnection):
         ]
 
     def post_song(self, song):
+        """Create one song on the server
+
+        Args:
+            song (dict): new song representation.
+        """
         url = self.server_url + "library/songs/"
         self.post(url, json=song)
 
     def delete_song(self, song_id):
+        """Delete one song on the server
+
+        Args:
+            song_id (int): ID of the song to delete.
+        """
         url = self.server_url + "library/songs/{}/".format(song_id)
         self.delete(url)
 
