@@ -18,10 +18,10 @@ class ListDirectoryTestCase(TestCase):
         mocked_walkfiles.return_value = (
             item
             for item in [
-                Path("directory/file0"),
-                Path("directory/file1"),
-                Path("directory/subdirectory/file2"),
-                Path("directory/subdirectory/file3"),
+                Path("directory/file0.mkv"),
+                Path("directory/file1.mkv"),
+                Path("directory/subdirectory/file2.mkv"),
+                Path("directory/subdirectory/file3.mkv"),
             ]
         )
 
@@ -31,10 +31,33 @@ class ListDirectoryTestCase(TestCase):
         # check the structure
         self.assertCountEqual(
             [
-                Path("file0"),
-                Path("file1"),
-                Path("subdirectory/file2"),
-                Path("subdirectory/file3"),
+                Path("file0.mkv"),
+                Path("file1.mkv"),
+                Path("subdirectory/file2.mkv"),
+                Path("subdirectory/file3.mkv"),
             ],
             listing,
+        )
+
+    @patch.object(Path, "walkfiles")
+    def test_list_directory_with_extra_files(self, mocked_walkfiles):
+        """Test to list a directory with extra unwanted files
+        """
+        # mock directory structure
+        mocked_walkfiles.return_value = (
+            item
+            for item in [
+                Path("directory/file0.mkv"),
+                Path("directory/file1.other"),
+                Path("directory/subdirectory/file2.mp4"),
+                Path("directory/subdirectory/file3.other"),
+            ]
+        )
+
+        # call the function
+        listing = directory_lister.list_directory(Path("directory"))
+
+        # check the structure
+        self.assertCountEqual(
+            [Path("file0.mkv"), Path("subdirectory/file2.mp4")], listing
         )
