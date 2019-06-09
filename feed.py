@@ -37,9 +37,12 @@ def feed(args):
     """Execute the feed action
     """
     feeder = DakaraFeeder(Path(args.config), args.debug)
+    feeder.configure_logger()
     feeder.feed()
 
 
 if __name__ == "__main__":
     parser = get_parser()
     args = parser.parse_args()
+
+    feed(args)

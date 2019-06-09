@@ -87,6 +87,7 @@ class ServerHTTPConnection:
 
         try:
             response = send_method(*args, headers=self.get_token_header(), **kwargs)
+            logger.debug(response.request.body)
 
         except requests.exceptions.RequestException:
             logger.error("{}, network error".format(message_on_error))
@@ -179,7 +180,7 @@ class DakaraServer(ServerHTTPConnection):
         Returns:
             list: list of path on the songs.
         """
-        url = self.server_url + "/feeder/retrieve"
+        url = self.server_url + "library/feeder/retrieve/"
         response = self.get(url)
 
         # join the directory and the filename
@@ -192,10 +193,10 @@ class DakaraServer(ServerHTTPConnection):
             added_songs (list): list of new songs.
             deleted_songs (list): list of deleted songs.
         """
-        url = self.server_url + "/feeder"
+        url = self.server_url + "library/feeder/"
         data = {"added": added_songs, "deleted": deleted_songs}
 
-        self.post(url, data=data)
+        self.post(url, json=data)
 
 
 def display_message(message, limit=100):

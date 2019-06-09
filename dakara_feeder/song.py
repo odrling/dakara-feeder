@@ -21,4 +21,5 @@ class Song:
             "title": self.path.stem,
             "filename": self.path.basename(),
             "directory": self.path.dirname(),
+            "duration": 0,
         }

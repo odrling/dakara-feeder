@@ -312,7 +312,7 @@ class DakaraServerTestCase(TestCase):
         )
 
         # assert the mock
-        mocked_get.assert_called_with(self.url + "/feeder/retrieve")
+        mocked_get.assert_called_with(self.url + "library/feeder/retrieve/")
 
     @patch.object(dakara_server.DakaraServer, "post")
     def test_post_songs_diff(self, mocked_post):
@@ -332,5 +332,6 @@ class DakaraServerTestCase(TestCase):
 
         # assert the mock
         mocked_post.assert_called_with(
-            self.url + "/feeder", data={"added": added_songs, "deleted": deleted_songs}
+            self.url + "library/feeder/",
+            json={"added": added_songs, "deleted": deleted_songs},
         )

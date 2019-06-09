@@ -33,6 +33,7 @@ class DakaraFeeder:
         # create objects
         self.dakara_server = DakaraServer(config["server"])
         self.kara_folder = Path(config["kara_folder"])
+        self.config = config
 
         # side-effect actions
         self.dakara_server.authenticate()

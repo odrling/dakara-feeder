@@ -38,6 +38,13 @@ class DakaraFeederTestCase(TestCase):
         mocked_dakara_server_class.return_value.get_songs.assert_called_with()
         mocked_list_directory.assert_called_with(ANY)
         mocked_dakara_server_class.return_value.post_songs_diff.assert_called_with(
-            [{"title": "song_2", "filename": "song_2.mp4", "directory": "directory_2"}],
+            [
+                {
+                    "title": "song_2",
+                    "filename": "song_2.mp4",
+                    "directory": "directory_2",
+                    "duration": 0,
+                }
+            ],
             [{"filename": "song_1.mp4", "directory": "directory_1"}],
         )
