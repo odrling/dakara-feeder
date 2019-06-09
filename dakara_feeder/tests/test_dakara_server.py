@@ -292,8 +292,8 @@ class DakaraServerTestCase(TestCase):
         """
         # create the mock
         mocked_get.return_value.json.return_value = [
-            {"filename": "song_0.mp4", "directory": "directory_0"},
-            {"filename": "song_1.mp4", "directory": "directory_1"},
+            {"filename": "song_0.mp4", "directory": "directory_0", "id": 0},
+            {"filename": "song_1.mp4", "directory": "directory_1", "id": 1},
         ]
 
         # create the object
@@ -306,8 +306,8 @@ class DakaraServerTestCase(TestCase):
         self.assertCountEqual(
             songs_list,
             [
-                Path("directory_0/song_0.mp4").normpath(),
-                Path("directory_1/song_1.mp4").normpath(),
+                {"path": Path("directory_0/song_0.mp4").normpath(), "id": 0},
+                {"path": Path("directory_1/song_1.mp4").normpath(), "id": 1},
             ],
         )
 

@@ -20,8 +20,8 @@ class DakaraFeederTestCase(TestCase):
         """
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = [
-            Path("directory_0/song_0.mp4"),
-            Path("directory_1/song_1.mp4"),
+            {"id": 0, "path": Path("directory_0/song_0.mp4")},
+            {"id": 1, "path": Path("directory_1/song_1.mp4")},
         ]
         mocked_list_directory.return_value = [
             Path("directory_0/song_0.mp4"),
@@ -38,17 +38,15 @@ class DakaraFeederTestCase(TestCase):
         # assert the mocked calls
         mocked_dakara_server_class.return_value.get_songs.assert_called_with()
         mocked_list_directory.assert_called_with(ANY)
-        mocked_dakara_server_class.return_value.post_songs_diff.assert_called_with(
-            [
-                {
-                    "title": "song_2",
-                    "filename": "song_2.mp4",
-                    "directory": "directory_2",
-                    "duration": 0,
-                }
-            ],
-            [{"filename": "song_1.mp4", "directory": "directory_1"}],
+        mocked_dakara_server_class.return_value.post_song.assert_called_with(
+            {
+                "title": "song_2",
+                "filename": "song_2.mp4",
+                "directory": "directory_2",
+                "duration": 0,
+            }
         )
+        mocked_dakara_server_class.return_value.delete_song.assert_called_with(1)
 
         self.assertListEqual(
             logger.output,

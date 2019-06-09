@@ -42,8 +42,11 @@ class DakaraFeeder:
         """Execute the feeding action
         """
         # get list of songs on the server
-        old_songs_path = self.dakara_server.get_songs()
-        logger.debug("Found %i songs in server", len(old_songs_path))
+        old_songs = self.dakara_server.get_songs()
+        logger.debug("Found %i songs in server", len(old_songs))
+
+        old_songs_id_by_path = {song["path"]: song["id"] for song in old_songs}
+        old_songs_path = list(old_songs_id_by_path.keys())
 
         # get list of songs on the local directory
         new_songs_path = list_directory(self.kara_folder)
@@ -62,13 +65,17 @@ class DakaraFeeder:
         ]
 
         # songs to delete
-        deleted_songs = [
-            {"filename": song_path.basename(), "directory": song_path.dirname()}
-            for song_path in deleted_songs_path
+        deleted_songs_id = [
+            old_songs_id_by_path[song_path] for song_path in deleted_songs_path
         ]
 
-        # send the two lists to server
-        self.dakara_server.post_songs_diff(added_songs, deleted_songs)
+        # create added songs on server
+        for song in added_songs:
+            self.dakara_server.post_song(song)
+
+        # remove deleted songs on server
+        for song_id in deleted_songs_id:
+            self.dakara_server.delete_song(song_id)
 
     @staticmethod
     def load_config(config_path, debug):

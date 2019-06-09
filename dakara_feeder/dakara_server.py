@@ -124,6 +124,11 @@ class ServerHTTPConnection:
         """
         return self.send_request("patch", *args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        """Generic method to patch data on server
+        """
+        return self.send_request("delete", *args, **kwargs)
+
     def authenticate(self):
         """Connect to the server
 
@@ -183,7 +188,18 @@ class DakaraServer(ServerHTTPConnection):
         response = self.get(url)
 
         # join the directory and the filename
-        return [Path(song["directory"]) / song["filename"] for song in response.json()]
+        return [
+            {"path": Path(song["directory"]) / song["filename"], "id": song["id"]}
+            for song in response.json()
+        ]
+
+    def post_song(self, song):
+        url = self.server_url + "library/songs/"
+        self.post(url, json=song)
+
+    def delete_song(self, song_id):
+        url = self.server_url + "library/songs/{}/".format(song_id)
+        self.delete(url)
 
     def post_songs_diff(self, added_songs, deleted_songs):
         """Post the lists of added and deleted songs
