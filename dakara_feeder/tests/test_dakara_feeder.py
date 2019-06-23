@@ -44,6 +44,13 @@ class DakaraFeederTestCase(TestCase):
                 "filename": "song_2.mp4",
                 "directory": "directory_2",
                 "duration": 0,
+                "artists": [],
+                "works": [],
+                "tags": [],
+                "version": "",
+                "detail": "",
+                "detail_video": "",
+                "lyrics": "",
             }
         )
         mocked_dakara_server_class.return_value.delete_song.assert_called_with(1)
