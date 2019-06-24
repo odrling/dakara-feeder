@@ -4,6 +4,7 @@ import yaml
 import coloredlogs
 from path import Path
 
+from dakara_feeder.exceptions import DakaraFeederError
 from dakara_feeder.dakara_server import DakaraServer
 from dakara_feeder.diff_generator import generate_diff
 from dakara_feeder.directory_lister import list_directory
@@ -92,7 +93,7 @@ class DakaraFeeder:
 
         # check the config file is present
         if not config_path.exists():
-            raise IOError("No config file found")
+            raise ConfigError("No config file found")
 
         # load and parse the file
         with open(config_path) as file:
@@ -100,12 +101,12 @@ class DakaraFeeder:
                 config = yaml.load(file, Loader=yaml.Loader)
 
             except yaml.parser.ParserError as error:
-                raise IOError("Unable to read config file") from error
+                raise ConfigError("Unable to read config file") from error
 
         # check file content
         for key in ("server", "kara_folder"):
             if key not in config:
-                raise ValueError("Invalid config file, missing '{}'".format(key))
+                raise ConfigError("Invalid config file, missing '{}'".format(key))
 
         # if debug is set as argument, override the config
         if debug:
@@ -127,6 +128,11 @@ class DakaraFeeder:
         # otherwise check if it is valid and apply it
         loglevel_numeric = getattr(logging, loglevel.upper(), None)
         if not isinstance(loglevel_numeric, int):
-            raise ValueError("Invalid loglevel in config file: '{}'".format(loglevel))
+            raise ConfigError("Invalid loglevel in config file: '{}'".format(loglevel))
 
         coloredlogs.set_level(loglevel_numeric)
+
+
+class ConfigError(DakaraFeederError):
+    """Error when reading the configuration file
+    """

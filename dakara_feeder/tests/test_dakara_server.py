@@ -64,7 +64,7 @@ class ServerHTTPConnectionTestCase(TestCase):
         self.dakara_server.token = self.token
 
         # call the method
-        with self.assertRaises(ValueError):
+        with self.assertRaises(dakara_server.MethodError):
             with self.assertLogs("dakara_feeder.dakara_server", "DEBUG"):
                 self.dakara_server.send_request(
                     "invalid",

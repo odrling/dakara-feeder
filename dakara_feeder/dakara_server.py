@@ -1,9 +1,10 @@
 import logging
 import urllib.parse
 
+import requests
 from path import Path
 
-import requests
+from dakara_feeder.exceptions import DakaraFeederError
 
 
 logger = logging.getLogger(__name__)
@@ -57,7 +58,7 @@ class ServerHTTPConnection:
             self.password = config["password"]
 
         except KeyError as error:
-            raise ValueError(
+            raise ParameterError(
                 "Missing parameter in server config: {}".format(error)
             ) from error
 
@@ -73,11 +74,11 @@ class ServerHTTPConnection:
                 error. It should describe what the request was about.
 
         Raises:
-            ValueError: if the method is not supported.
+            MethodError: if the method is not supported.
         """
         # handle method function
         if not hasattr(requests, method):
-            raise ValueError("Method {} not supported".format(method))
+            raise MethodError("Method {} not supported".format(method))
 
         send_method = getattr(requests, method)
 
@@ -233,11 +234,26 @@ def display_message(message, limit=100):
     return message[: limit - 3].strip() + "..."
 
 
-class AuthenticationError(Exception):
+class DakaraServerError(DakaraFeederError):
+    """Basic exception class for the module
+    """
+
+
+class ParameterError(DakaraServerError, ValueError):
+    """Error raised when server parameters are unproperly set
+    """
+
+
+class MethodError(DakaraServerError, ValueError):
+    """Error raised when using an unsupported method
+    """
+
+
+class AuthenticationError(DakaraServerError):
     """Error raised when authentication fails
     """
 
 
-class NetworkError(Exception):
+class NetworkError(DakaraServerError):
     """Error raised when the communication fails during a critical task
     """
