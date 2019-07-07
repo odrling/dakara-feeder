@@ -1,3 +1,6 @@
+from dakara_feeder.metadata_parser import FFProbeMetadataParser
+
+
 class Song:
     """Class describing a song
 
@@ -18,7 +21,8 @@ class Song:
         pass
 
     def get_duration(self):
-        return 0
+        parser = FFProbeMetadataParser.parse(self.path)
+        return parser.duration.total_seconds()
 
     def get_artists(self):
         return []

@@ -1,20 +1,27 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock, ANY
+from datetime import timedelta
 
 from path import Path
 
 from dakara_feeder.dakara_feeder import DakaraFeeder
+from dakara_feeder.metadata_parser import FFProbeMetadataParser
 
 
 class DakaraFeederTestCase(TestCase):
     """Test the `Feeder` class
     """
 
+    @patch.object(FFProbeMetadataParser, "parse")
     @patch("dakara_feeder.dakara_feeder.list_directory")
     @patch("dakara_feeder.dakara_feeder.DakaraServer")
     @patch.object(DakaraFeeder, "load_config")
     def test_feed(
-        self, mocked_load_config, mocked_dakara_server_class, mocked_list_directory
+        self,
+        mocked_load_config,
+        mocked_dakara_server_class,
+        mocked_list_directory,
+        mocked_parse,
     ):
         """Test to feed
         """
@@ -27,6 +34,7 @@ class DakaraFeederTestCase(TestCase):
             Path("directory_0/song_0.mp4"),
             Path("directory_2/song_2.mp4"),
         ]
+        mocked_parse.return_value.duration = timedelta(seconds=1)
 
         # create the object
         feeder = DakaraFeeder(MagicMock(), MagicMock())
@@ -43,7 +51,7 @@ class DakaraFeederTestCase(TestCase):
                 "title": "song_2",
                 "filename": "song_2.mp4",
                 "directory": "directory_2",
-                "duration": 0,
+                "duration": 1,
                 "artists": [],
                 "works": [],
                 "tags": [],
