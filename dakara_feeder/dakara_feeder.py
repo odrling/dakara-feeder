@@ -50,19 +50,25 @@ class DakaraFeeder:
         old_songs_path = list(old_songs_id_by_path.keys())
 
         # get list of songs on the local directory
-        new_songs_path = list_directory(self.kara_folder)
-        logger.debug("Found %i songs in local directory", len(new_songs_path))
+        new_songs_paths = list_directory(self.kara_folder)
+        logger.debug("Found %i songs in local directory", len(new_songs_paths))
+        new_songs_video_path = [song.video for song in new_songs_paths]
+
+        # create map of new songs
+        new_songs_paths_map = {song.video: song for song in new_songs_paths}
 
         # compute the diffs
         added_songs_path, deleted_songs_path = generate_diff(
-            old_songs_path, new_songs_path
+            old_songs_path, new_songs_video_path
         )
         logger.debug("Found %i songs to add", len(added_songs_path))
         logger.debug("Found %i songs to delete", len(deleted_songs_path))
 
         # songs to add
+        # recover the song paths with the path of the video
         added_songs = [
-            Song(song_path).get_representation() for song_path in added_songs_path
+            Song(self.kara_folder, new_songs_paths_map[song_path]).get_representation()
+            for song_path in added_songs_path
         ]
 
         # songs to delete

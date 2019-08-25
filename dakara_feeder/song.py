@@ -5,14 +5,17 @@ class Song:
     """Class describing a song
 
     Args.
-        path (path.Path): path to the song file.
+        base_directory (path.Path): path to the scanned directory.
+        paths (directory_lister.SongPaths): paths of the song file.
 
     Attributes:
-        path (path.Path): path to the song file.
+        base_directory (path.Path): path to the scanned directory.
+        video_path (path.Path): path to the song file, relative to the base directory.
     """
 
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, base_directory, paths):
+        self.base_directory = base_directory
+        self.video_path = paths.video
 
     def pre_process(self):
         pass
@@ -21,7 +24,7 @@ class Song:
         pass
 
     def get_duration(self):
-        parser = FFProbeMetadataParser.parse(self.path)
+        parser = FFProbeMetadataParser.parse(self.base_directory / self.video_path)
         return parser.duration.total_seconds()
 
     def get_artists(self):
@@ -53,9 +56,9 @@ class Song:
         """
         self.pre_process()
         representation = {
-            "title": self.path.stem,
-            "filename": self.path.basename(),
-            "directory": self.path.dirname(),
+            "title": self.video_path.stem,
+            "filename": str(self.video_path.basename()),
+            "directory": str(self.video_path.dirname()),
             "duration": self.get_duration(),
             "artists": self.get_artists(),
             "works": self.get_works(),
