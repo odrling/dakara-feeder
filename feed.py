@@ -3,9 +3,10 @@ import logging
 from argparse import ArgumentParser
 
 from path import Path
+from dakara_base.exception import DakaraError
+from dakara_base.config import load_config, create_logger, set_loglevel
 
 from dakara_feeder.dakara_feeder import DakaraFeeder
-from dakara_feeder.exceptions import DakaraFeederError
 
 
 CONFIG_FILE_PATH = "config.yaml"
@@ -40,9 +41,20 @@ def get_parser():
 
 def feed(args):
     """Execute the feed action
+
+    Args:
+        args (argparse.Namespace): arguments from command line.
     """
-    feeder = DakaraFeeder(Path(args.config), args.debug)
-    feeder.configure_logger()
+    # prepare execution
+    create_logger()
+    config = load_config(
+        Path(args.config), args.debug, mandatory_keys=["kara_folder", "server"]
+    )
+    set_loglevel(config)
+
+    # do the actual feeding
+    feeder = DakaraFeeder(config)
+    feeder.load()
     feeder.feed()
 
 
@@ -53,16 +65,30 @@ if __name__ == "__main__":
     try:
         feed(args)
 
-    except DakaraFeederError as error:
+    except KeyboardInterrupt:
+        logger.info("Quit by user")
+        exit(255)
+
+    except SystemExit:
+        logger.info("Quit by system")
+        exit(254)
+
+    except DakaraError as error:
+        if args.debug:
+            raise
+
         logger.critical(error)
         exit(1)
 
     except BaseException as error:
+        if args.debug:
+            raise
+
         logger.exception("Unexpected error: {}".format(error))
         logger.critical(
             "Please fill a bug report at "
             "https://github.com/DakaraProject/dakara-feeder/issues"
         )
-        exit(255)
+        exit(128)
 
     exit(0)

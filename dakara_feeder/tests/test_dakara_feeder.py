@@ -17,13 +17,8 @@ class DakaraFeederTestCase(TestCase):
     @patch.object(FFProbeMetadataParser, "parse")
     @patch("dakara_feeder.dakara_feeder.list_directory")
     @patch("dakara_feeder.dakara_feeder.DakaraServer")
-    @patch.object(DakaraFeeder, "load_config")
     def test_feed(
-        self,
-        mocked_load_config,
-        mocked_dakara_server_class,
-        mocked_list_directory,
-        mocked_parse,
+        self, mocked_dakara_server_class, mocked_list_directory, mocked_parse
     ):
         """Test to feed
         """
@@ -39,7 +34,7 @@ class DakaraFeederTestCase(TestCase):
         mocked_parse.return_value.duration = timedelta(seconds=1)
 
         # create the object
-        feeder = DakaraFeeder(MagicMock(), MagicMock())
+        feeder = DakaraFeeder(MagicMock())
 
         # call the method
         with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger:
@@ -81,16 +76,18 @@ class DakaraFeederIntegrationTestCase(TestCase):
     """
 
     @patch("dakara_feeder.dakara_feeder.DakaraServer")
-    @patch.object(DakaraFeeder, "load_config")
-    def test_feed(self, mocked_load_config, mocked_dakara_server_class):
+    def test_feed(self, mocked_dakara_server_class):
         """Test to feed
         """
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = []
 
         # create the object
-        feeder = DakaraFeeder(MagicMock(), MagicMock())
-        feeder.kara_folder = get_file("dakara_feeder.tests.resources", "")
+        config = {
+            "server": {},
+            "kara_folder": get_file("dakara_feeder.tests.resources", ""),
+        }
+        feeder = DakaraFeeder(config)
 
         # call the method
         with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG"):
