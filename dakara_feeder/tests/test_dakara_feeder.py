@@ -11,7 +11,7 @@ from dakara_feeder.metadata_parser import FFProbeMetadataParser
 
 
 class DakaraFeederTestCase(TestCase):
-    """Test the `Feeder` class
+    """Test the feeder class
     """
 
     @patch.object(FFProbeMetadataParser, "parse", autoset=True)

@@ -18,9 +18,9 @@ class DakaraFeeder:
         config (dict): dictionary of config.
 
     Attributes:
-        config (dict): config of the feeder.
-        dakara_server (dakara_server.DakaraServer): connection to the Dakara server.
-        kara_folder (path.Path): path to the folder containing karaoke files.
+        dakara_server (dakara_server.DakaraServer): client for the Dakara server.
+        kara_folder (path.Path): path to the scanned folder containing karaoke
+            files.
     """
 
     def __init__(self, config):

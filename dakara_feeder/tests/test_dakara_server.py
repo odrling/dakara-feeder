@@ -7,7 +7,7 @@ from dakara_feeder import dakara_server
 
 
 class DakaraServerTestCase(TestCase):
-    """Test the `DakaraServer` class
+    """Test the Dakara client
     """
 
     def setUp(self):
