@@ -16,9 +16,8 @@ def list_directory(path):
         path (path.Path): Path of directory to scan.
 
     Returns:
-        list of dict: the dictionary contains the path of the video, of the
-        subtitle and of other files (see group_by_type). Path of each file is
-        relative to the given path.
+        list of SongPaths: paths of the files for each song. Paths are relative
+        to the given path.
     """
     logger.debug("Listing %s", path)
     files_list = [p.relpath(path) for p in path.walkfiles()]
@@ -42,10 +41,7 @@ def group_by_type(files):
         files (list of path.Path): list of files to group.
 
     Returns:
-        list of dict: For each video files, returns a dictionary with the keys:
-            - "video" contains the path to the video file;
-            - "subtitle" contains the path to the subtitle file;
-            - "others" contains the different other files.
+        list of SongPaths: paths of the files for each song.
     """
     # sort files by their extension
     videos = []
@@ -73,10 +69,32 @@ def group_by_type(files):
 
     # recombine the files
     return [
-        {
-            "video": video,
-            "subtitle": subtitles[0] if subtitles else None,
-            "others": others,
-        }
+        SongPaths(video, subtitles[0] if subtitles else None, others)
         for video in videos
     ]
+
+
+class SongPaths:
+    """Paths of files related to a song
+
+    Attributes:
+        video (path.Path): Path to the video file.
+        subtitle (path.Path): Path to the subtitle file.
+        others (list of path.Path): Paths of other files.
+    """
+
+    def __init__(self, video, subtitle=None, others=[]):
+        self.video = video
+        self.subtitle = subtitle
+        self.others = others
+
+    def __eq__(self, other):
+        return self.__hash__() == other.__hash__()
+
+    def __hash__(self):
+        return hash(str(self))
+
+    def __repr__(self):
+        return "video: {}, subtitle: {}, others: {}".format(
+            self.video, self.subtitle, self.others
+        )

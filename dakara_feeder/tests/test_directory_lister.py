@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from path import Path
 
-from dakara_feeder import directory_lister
+from dakara_feeder.directory_lister import list_directory, group_by_type, SongPaths
 
 
 class ListDirectoryTestCase(TestCase):
@@ -33,32 +33,18 @@ class ListDirectoryTestCase(TestCase):
 
         # call the function
         with self.assertLogs("dakara_feeder.directory_lister", "DEBUG") as logger:
-            listing = directory_lister.list_directory(Path("directory"))
+            listing = list_directory(Path("directory"))
 
         # check the structure
         self.assertEqual(len(listing), 4)
         self.assertCountEqual(
             [
-                {
-                    "video": Path("file0.mkv"),
-                    "subtitle": Path("file0.ass"),
-                    "others": [],
-                },
-                {
-                    "video": Path("file1.mkv"),
-                    "subtitle": Path("file1.ass"),
-                    "others": [],
-                },
-                {
-                    "video": Path("subdirectory/file2.mkv"),
-                    "subtitle": None,
-                    "others": [],
-                },
-                {
-                    "video": Path("subdirectory/file3.mkv"),
-                    "subtitle": Path("subdirectory/file3.ass"),
-                    "others": [],
-                },
+                SongPaths(Path("file0.mkv"), Path("file0.ass")),
+                SongPaths(Path("file1.mkv"), Path("file1.ass")),
+                SongPaths(Path("subdirectory/file2.mkv")),
+                SongPaths(
+                    Path("subdirectory/file3.mkv"), Path("subdirectory/file3.ass")
+                ),
             ],
             listing,
         )
@@ -81,28 +67,23 @@ class GroupByTypeTestCase(TestCase):
     def test_one_video_one_subtitle(self):
         """Test to group one video and one subtitle
         """
-        results = directory_lister.group_by_type([Path("video.mp4"), Path("video.ass")])
+        results = group_by_type([Path("video.mp4"), Path("video.ass")])
 
         self.assertEqual(len(results), 1)
-        self.assertDictEqual(
-            results[0],
-            {"video": Path("video.mp4"), "subtitle": Path("video.ass"), "others": []},
-        )
+        self.assertEqual(results[0], SongPaths(Path("video.mp4"), Path("video.ass")))
 
     def test_one_video_no_subtitle(self):
         """Test to group one video and no subtitle
         """
-        results = directory_lister.group_by_type([Path("video.mp4")])
+        results = group_by_type([Path("video.mp4")])
 
         self.assertEqual(len(results), 1)
-        self.assertDictEqual(
-            results[0], {"video": Path("video.mp4"), "subtitle": None, "others": []}
-        )
+        self.assertEqual(results[0], SongPaths(Path("video.mp4")))
 
     def test_one_video_one_subtitle_plus_others(self):
         """Test to group one video, one subtitle and other files
         """
-        results = directory_lister.group_by_type(
+        results = group_by_type(
             [
                 Path("video.mp4"),
                 Path("video.ass"),
@@ -112,20 +93,20 @@ class GroupByTypeTestCase(TestCase):
         )
 
         self.assertEqual(len(results), 1)
-        self.assertDictEqual(
+        self.assertEqual(
             results[0],
-            {
-                "video": Path("video.mp4"),
-                "subtitle": Path("video.ass"),
-                "others": [Path("video.other"), Path("video.dat")],
-            },
+            SongPaths(
+                Path("video.mp4"),
+                Path("video.ass"),
+                [Path("video.other"), Path("video.dat")],
+            ),
         )
 
     def test_one_video_two_subtitles(self):
         """Test to group one video and two subtitles
         """
         with self.assertLogs("dakara_feeder.directory_lister") as logger:
-            results = directory_lister.group_by_type(
+            results = group_by_type(
                 [Path("video.mp4"), Path("video.ass"), Path("video.ssa")]
             )
 
@@ -142,14 +123,14 @@ class GroupByTypeTestCase(TestCase):
     def test_no_video_no_subtitle_other(self):
         """Test to group no video, no subtitle and one other file
         """
-        results = directory_lister.group_by_type([Path("other.dat")])
+        results = group_by_type([Path("other.dat")])
 
         self.assertEqual(len(results), 0)
 
     def test_two_videos_one_subtitle(self):
         """Test to group two videos and one subtitle
         """
-        results = directory_lister.group_by_type(
+        results = group_by_type(
             [Path("video.mp4"), Path("video.mkv"), Path("video.ass")]
         )
 
@@ -157,26 +138,15 @@ class GroupByTypeTestCase(TestCase):
         self.assertCountEqual(
             results,
             [
-                {
-                    "video": Path("video.mp4"),
-                    "subtitle": Path("video.ass"),
-                    "others": [],
-                },
-                {
-                    "video": Path("video.mkv"),
-                    "subtitle": Path("video.ass"),
-                    "others": [],
-                },
+                SongPaths(Path("video.mp4"), Path("video.ass")),
+                SongPaths(Path("video.mkv"), Path("video.ass")),
             ],
         )
 
     def test_one_video_upper_case_one_subtitle(self):
         """Test to group one video with uppercase extension and one subtitle
         """
-        results = directory_lister.group_by_type([Path("video.MP4"), Path("video.ass")])
+        results = group_by_type([Path("video.MP4"), Path("video.ass")])
 
         self.assertEqual(len(results), 1)
-        self.assertDictEqual(
-            results[0],
-            {"video": Path("video.MP4"), "subtitle": Path("video.ass"), "others": []},
-        )
+        self.assertEqual(results[0], SongPaths(Path("video.MP4"), Path("video.ass")))
