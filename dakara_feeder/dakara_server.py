@@ -1,7 +1,7 @@
 import logging
 
-from path import Path
 from dakara_base.http_client import HTTPClient
+from path import Path
 
 
 logger = logging.getLogger(__name__)

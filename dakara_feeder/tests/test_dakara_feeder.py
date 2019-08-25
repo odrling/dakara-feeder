@@ -1,6 +1,6 @@
-from unittest import TestCase
-from unittest.mock import patch, MagicMock, ANY
 from datetime import timedelta
+from unittest import TestCase
+from unittest.mock import ANY, MagicMock, patch
 
 from dakara_base.resources_manager import get_file
 from path import Path

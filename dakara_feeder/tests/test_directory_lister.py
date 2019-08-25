@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from path import Path
 
-from dakara_feeder.directory_lister import list_directory, group_by_type, SongPaths
+from dakara_feeder.directory_lister import group_by_type, list_directory, SongPaths
 
 
 class ListDirectoryTestCase(TestCase):
