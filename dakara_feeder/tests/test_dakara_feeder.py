@@ -14,9 +14,9 @@ class DakaraFeederTestCase(TestCase):
     """Test the `Feeder` class
     """
 
-    @patch.object(FFProbeMetadataParser, "parse")
-    @patch("dakara_feeder.dakara_feeder.list_directory")
-    @patch("dakara_feeder.dakara_feeder.DakaraServer")
+    @patch.object(FFProbeMetadataParser, "parse", autoset=True)
+    @patch("dakara_feeder.dakara_feeder.list_directory", autoset=True)
+    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
     def test_feed(
         self, mocked_dakara_server_class, mocked_list_directory, mocked_parse
     ):
@@ -75,7 +75,7 @@ class DakaraFeederIntegrationTestCase(TestCase):
     """Integration test for the Feeder class
     """
 
-    @patch("dakara_feeder.dakara_feeder.DakaraServer")
+    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
     def test_feed(self, mocked_dakara_server_class):
         """Test to feed
         """

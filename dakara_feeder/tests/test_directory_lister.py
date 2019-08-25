@@ -12,7 +12,7 @@ class ListDirectoryTestCase(TestCase):
 
     maxDiff = None
 
-    @patch.object(Path, "walkfiles")
+    @patch.object(Path, "walkfiles", autoset=True)
     def test_list_directory(self, mocked_walkfiles):
         """Test to list a directory
         """

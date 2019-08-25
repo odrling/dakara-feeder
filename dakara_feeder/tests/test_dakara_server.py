@@ -31,7 +31,7 @@ class DakaraServerTestCase(TestCase):
             "address": self.address,
         }
 
-    @patch.object(dakara_server.DakaraServer, "get")
+    @patch.object(dakara_server.DakaraServer, "get", autoset=True)
     def test_get_songs(self, mocked_get):
         """Test to obtain the list of song paths
         """
@@ -61,7 +61,7 @@ class DakaraServerTestCase(TestCase):
         # assert the mock
         mocked_get.assert_called_with("library/feeder/retrieve/")
 
-    @patch.object(dakara_server.DakaraServer, "post")
+    @patch.object(dakara_server.DakaraServer, "post", autoset=True)
     def test_post_song(self, mocked_post):
         """Test to create one song on the server
         """
@@ -84,7 +84,7 @@ class DakaraServerTestCase(TestCase):
         # assert the mock
         mocked_post.assert_called_with("library/songs/", json=song)
 
-    @patch.object(dakara_server.DakaraServer, "delete")
+    @patch.object(dakara_server.DakaraServer, "delete", autoset=True)
     def test_delete_song(self, mocked_delete):
         """Test to delete one song on the server
         """
@@ -102,7 +102,7 @@ class DakaraServerTestCase(TestCase):
         # assert the mock
         mocked_delete.assert_called_with("library/songs/42/")
 
-    @patch.object(dakara_server.DakaraServer, "post")
+    @patch.object(dakara_server.DakaraServer, "post", autoset=True)
     def test_post_songs_diff(self, mocked_post):
         """Test to post the list of diff songs
         """
