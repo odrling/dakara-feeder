@@ -6,42 +6,57 @@ logger = logging.getLogger(__name__)
 
 
 VIDEO_EXTENSIONS = [".avi", ".mkv", ".mp4", ".mpeg", ".mpg", ".vob", ".webm"]
-SUBTITLE_EXTENSIONS = []
+SUBTITLE_EXTENSIONS = [".ass", ".ssa"]
 
 
 def list_directory(path):
-    """List files in local directory
-
-    Must be video files.
+    """List video files in given directory recursively
 
     Args:
         path (path.Path): Path of directory to scan.
 
     Returns:
-        list: each file in the directory and its subdirectories. Path of
-            each file is relative to the given path.
+        list of dict: the dictionary contains the path of the video, of the
+        subtitle and of other files (see group_by_type). Path of each file is
+        relative to the given path.
     """
     logger.debug("Listing %s", path)
-    files_list = path.walkfiles()
+    files_list = [p.relpath(path) for p in path.walkfiles()]
     logger.debug("Listed %i files", len(files_list))
 
-    return [
+    listing = [
         item
         for _, files in groupby(files_list, lambda f: f.stem)
         for item in group_by_type(files)
     ]
 
+    logger.debug("Found %i different videos", len(listing))
+
+    return listing
+
+
 def group_by_type(files):
+    """Group files by extension
+
+    Args:
+        files (list of path.Path): list of files to group.
+
+    Returns:
+        list of dict: For each video files, returns a dictionary with the keys:
+            - "video" contains the path to the video file;
+            - "subtitle" contains the path to the subtitle file;
+            - "others" contains the different other files.
+    """
     # sort files by their extension
     videos = []
     subtitles = []
     others = []
     for file in files:
-        if file.ext in VIDEO_EXTENSIONS:
+        if file.ext.lower() in VIDEO_EXTENSIONS:
             videos.append(file)
             continue
 
-        if file.ext in SUBTITLE_EXTENSIONS:
+        if file.ext.lower() in SUBTITLE_EXTENSIONS:
             subtitles.append(file)
             continue
 
@@ -61,6 +76,7 @@ def group_by_type(files):
         {
             "video": video,
             "subtitle": subtitles[0] if subtitles else None,
-            "others": others
-        } for video in videos
+            "others": others,
+        }
+        for video in videos
     ]
