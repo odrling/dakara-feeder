@@ -1,6 +1,6 @@
 from datetime import timedelta
 from unittest import TestCase
-from unittest.mock import ANY, patch
+from unittest.mock import patch
 
 from dakara_base.resources_manager import get_file
 from path import Path
@@ -8,13 +8,14 @@ from path import Path
 from dakara_feeder.dakara_feeder import DakaraFeeder
 from dakara_feeder.directory_lister import SongPaths
 from dakara_feeder.metadata_parser import FFProbeMetadataParser
+from dakara_feeder.subtitle_parser import Pysubs2SubtitleParser
 
 
 class DakaraFeederTestCase(TestCase):
     """Test the feeder class
     """
 
-    @patch("dakara_feeder.song.Pysubs2SubtitleParser", autoset=True)
+    @patch.object(Pysubs2SubtitleParser, "parse", autoset=True)
     @patch.object(FFProbeMetadataParser, "parse", autoset=True)
     @patch("dakara_feeder.dakara_feeder.list_directory", autoset=True)
     @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
@@ -22,8 +23,8 @@ class DakaraFeederTestCase(TestCase):
         self,
         mocked_dakara_server_class,
         mocked_list_directory,
-        mocked_parse,
-        mocked_subtitle_parser_class,
+        mocked_metadata_parse,
+        mocked_subtitle_parse,
     ):
         """Test to feed
         """
@@ -36,8 +37,8 @@ class DakaraFeederTestCase(TestCase):
             SongPaths(Path("directory_0/song_0.mp4")),
             SongPaths(Path("directory_2/song_2.mp4"), Path("directory_2/song_2.ass")),
         ]
-        mocked_parse.return_value.duration = timedelta(seconds=1)
-        mocked_subtitle_parser_class.return_value.get_lyrics.return_value = "lyri lyri"
+        mocked_metadata_parse.return_value.duration = timedelta(seconds=1)
+        mocked_subtitle_parse.return_value.get_lyrics.return_value = "lyri lyri"
 
         # create the config
         config = {"server": {}, "kara_folder": "basepath"}
@@ -50,7 +51,7 @@ class DakaraFeederTestCase(TestCase):
 
         # assert the mocked calls
         mocked_dakara_server_class.return_value.get_songs.assert_called_with()
-        mocked_list_directory.assert_called_with(ANY)
+        mocked_list_directory.assert_called_with("basepath")
         mocked_dakara_server_class.return_value.post_song.assert_called_with(
             {
                 "title": "song_2",
@@ -67,10 +68,8 @@ class DakaraFeederTestCase(TestCase):
             }
         )
         mocked_dakara_server_class.return_value.delete_song.assert_called_with(1)
-        mocked_subtitle_parser_class.assert_called_with(
-            "basepath/directory_2/song_2.ass"
-        )
-        mocked_subtitle_parser_class.return_value.get_lyrics.assert_called_with()
+        mocked_subtitle_parse.assert_called_with("basepath/directory_2/song_2.ass")
+        mocked_subtitle_parse.return_value.get_lyrics.assert_called_with()
 
         self.assertListEqual(
             logger.output,

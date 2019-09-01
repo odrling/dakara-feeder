@@ -51,7 +51,7 @@ class Song:
         if not self.subtitle_path:
             return ""
 
-        parser = Pysubs2SubtitleParser(self.base_directory / self.subtitle_path)
+        parser = Pysubs2SubtitleParser.parse(self.base_directory / self.subtitle_path)
         return parser.get_lyrics()
 
     def get_representation(self):

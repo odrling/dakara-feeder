@@ -1,6 +1,6 @@
 import re
-from collections import OrderedDict
 from abc import ABC, abstractmethod
+from collections import OrderedDict
 
 import pysubs2
 
@@ -9,29 +9,61 @@ class SubtitleParser(ABC):
     """Abstract class for subtitle parser
 
     Args:
-        filepath (str): path of the file to extract lyrics from.
+        content (anything): object containing the lyrics. Can be a complete
+            object or the full text of the lyrics.
     """
 
+    def __init__(self, content={}):
+        self.content = content
+
+    @classmethod
     @abstractmethod
-    def __init__(self, filepath):
-        pass
+    def parse(cls, filepath):
+        """Read a subtitle file and store the lyrics
+
+        Args:
+            filepath (path.Path): path of the file to extract lyrics from.
+
+        Returns:
+            SubtitleParser: instance of the class for the given file.
+        """
+        return cls()
 
     @abstractmethod
     def get_lyrics(self):
         """Extract lyrics
+
+        Returns:
+            str: text of the lyrics.
         """
         return ""
 
 
 class TXTSubtitleParser(SubtitleParser):
     """Subtitle parser for txt files
+
+    Args:
+        content (text): Full text of the lyrics.
     """
 
-    def __init__(self, filepath):
-        with open(filepath) as file:
-            self.content = file.read()
+    @classmethod
+    def parse(cls, filepath):
+        """Read a subtitle file and store the lyrics
+
+        Args:
+            filepath (path.Path): path of the file to extract lyrics from.
+
+        Returns:
+            TXTSubtitleParser: instance of the class for the given file.
+        """
+        return cls(filepath.text())
 
     def get_lyrics(self):
+        """Extract lyrics
+
+        Returns:
+            str: text of the lyrics.
+        """
         return self.content
 
 
@@ -43,9 +75,12 @@ class Pysubs2SubtitleParser(SubtitleParser):
     It uses the `pysubs2` package to parse the ASS file.
 
     Attributes:
-        content (pysubs2 object): parsed subtitle.
-        override_sequence (regex matcher): regex that matches any tag and any
+        content (pysubs2.SSAFile): parsed subtitle.
+        override_sequence (re.Pattern): regex that matches any tag and any
             drawing area.
+
+    Args:
+        content (pysubs2.SSAFile): parsed subtitle.
     """
 
     override_sequence = re.compile(
@@ -63,8 +98,17 @@ class Pysubs2SubtitleParser(SubtitleParser):
         re.UNICODE | re.VERBOSE,
     )
 
-    def __init__(self, filepath):
-        self.content = pysubs2.load(filepath)
+    @classmethod
+    def parse(cls, filepath):
+        """Read a subtitle file and store the lyrics
+
+        Args:
+            filepath (path.Path): path of the file to extract lyrics from.
+
+        Returns:
+            Pysubs2SubtitleParser: instance of the class for the given file.
+        """
+        return cls(pysubs2.load(filepath))
 
     def get_lyrics(self):
         """Gives the cleaned text of the Event block
@@ -76,11 +120,11 @@ class Pysubs2SubtitleParser(SubtitleParser):
                 lines" in the file.
 
         Returns:
-            (str) Cleaned lyrics.
+            str: Cleaned lyrics.
         """
         lyrics = []
 
-        # previous line handles
+        # previous line object
         event_previous = None
 
         # loop over each dialog line
@@ -108,7 +152,6 @@ class Pysubs2SubtitleParser(SubtitleParser):
                 and event_previous.start == event.start
                 and event_previous.end == event.end
             ):
-
                 lyrics.append(line)
 
             # update previous line handles
