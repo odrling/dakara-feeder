@@ -1,16 +1,85 @@
-from unittest import TestCase
+import sys
+from unittest import TestCase, skipIf
 from unittest.mock import ANY, patch
 from datetime import timedelta
 from subprocess import CalledProcessError
 
 from dakara_base.resources_manager import get_file
 from path import Path
+from pymediainfo import MediaInfo
 
 from dakara_feeder.metadata_parser import (
     FFProbeMetadataParser,
     ParseError,
     MediaFileNotFoundError,
+    MediainfoMetadataParser,
 )
+
+
+@skipIf(sys.platform.startswith("win"), "Disabled for Windows")
+class MediainfoMetadataParserTestCase(TestCase):
+    """Test the Mediainfo metadata parser
+    """
+
+    @patch("dakara_feeder.metadata_parser.MediaInfo.can_parse", autoset=True)
+    def test_available(self, mocked_can_parse):
+        """Test when the parser is available
+        """
+        # call the method
+        result = MediainfoMetadataParser.is_available()
+
+        # assert the result
+        self.assertTrue(result)
+
+        # assert the call
+        mocked_can_parse.assert_called_with()
+
+    @patch("dakara_feeder.metadata_parser.MediaInfo.can_parse", autoset=True)
+    def test_not_available(self, mocked_can_parse):
+        """Test when the parser is not available
+        """
+        # prepare the mock
+        mocked_can_parse.return_value = False
+
+        # call the method
+        result = MediainfoMetadataParser.is_available()
+
+        # assert the result
+        self.assertFalse(result)
+
+    def test_parse_not_found(self):
+        """Test to extract metadata from a file that does not exist
+        """
+        # call the method
+        with self.assertRaises(MediaFileNotFoundError) as error:
+            MediainfoMetadataParser.parse(Path("nowhere"))
+
+        # assert the error
+        self.assertEqual(str(error.exception), "Media file nowhere not found")
+
+    @patch.object(MediaInfo, "parse", autoset=True)
+    def test_parse_invalid(self, mocked_parse):
+        """Test to extract metadata from a file that cannot be parsed
+        """
+        # prepare the mock
+        mocked_parse.side_effect = Exception("invalid")
+
+        # call the method
+        with self.assertRaises(ParseError) as error:
+            MediainfoMetadataParser.parse(Path("nowhere"))
+
+        # assert the error
+        self.assertEqual(
+            str(error.exception), "Error when processing media file nowhere"
+        )
+
+    def test_get_duration(self):
+        """Test to get duration
+        """
+        parser = MediainfoMetadataParser.parse(
+            get_file("dakara_feeder.tests.resources", "dummy.mkv")
+        )
+        self.assertEqual(parser.duration, timedelta(seconds=2))
 
 
 class FFProbeMetadataParserTestCase(TestCase):

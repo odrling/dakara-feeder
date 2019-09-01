@@ -83,7 +83,19 @@ class MediainfoMetadataParser(MetadataParser):
         Args:
             filename (str): path of the file to parse.
         """
-        metadata = MediaInfo.parse(filename)
+        try:
+            metadata = MediaInfo.parse(filename)
+
+        except FileNotFoundError as error:
+            raise MediaFileNotFoundError(
+                "Media file {} not found".format(filename)
+            ) from error
+
+        except BaseException as error:
+            raise ParseError(
+                "Error when processing media file {}".format(filename)
+            ) from error
+
         return cls(metadata)
 
     @property
@@ -187,6 +199,6 @@ class ParseError(DakaraError):
     """
 
 
-class MediaFileNotFoundError(DakaraError):
+class MediaFileNotFoundError(DakaraError, FileNotFoundError):
     """Error if the metadata file does not exist
     """
