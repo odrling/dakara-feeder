@@ -21,6 +21,7 @@ def list_directory(path):
     """
     logger.debug("Listing %s", path)
     files_list = [p.relpath(path) for p in path.walkfiles()]
+    files_list.sort()
     logger.debug("Listed %i files", len(files_list))
 
     listing = [

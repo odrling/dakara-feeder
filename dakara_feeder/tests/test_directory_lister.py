@@ -2,6 +2,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from path import Path
+from dakara_base.resources_manager import get_file
 
 from dakara_feeder.directory_lister import group_by_type, list_directory, SongPaths
 
@@ -9,8 +10,6 @@ from dakara_feeder.directory_lister import group_by_type, list_directory, SongPa
 class ListDirectoryTestCase(TestCase):
     """Test the directory lister
     """
-
-    maxDiff = None
 
     @patch.object(Path, "walkfiles", autoset=True)
     def test_list_directory(self, mocked_walkfiles):
@@ -21,13 +20,13 @@ class ListDirectoryTestCase(TestCase):
             item
             for item in [
                 Path("directory/file0.mkv"),
-                Path("directory/file0.ass"),
                 Path("directory/file1.mkv"),
                 Path("directory/file1.ass"),
                 Path("directory/subdirectory/file2.mkv"),
                 Path("directory/subdirectory/file3.mkv"),
                 Path("directory/subdirectory/file3.ass"),
                 Path("directory/subdirectory/empty"),
+                Path("directory/file0.ass"),
             ]
         )
 
@@ -58,6 +57,18 @@ class ListDirectoryTestCase(TestCase):
                 "DEBUG:dakara_feeder.directory_lister:Found 4 different videos",
             ],
         )
+
+    def test_list_directory_dummy(self):
+        """Test to list a directory using test ressource dummy files
+        """
+        # call the function
+        with self.assertLogs("dakara_feeder.directory_lister", "DEBUG"):
+            directory = get_file("dakara_feeder.tests.resources", "")
+            listing = list_directory(directory)
+
+        # check the structure
+        self.assertEqual(len(listing), 1)
+        self.assertEqual(SongPaths(Path("dummy.mkv"), Path("dummy.ass")), listing[0])
 
 
 class GroupByTypeTestCase(TestCase):
