@@ -1,4 +1,5 @@
 from dakara_feeder.metadata_parser import FFProbeMetadataParser
+from dakara_feeder.subtitle_parser import Pysubs2SubtitleParser
 
 
 class Song:
@@ -16,6 +17,7 @@ class Song:
     def __init__(self, base_directory, paths):
         self.base_directory = base_directory
         self.video_path = paths.video
+        self.subtitle_path = paths.subtitle
 
     def pre_process(self):
         pass
@@ -46,7 +48,11 @@ class Song:
         return ""
 
     def get_lyrics(self):
-        return ""
+        if not self.subtitle_path:
+            return ""
+
+        parser = Pysubs2SubtitleParser(self.base_directory / self.subtitle_path)
+        return parser.get_lyrics()
 
     def get_representation(self):
         """Get the simple representation of the song

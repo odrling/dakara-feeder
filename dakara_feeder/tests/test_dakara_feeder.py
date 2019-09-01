@@ -1,6 +1,6 @@
 from datetime import timedelta
 from unittest import TestCase
-from unittest.mock import ANY, MagicMock, patch
+from unittest.mock import ANY, patch
 
 from dakara_base.resources_manager import get_file
 from path import Path
@@ -14,11 +14,16 @@ class DakaraFeederTestCase(TestCase):
     """Test the feeder class
     """
 
+    @patch("dakara_feeder.song.Pysubs2SubtitleParser", autoset=True)
     @patch.object(FFProbeMetadataParser, "parse", autoset=True)
     @patch("dakara_feeder.dakara_feeder.list_directory", autoset=True)
     @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
     def test_feed(
-        self, mocked_dakara_server_class, mocked_list_directory, mocked_parse
+        self,
+        mocked_dakara_server_class,
+        mocked_list_directory,
+        mocked_parse,
+        mocked_subtitle_parser_class,
     ):
         """Test to feed
         """
@@ -29,12 +34,15 @@ class DakaraFeederTestCase(TestCase):
         ]
         mocked_list_directory.return_value = [
             SongPaths(Path("directory_0/song_0.mp4")),
-            SongPaths(Path("directory_2/song_2.mp4")),
+            SongPaths(Path("directory_2/song_2.mp4"), Path("directory_2/song_2.ass")),
         ]
         mocked_parse.return_value.duration = timedelta(seconds=1)
+        mocked_subtitle_parser_class.return_value.get_lyrics.return_value = "lyri lyri"
 
+        # create the config
+        config = {"server": {}, "kara_folder": "basepath"}
         # create the object
-        feeder = DakaraFeeder(MagicMock())
+        feeder = DakaraFeeder(config)
 
         # call the method
         with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger:
@@ -55,10 +63,14 @@ class DakaraFeederTestCase(TestCase):
                 "version": "",
                 "detail": "",
                 "detail_video": "",
-                "lyrics": "",
+                "lyrics": "lyri lyri",
             }
         )
         mocked_dakara_server_class.return_value.delete_song.assert_called_with(1)
+        mocked_subtitle_parser_class.assert_called_with(
+            "basepath/directory_2/song_2.ass"
+        )
+        mocked_subtitle_parser_class.return_value.get_lyrics.assert_called_with()
 
         self.assertListEqual(
             logger.output,
@@ -107,6 +119,6 @@ class DakaraFeederIntegrationTestCase(TestCase):
                 "version": "",
                 "detail": "",
                 "detail_video": "",
-                "lyrics": "",
+                "lyrics": "Piyo!",
             }
         )
