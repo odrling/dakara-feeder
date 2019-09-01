@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from datetime import timedelta
 
 from pymediainfo import MediaInfo
+from dakara_base.exceptions import DakaraError
 
 
 class MetadataParser(ABC):
@@ -121,7 +122,7 @@ class FFProbeMetadataParser(MetadataParser):
 
                 return True
 
-        except BaseException:
+        except subprocess.CalledProcessError:
             return False
 
     @classmethod
@@ -129,7 +130,7 @@ class FFProbeMetadataParser(MetadataParser):
         """Parse metadata from file name
 
         Args:
-            filename (str): path of the file to parse.
+            filename (path.Path): path of the file to parse.
         """
         command = [
             "ffprobe",
@@ -142,18 +143,28 @@ class FFProbeMetadataParser(MetadataParser):
             filename,
         ]
 
-        pipe = subprocess.Popen(
+        process = subprocess.run(
             command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
         )
 
-        out, _ = pipe.communicate()
-        return cls(json.loads(out.decode(sys.stdout.encoding)))
+        # check errors
+        if process.returncode:
+            # check the file exists
+            if not filename.exists():
+                raise MediaFileNotFoundError("Media file {} not found".format(filename))
+
+            # otherwise
+            raise ParseError("Error when processing media file {}".format(filename))
+
+        return cls(json.loads(process.stdout.decode(sys.stdout.encoding)))
 
     @property
     def duration(self):
         """Get duration as timedelta object
 
-        Returns timedelta 0 if unable to get duration.
+        Returns:
+            datetime.timedelta: duration of the media. Timedelta of 0 if unable
+            to get duration.
         """
         # try in generic location
         if "format" in self.metadata:
@@ -169,3 +180,13 @@ class FFProbeMetadataParser(MetadataParser):
 
         # if nothing is found
         return timedelta(0)
+
+
+class ParseError(DakaraError):
+    """Error if the metadata cannot be parsed
+    """
+
+
+class MediaFileNotFoundError(DakaraError):
+    """Error if the metadata file does not exist
+    """
