@@ -43,8 +43,8 @@ class GenerateDiffTestCase(TestCase):
         self.assertCountEqual(["c"], deleted)
 
 
-class FindSimilarTestCase(TestCase):
-    """Test ind_similar method
+class MatchSimilarTestCase(TestCase):
+    """Test match_similar method
     """
 
     def test_simple(self):
