@@ -1,10 +1,13 @@
 from unittest import TestCase
 
+from path import Path
+
 from dakara_feeder import diff_generator
+from dakara_feeder.similarity_calculator import calculate_file_path_similarity
 
 
-class DiffGeneratorTestCase(TestCase):
-    """Test the diff generator
+class GenerateDiffTestCase(TestCase):
+    """Test the generate_diff method
     """
 
     def test_generate_diff_all_added(self):
@@ -38,3 +41,41 @@ class DiffGeneratorTestCase(TestCase):
 
         self.assertCountEqual(["d"], added)
         self.assertCountEqual(["c"], deleted)
+
+
+class FindSimilarTestCase(TestCase):
+    """Test ind_similar method
+    """
+
+    def test_simple(self):
+        """Test basic similar name matching
+        """
+
+        list1 = [
+            Path("directory/file.mp4"),
+            Path("directory/other.mp4"),
+            Path("other/file.mp4"),
+            Path("directory/newfile.mkv"),
+        ]
+
+        list2 = [
+            Path("directory/fil.mp4"),
+            Path("other/other.mp4"),
+            Path("other/fil.mp4"),
+            Path("directory/oldfile.mkv"),
+        ]
+
+        similar, remaining1, remaining2 = diff_generator.match_similar(
+            list1, list2, calculate_file_path_similarity
+        )
+
+        self.assertCountEqual(
+            similar,
+            [
+                ("directory/file.mp4", "directory/fil.mp4"),
+                ("other/file.mp4", "other/fil.mp4"),
+                ("directory/other.mp4", "other/other.mp4"),
+            ],
+        )
+        self.assertCountEqual(remaining1, ["directory/newfile.mkv"])
+        self.assertCountEqual(remaining2, ["directory/oldfile.mkv"])
