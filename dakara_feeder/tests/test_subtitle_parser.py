@@ -1,9 +1,14 @@
 from unittest import TestCase
+from unittest.mock import patch
 
 from dakara_base.resources_manager import get_file
 from path import Path
 
-from dakara_feeder.subtitle_parser import Pysubs2SubtitleParser
+from dakara_feeder.subtitle_parser import (
+    Pysubs2SubtitleParser,
+    SubtitleParseError,
+    SubtitleNotFoundError,
+)
 
 
 class Pysubs2SubtitleParserTestCase(TestCase):
@@ -51,8 +56,28 @@ class Pysubs2SubtitleParserTestCase(TestCase):
         """
         self.generic_test_subtitle("comment_and_whitespace.ass")
 
-    def test_not_found(self):
+    def test_not_found_error(self):
         """Test when the ass file to parse does not exist
         """
-        with self.assertRaises(FileNotFoundError):
+        # call the method
+        with self.assertRaises(SubtitleNotFoundError) as error:
             Pysubs2SubtitleParser.parse(Path("nowhere"))
+
+        # assert the error
+        self.assertEqual(str(error.exception), "Subtitle file nowhere not found")
+
+    @patch("dakara_feeder.subtitle_parser.pysubs2.load")
+    def test_parse_error(self, mocked_load):
+        """Test when the ass file to parse is invalid
+        """
+        # prepare the mock
+        mocked_load.side_effect = Exception("invalid")
+
+        # call the method
+        with self.assertRaises(SubtitleParseError) as error:
+            Pysubs2SubtitleParser.parse(Path("nowhere"))
+
+        # assert the error
+        self.assertEqual(
+            str(error.exception), "Error when parsing subtitle file nowhere: invalid"
+        )

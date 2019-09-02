@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from collections import OrderedDict
 
 import pysubs2
+from dakara_base.exceptions import DakaraError
 
 
 class SubtitleParser(ABC):
@@ -108,7 +109,20 @@ class Pysubs2SubtitleParser(SubtitleParser):
         Returns:
             Pysubs2SubtitleParser: instance of the class for the given file.
         """
-        return cls(pysubs2.load(filepath))
+        try:
+            instance = cls(pysubs2.load(filepath))
+
+        except FileNotFoundError as error:
+            raise SubtitleNotFoundError(
+                "Subtitle file {} not found".format(filepath)
+            ) from error
+
+        except BaseException as error:
+            raise SubtitleParseError(
+                "Error when parsing subtitle file {}: {}".format(filepath, error)
+            ) from error
+
+        return instance
 
     def get_lyrics(self):
         """Gives the cleaned text of the Event block
@@ -168,3 +182,13 @@ PARSER_BY_EXTENSION = OrderedDict(
         (".txt", TXTSubtitleParser),
     )
 )
+
+
+class SubtitleParseError(DakaraError):
+    """Error when the subtitle file cannot be parsed
+    """
+
+
+class SubtitleNotFoundError(DakaraError):
+    """Error when the subtitle file cannot be found
+    """
