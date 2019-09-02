@@ -10,8 +10,8 @@ from pymediainfo import MediaInfo
 
 from dakara_feeder.metadata_parser import (
     FFProbeMetadataParser,
-    ParseError,
-    MediaFileNotFoundError,
+    MediaParseError,
+    MediaNotFoundError,
     MediainfoMetadataParser,
 )
 
@@ -47,30 +47,30 @@ class MediainfoMetadataParserTestCase(TestCase):
         # assert the result
         self.assertFalse(result)
 
-    def test_parse_not_found(self):
+    def test_parse_not_found_error(self):
         """Test to extract metadata from a file that does not exist
         """
         # call the method
-        with self.assertRaises(MediaFileNotFoundError) as error:
+        with self.assertRaises(MediaNotFoundError) as error:
             MediainfoMetadataParser.parse(Path("nowhere"))
 
         # assert the error
         self.assertEqual(str(error.exception), "Media file nowhere not found")
 
     @patch.object(MediaInfo, "parse", autoset=True)
-    def test_parse_invalid(self, mocked_parse):
+    def test_parse_invalid_error(self, mocked_parse):
         """Test to extract metadata from a file that cannot be parsed
         """
         # prepare the mock
         mocked_parse.side_effect = Exception("invalid")
 
         # call the method
-        with self.assertRaises(ParseError) as error:
+        with self.assertRaises(MediaParseError) as error:
             MediainfoMetadataParser.parse(Path("nowhere"))
 
         # assert the error
         self.assertEqual(
-            str(error.exception), "Error when processing media file nowhere"
+            str(error.exception), "Error when processing media file nowhere: invalid"
         )
 
     def test_get_duration(self):
@@ -113,14 +113,14 @@ class FFProbeMetadataParserTestCase(TestCase):
         self.assertFalse(result)
 
     @patch.object(Path, "exists", autoset=True)
-    def test_parse_not_found(self, mocked_exists):
+    def test_parse_not_found_error(self, mocked_exists):
         """Test to extract metadata from a file that does not exist
         """
         # prepare the mock
         mocked_exists.return_value = False
 
         # call the method
-        with self.assertRaises(MediaFileNotFoundError) as error:
+        with self.assertRaises(MediaNotFoundError) as error:
             FFProbeMetadataParser.parse(Path("nowhere"))
 
         # assert the error
@@ -130,14 +130,14 @@ class FFProbeMetadataParserTestCase(TestCase):
         mocked_exists.assert_called_with()
 
     @patch.object(Path, "exists", autoset=True)
-    def test_parse_invalid(self, mocked_exists):
+    def test_parse_invalid_error(self, mocked_exists):
         """Test to extract metadata from a file that cannot be parsed
         """
         # prepare the mock
         mocked_exists.return_value = True
 
         # call the method
-        with self.assertRaises(ParseError) as error:
+        with self.assertRaises(MediaParseError) as error:
             FFProbeMetadataParser.parse(Path("nowhere"))
 
         # assert the error

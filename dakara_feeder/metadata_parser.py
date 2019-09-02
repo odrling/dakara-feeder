@@ -87,13 +87,13 @@ class MediainfoMetadataParser(MetadataParser):
             metadata = MediaInfo.parse(filename)
 
         except FileNotFoundError as error:
-            raise MediaFileNotFoundError(
+            raise MediaNotFoundError(
                 "Media file {} not found".format(filename)
             ) from error
 
         except BaseException as error:
-            raise ParseError(
-                "Error when processing media file {}".format(filename)
+            raise MediaParseError(
+                "Error when processing media file {}: {}".format(filename, error)
             ) from error
 
         return cls(metadata)
@@ -163,10 +163,12 @@ class FFProbeMetadataParser(MetadataParser):
         if process.returncode:
             # check the file exists
             if not filename.exists():
-                raise MediaFileNotFoundError("Media file {} not found".format(filename))
+                raise MediaNotFoundError("Media file {} not found".format(filename))
 
             # otherwise
-            raise ParseError("Error when processing media file {}".format(filename))
+            raise MediaParseError(
+                "Error when processing media file {}".format(filename)
+            )
 
         return cls(json.loads(process.stdout.decode(sys.stdout.encoding)))
 
@@ -194,11 +196,11 @@ class FFProbeMetadataParser(MetadataParser):
         return timedelta(0)
 
 
-class ParseError(DakaraError):
+class MediaParseError(DakaraError):
     """Error if the metadata cannot be parsed
     """
 
 
-class MediaFileNotFoundError(DakaraError, FileNotFoundError):
+class MediaNotFoundError(DakaraError, FileNotFoundError):
     """Error if the metadata file does not exist
     """
