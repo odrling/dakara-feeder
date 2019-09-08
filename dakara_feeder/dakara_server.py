@@ -44,14 +44,12 @@ class DakaraServer(HTTPClient):
         endpoint = "library/songs/{}/".format(song_id)
         self.delete(endpoint)
 
-    def post_songs_diff(self, added_songs, deleted_songs):
-        """Post the lists of added and deleted songs
+    def put_song(self, song_id, song):
+        """Update one song on the server
 
         Args:
-            added_songs (list): list of new songs.
-            deleted_songs (list): list of deleted songs.
+            song_id (int): ID of the song to update.
+            song (dict): song representation.
         """
-        endpoint = "library/feeder/"
-        data = {"added": added_songs, "deleted": deleted_songs}
-
-        self.post(endpoint, json=data)
+        endpoint = "library/songs/{}/".format(song_id)
+        self.put(endpoint, json=song)
