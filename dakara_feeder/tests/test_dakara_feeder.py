@@ -74,11 +74,11 @@ class DakaraFeederTestCase(TestCase):
         self.assertListEqual(
             logger.output,
             [
-                "DEBUG:dakara_feeder.dakara_feeder:Found 2 songs in server",
-                "DEBUG:dakara_feeder.dakara_feeder:Found 2 songs in local directory",
-                "DEBUG:dakara_feeder.dakara_feeder:Found 1 songs to add",
-                "DEBUG:dakara_feeder.dakara_feeder:Found 1 songs to delete",
-                "DEBUG:dakara_feeder.dakara_feeder:Found 0 songs to update",
+                "INFO:dakara_feeder.dakara_feeder:Found 2 songs in server",
+                "INFO:dakara_feeder.dakara_feeder:Found 2 songs in local directory",
+                "INFO:dakara_feeder.dakara_feeder:Found 1 songs to add",
+                "INFO:dakara_feeder.dakara_feeder:Found 1 songs to delete",
+                "INFO:dakara_feeder.dakara_feeder:Found 0 songs to update",
             ],
         )
 
@@ -135,11 +135,11 @@ class DakaraFeederTestCase(TestCase):
         self.assertListEqual(
             logger.output,
             [
-                "DEBUG:dakara_feeder.dakara_feeder:Found 2 songs in server",
-                "DEBUG:dakara_feeder.dakara_feeder:Found 2 songs in local directory",
-                "DEBUG:dakara_feeder.dakara_feeder:Found 0 songs to add",
-                "DEBUG:dakara_feeder.dakara_feeder:Found 0 songs to delete",
-                "DEBUG:dakara_feeder.dakara_feeder:Found 1 songs to update",
+                "INFO:dakara_feeder.dakara_feeder:Found 2 songs in server",
+                "INFO:dakara_feeder.dakara_feeder:Found 2 songs in local directory",
+                "INFO:dakara_feeder.dakara_feeder:Found 0 songs to add",
+                "INFO:dakara_feeder.dakara_feeder:Found 0 songs to delete",
+                "INFO:dakara_feeder.dakara_feeder:Found 1 songs to update",
             ],
         )
 

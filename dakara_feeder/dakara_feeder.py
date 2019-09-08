@@ -39,14 +39,14 @@ class DakaraFeeder:
         """
         # get list of songs on the server
         old_songs = self.dakara_server.get_songs()
-        logger.debug("Found %i songs in server", len(old_songs))
+        logger.info("Found %i songs in server", len(old_songs))
 
         old_songs_id_by_path = {song["path"]: song["id"] for song in old_songs}
         old_songs_path = list(old_songs_id_by_path.keys())
 
         # get list of songs on the local directory
         new_songs_paths = list_directory(self.kara_folder)
-        logger.debug("Found %i songs in local directory", len(new_songs_paths))
+        logger.info("Found %i songs in local directory", len(new_songs_paths))
         new_songs_video_path = [song.video for song in new_songs_paths]
 
         # create map of new songs
@@ -62,9 +62,9 @@ class DakaraFeeder:
             added_songs_path, deleted_songs_path, calculate_file_path_similarity
         )
 
-        logger.debug("Found %i songs to add", len(added_songs_path))
-        logger.debug("Found %i songs to delete", len(deleted_songs_path))
-        logger.debug("Found %i songs to update", len(updated_songs_path))
+        logger.info("Found %i songs to add", len(added_songs_path))
+        logger.info("Found %i songs to delete", len(deleted_songs_path))
+        logger.info("Found %i songs to update", len(updated_songs_path))
 
         # songs to add
         # recover the song paths with the path of the video
