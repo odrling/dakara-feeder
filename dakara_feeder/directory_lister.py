@@ -26,7 +26,7 @@ def list_directory(path):
 
     listing = [
         item
-        for _, files in groupby(files_list, lambda f: f.stem)
+        for _, files in groupby(files_list, lambda f: f.dirname() / f.stem)
         for item in group_by_type(files)
     ]
 

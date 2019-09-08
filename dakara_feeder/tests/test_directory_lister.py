@@ -58,6 +58,47 @@ class ListDirectoryTestCase(TestCase):
             ],
         )
 
+    @patch.object(Path, "walkfiles", autoset=True)
+    def test_list_directory_same_stem(self, mocked_walkfiles):
+        """Test case when files with the same name exists in different directories
+        """
+        # mock directory structure
+        mocked_walkfiles.return_value = (
+            item
+            for item in [
+                Path("directory/file0.mkv"),
+                Path("directory/file0.ass"),
+                Path("directory/subdirectory/file0.mkv"),
+                Path("directory/subdirectory/file0.ass"),
+            ]
+        )
+
+        # call the function
+        with self.assertLogs("dakara_feeder.directory_lister", "DEBUG") as logger:
+            listing = list_directory(Path("directory"))
+
+        # check the structure
+        self.assertEqual(len(listing), 2)
+        self.assertCountEqual(
+            [
+                SongPaths(Path("file0.mkv"), Path("file0.ass")),
+                SongPaths(
+                    Path("subdirectory/file0.mkv"), Path("subdirectory/file0.ass")
+                ),
+            ],
+            listing,
+        )
+
+        # check the logger was called
+        self.assertListEqual(
+            logger.output,
+            [
+                "DEBUG:dakara_feeder.directory_lister:Listing directory",
+                "DEBUG:dakara_feeder.directory_lister:Listed 4 files",
+                "DEBUG:dakara_feeder.directory_lister:Found 2 different videos",
+            ],
+        )
+
     def test_list_directory_dummy(self):
         """Test to list a directory using test ressource dummy files
         """
