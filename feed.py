@@ -3,7 +3,7 @@ import logging
 from argparse import ArgumentParser
 
 from path import Path
-from dakara_base.exception import DakaraError
+from dakara_base.exceptions import DakaraError
 from dakara_base.config import load_config, create_logger, set_loglevel
 
 from dakara_feeder.dakara_feeder import DakaraFeeder
