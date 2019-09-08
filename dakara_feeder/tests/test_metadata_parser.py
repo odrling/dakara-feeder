@@ -1,5 +1,5 @@
 import sys
-from unittest import TestCase, skipIf
+from unittest import TestCase, skipIf, skipUnless
 from unittest.mock import ANY, patch
 from datetime import timedelta
 from subprocess import CalledProcessError
@@ -17,6 +17,7 @@ from dakara_feeder.metadata_parser import (
 
 
 @skipIf(sys.platform.startswith("win"), "Disabled for Windows")
+@skipUnless(MediaInfo.can_parse(), "MediaInfo not installed")
 class MediainfoMetadataParserTestCase(TestCase):
     """Test the Mediainfo metadata parser
     """
