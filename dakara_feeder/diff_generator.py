@@ -2,7 +2,7 @@ import itertools
 
 
 def generate_diff(old_list, new_list):
-    """Returns 2 lists of added and deleted elements
+    """Returns 2 lists of added, deleted and unchanged elements
 
     Added elements are elements presents in new_list but not in old_list.
     Deleted elements are elements presents in old_list but not in new_list.
@@ -15,14 +15,16 @@ def generate_diff(old_list, new_list):
         tuple: contains 2 elements:
             - A list of added elements;
             - A list of deleted elements.
+            - A list of unchanged elements.
     """
     old_set = set(old_list)
     new_set = set(new_list)
 
     added = new_set - old_set
     deleted = old_set - new_set
+    unchanged = old_set.intersection(new_set)
 
-    return list(added), list(deleted)
+    return list(added), list(deleted), list(unchanged)
 
 
 def match_similar(list1, list2, compute_similarity, threshold=0.8):

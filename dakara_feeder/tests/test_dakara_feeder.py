@@ -143,6 +143,69 @@ class DakaraFeederTestCase(TestCase):
             ],
         )
 
+    @patch.object(Pysubs2SubtitleParser, "parse", autoset=True)
+    @patch.object(FFProbeMetadataParser, "parse", autoset=True)
+    @patch("dakara_feeder.dakara_feeder.list_directory", autoset=True)
+    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
+    def test_feed_with_force_update(
+        self,
+        mocked_dakara_server_class,
+        mocked_list_directory,
+        mocked_metadata_parse,
+        mocked_subtitle_parse,
+    ):
+        """Test to feed
+        """
+        # create the mocks
+        mocked_dakara_server_class.return_value.get_songs.return_value = [
+            {"id": 1, "path": Path("music_1.mp4")}
+        ]
+        mocked_list_directory.return_value = [
+            SongPaths(Path("music_1.mp4"), Path("music_1.ass"))
+        ]
+        mocked_metadata_parse.return_value.duration = timedelta(seconds=1)
+        mocked_subtitle_parse.return_value.get_lyrics.return_value = "lyri lyri"
+
+        # create the config
+        config = {"server": {}, "kara_folder": "basepath"}
+        # create the object
+        feeder = DakaraFeeder(config, force_update=True)
+
+        # call the method
+        with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger:
+            feeder.feed()
+
+        # assert the mocked calls
+        mocked_dakara_server_class.return_value.get_songs.assert_called_with()
+        mocked_list_directory.assert_called_with("basepath")
+        mocked_dakara_server_class.return_value.put_song.assert_called_with(
+            1,
+            {
+                "title": "music_1",
+                "filename": "music_1.mp4",
+                "directory": "",
+                "duration": 1,
+                "artists": [],
+                "works": [],
+                "tags": [],
+                "version": "",
+                "detail": "",
+                "detail_video": "",
+                "lyrics": "lyri lyri",
+            },
+        )
+
+        self.assertListEqual(
+            logger.output,
+            [
+                "INFO:dakara_feeder.dakara_feeder:Found 1 songs in server",
+                "INFO:dakara_feeder.dakara_feeder:Found 1 songs in local directory",
+                "INFO:dakara_feeder.dakara_feeder:Found 0 songs to add",
+                "INFO:dakara_feeder.dakara_feeder:Found 0 songs to delete",
+                "INFO:dakara_feeder.dakara_feeder:Found 1 songs to update",
+            ],
+        )
+
 
 class DakaraFeederIntegrationTestCase(TestCase):
     """Integration test for the Feeder class

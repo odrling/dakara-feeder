@@ -31,6 +31,10 @@ def get_parser():
     )
 
     parser.add_argument(
+        "-f", "--force", action="store_true", help="force unchanged files to be updated"
+    )
+
+    parser.add_argument(
         "--config",
         help="path to the config file, default: '{}'".format(CONFIG_FILE_PATH),
         default=CONFIG_FILE_PATH,
@@ -53,7 +57,7 @@ def feed(args):
     set_loglevel(config)
 
     # do the actual feeding
-    feeder = DakaraFeeder(config)
+    feeder = DakaraFeeder(config, force_update=args.force)
     feeder.load()
     feeder.feed()
 

@@ -24,10 +24,11 @@ class DakaraFeeder:
             files.
     """
 
-    def __init__(self, config):
+    def __init__(self, config, force_update=False):
         # create objects
         self.dakara_server = DakaraServer(config["server"], endpoint_prefix="api")
         self.kara_folder = Path(config["kara_folder"])
+        self.force_update = force_update
 
     def load(self):
         """Execute side-effect initialization tasks
@@ -53,7 +54,7 @@ class DakaraFeeder:
         new_songs_paths_map = {song.video: song for song in new_songs_paths}
 
         # compute the diffs
-        added_songs_path, deleted_songs_path = generate_diff(
+        added_songs_path, deleted_songs_path, unchanged_songs_path = generate_diff(
             old_songs_path, new_songs_video_path
         )
 
@@ -61,6 +62,10 @@ class DakaraFeeder:
         updated_songs_path, added_songs_path, deleted_songs_path = match_similar(
             added_songs_path, deleted_songs_path, calculate_file_path_similarity
         )
+
+        # when force_update is true, unchanged files are added to update list
+        if self.force_update:
+            updated_songs_path.extend([(path, path) for path in unchanged_songs_path])
 
         logger.info("Found %i songs to add", len(added_songs_path))
         logger.info("Found %i songs to delete", len(deleted_songs_path))
