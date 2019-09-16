@@ -53,19 +53,21 @@ class DakaraFeederTestCase(TestCase):
         mocked_dakara_server_class.return_value.get_songs.assert_called_with()
         mocked_list_directory.assert_called_with("basepath")
         mocked_dakara_server_class.return_value.post_song.assert_called_with(
-            {
-                "title": "song_2",
-                "filename": "song_2.mp4",
-                "directory": "directory_2",
-                "duration": 1,
-                "artists": [],
-                "works": [],
-                "tags": [],
-                "version": "",
-                "detail": "",
-                "detail_video": "",
-                "lyrics": "lyri lyri",
-            }
+            [
+                {
+                    "title": "song_2",
+                    "filename": "song_2.mp4",
+                    "directory": "directory_2",
+                    "duration": 1,
+                    "artists": [],
+                    "works": [],
+                    "tags": [],
+                    "version": "",
+                    "detail": "",
+                    "detail_video": "",
+                    "lyrics": "lyri lyri",
+                }
+            ]
         )
         mocked_dakara_server_class.return_value.delete_song.assert_called_with(1)
         mocked_subtitle_parse.assert_called_with("basepath/directory_2/song_2.ass")
@@ -206,6 +208,92 @@ class DakaraFeederTestCase(TestCase):
             ],
         )
 
+    @patch.object(Pysubs2SubtitleParser, "parse", autoset=True)
+    @patch.object(FFProbeMetadataParser, "parse", autoset=True)
+    @patch("dakara_feeder.dakara_feeder.list_directory", autoset=True)
+    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
+    def test_create_two_songs(
+        self,
+        mocked_dakara_server_class,
+        mocked_list_directory,
+        mocked_metadata_parse,
+        mocked_subtitle_parse,
+    ):
+        """Test to create two songs
+        """
+        # create the mocks
+        mocked_dakara_server_class.return_value.get_songs.return_value = []
+        mocked_list_directory.return_value = [
+            SongPaths(Path("directory_0/song_0.mp4")),
+            SongPaths(Path("directory_1/song_1.mp4")),
+        ]
+        mocked_metadata_parse.return_value.duration = timedelta(seconds=1)
+
+        # create the config
+        config = {"server": {}, "kara_folder": "basepath"}
+        # create the object
+        feeder = DakaraFeeder(config)
+
+        # call the method
+        with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger:
+            feeder.feed()
+
+        # assert the mocked calls
+        mocked_dakara_server_class.return_value.get_songs.assert_called_with()
+        mocked_list_directory.assert_called_with("basepath")
+        songs = [
+            {
+                "title": "song_0",
+                "filename": "song_0.mp4",
+                "directory": "directory_0",
+                "duration": 1,
+                "artists": [],
+                "works": [],
+                "tags": [],
+                "version": "",
+                "detail": "",
+                "detail_video": "",
+                "lyrics": "",
+            },
+            {
+                "title": "song_1",
+                "filename": "song_1.mp4",
+                "directory": "directory_1",
+                "duration": 1,
+                "artists": [],
+                "works": [],
+                "tags": [],
+                "version": "",
+                "detail": "",
+                "detail_video": "",
+                "lyrics": "",
+            },
+        ]
+        post_calls = mocked_dakara_server_class.return_value.post_song.mock_calls
+
+        # check called once
+        self.assertEqual(len(post_calls), 1)
+
+        # check one positional argument
+        _, args, kwargs, = post_calls[0]
+        self.assertEqual(len(args), 1)
+        self.assertEqual(len(kwargs), 0)
+
+        # check first arguement is the list of the two expected songs
+        self.assertCountEqual(args[0], songs)
+        mocked_dakara_server_class.return_value.delete_song.assert_not_called()
+
+        self.assertListEqual(
+            logger.output,
+            [
+                "INFO:dakara_feeder.dakara_feeder:Found 0 songs in server",
+                "INFO:dakara_feeder.dakara_feeder:Found 2 songs in local directory",
+                "INFO:dakara_feeder.dakara_feeder:Found 2 songs to add",
+                "INFO:dakara_feeder.dakara_feeder:Found 0 songs to delete",
+                "INFO:dakara_feeder.dakara_feeder:Found 0 songs to update",
+            ],
+        )
+
 
 class DakaraFeederIntegrationTestCase(TestCase):
     """Integration test for the Feeder class
@@ -232,17 +320,19 @@ class DakaraFeederIntegrationTestCase(TestCase):
         # assert the mocked calls
         mocked_dakara_server_class.return_value.get_songs.assert_called_with()
         mocked_dakara_server_class.return_value.post_song.assert_called_with(
-            {
-                "title": "dummy",
-                "filename": "dummy.mkv",
-                "directory": "",
-                "duration": 2,
-                "artists": [],
-                "works": [],
-                "tags": [],
-                "version": "",
-                "detail": "",
-                "detail_video": "",
-                "lyrics": "Piyo!",
-            }
+            [
+                {
+                    "title": "dummy",
+                    "filename": "dummy.mkv",
+                    "directory": "",
+                    "duration": 2,
+                    "artists": [],
+                    "works": [],
+                    "tags": [],
+                    "version": "",
+                    "detail": "",
+                    "detail_video": "",
+                    "lyrics": "Piyo!",
+                }
+            ]
         )

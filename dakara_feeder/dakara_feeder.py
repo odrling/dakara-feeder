@@ -7,6 +7,7 @@ from dakara_feeder.diff_generator import generate_diff, match_similar
 from dakara_feeder.directory_lister import list_directory
 from dakara_feeder.similarity_calculator import calculate_file_path_similarity
 from dakara_feeder.song import Song
+from dakara_feeder.utils import divide_chunks
 
 
 logger = logging.getLogger(__name__)
@@ -91,8 +92,8 @@ class DakaraFeeder:
         ]
 
         # create added songs on server
-        for song in added_songs:
-            self.dakara_server.post_song(song)
+        for songs_chunk in divide_chunks(added_songs, 100):
+            self.dakara_server.post_song(songs_chunk)
 
         # update renamed songs on server
         for song, song_id in updated_songs:

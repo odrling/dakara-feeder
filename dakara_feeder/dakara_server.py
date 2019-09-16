@@ -27,10 +27,10 @@ class DakaraServer(HTTPClient):
         ]
 
     def post_song(self, song):
-        """Create one song on the server
+        """Create one or several songs on the server
 
         Args:
-            song (dict): new song representation.
+            song (dict or list of dict): new song(s) representation.
         """
         endpoint = "library/songs/"
         self.post(endpoint, json=song)
