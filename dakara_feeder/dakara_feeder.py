@@ -13,6 +13,9 @@ from dakara_feeder.utils import divide_chunks
 logger = logging.getLogger(__name__)
 
 
+SONGS_PER_CHUNK = 100
+
+
 class DakaraFeeder:
     """Class for the Dakara feeder
 
@@ -23,6 +26,8 @@ class DakaraFeeder:
         dakara_server (dakara_server.DakaraServer): client for the Dakara server.
         kara_folder (path.Path): path to the scanned folder containing karaoke
             files.
+        songs_per_chunk (int): number of songs per chunk to send to server when
+            creating songs.
     """
 
     def __init__(self, config, force_update=False):
@@ -30,6 +35,7 @@ class DakaraFeeder:
         self.dakara_server = DakaraServer(config["server"], endpoint_prefix="api")
         self.kara_folder = Path(config["kara_folder"])
         self.force_update = force_update
+        self.songs_per_chunk = config["server"].get("songs_per_chunk", SONGS_PER_CHUNK)
 
     def load(self):
         """Execute side-effect initialization tasks
@@ -92,7 +98,7 @@ class DakaraFeeder:
         ]
 
         # create added songs on server
-        for songs_chunk in divide_chunks(added_songs, 100):
+        for songs_chunk in divide_chunks(added_songs, self.songs_per_chunk):
             self.dakara_server.post_song(songs_chunk)
 
         # update renamed songs on server

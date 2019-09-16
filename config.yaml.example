@@ -10,6 +10,12 @@ server:
   # Use a secured connection
   # ssl: false
 
+  # Number of songs per chunk to send to server when creating songs
+  # This allows to reduce server jamming when creating a large amount of songs
+  # for the first time, especially for the first feeding.
+  # Default is 100
+  # songs_per_chunk: 100
+
 # Path of the karaoke folder
 kara_folder: /path/to/folder
 
