@@ -43,11 +43,12 @@ class DakaraFeederTestCase(TestCase):
         # create the config
         config = {"server": {}, "kara_folder": "basepath"}
         # create the object
-        feeder = DakaraFeeder(config)
+        feeder = DakaraFeeder(config, progress=False)
 
         # call the method
-        with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger:
-            feeder.feed()
+        with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger_feeder:
+            with self.assertLogs("dakara_base.progress_bar") as logger_progress:
+                feeder.feed()
 
         # assert the mocked calls
         mocked_dakara_server_class.return_value.get_songs.assert_called_with()
@@ -74,13 +75,23 @@ class DakaraFeederTestCase(TestCase):
         mocked_subtitle_parse.return_value.get_lyrics.assert_called_with()
 
         self.assertListEqual(
-            logger.output,
+            logger_feeder.output,
             [
                 "INFO:dakara_feeder.dakara_feeder:Found 2 songs in server",
                 "INFO:dakara_feeder.dakara_feeder:Found 2 songs in local directory",
                 "INFO:dakara_feeder.dakara_feeder:Found 1 songs to add",
                 "INFO:dakara_feeder.dakara_feeder:Found 1 songs to delete",
                 "INFO:dakara_feeder.dakara_feeder:Found 0 songs to update",
+            ],
+        )
+        self.assertListEqual(
+            logger_progress.output,
+            [
+                "INFO:dakara_base.progress_bar:Parsing songs to add",
+                "INFO:dakara_base.progress_bar:Parsing songs to update",
+                "INFO:dakara_base.progress_bar:Uploading added songs",
+                "INFO:dakara_base.progress_bar:Uploading updated songs",
+                "INFO:dakara_base.progress_bar:Deleting removed songs",
             ],
         )
 
@@ -109,11 +120,12 @@ class DakaraFeederTestCase(TestCase):
         # create the config
         config = {"server": {}, "kara_folder": "basepath"}
         # create the object
-        feeder = DakaraFeeder(config)
+        feeder = DakaraFeeder(config, progress=False)
 
         # call the method
         with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger:
-            feeder.feed()
+            with self.assertLogs("dakara_base.progress_bar"):
+                feeder.feed()
 
         # assert the mocked calls
         mocked_dakara_server_class.return_value.get_songs.assert_called_with()
@@ -171,11 +183,12 @@ class DakaraFeederTestCase(TestCase):
         # create the config
         config = {"server": {}, "kara_folder": "basepath"}
         # create the object
-        feeder = DakaraFeeder(config, force_update=True)
+        feeder = DakaraFeeder(config, force_update=True, progress=False)
 
         # call the method
         with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger:
-            feeder.feed()
+            with self.assertLogs("dakara_base.progress_bar"):
+                feeder.feed()
 
         # assert the mocked calls
         mocked_dakara_server_class.return_value.get_songs.assert_called_with()
@@ -232,11 +245,12 @@ class DakaraFeederTestCase(TestCase):
         # create the config
         config = {"server": {}, "kara_folder": "basepath"}
         # create the object
-        feeder = DakaraFeeder(config)
+        feeder = DakaraFeeder(config, progress=False)
 
         # call the method
         with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger:
-            feeder.feed()
+            with self.assertLogs("dakara_base.progress_bar"):
+                feeder.feed()
 
         # assert the mocked calls
         mocked_dakara_server_class.return_value.get_songs.assert_called_with()
@@ -311,11 +325,12 @@ class DakaraFeederIntegrationTestCase(TestCase):
             "server": {},
             "kara_folder": get_file("dakara_feeder.tests.resources", ""),
         }
-        feeder = DakaraFeeder(config)
+        feeder = DakaraFeeder(config, progress=False)
 
         # call the method
         with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG"):
-            feeder.feed()
+            with self.assertLogs("dakara_base.progress_bar"):
+                feeder.feed()
 
         # assert the mocked calls
         mocked_dakara_server_class.return_value.get_songs.assert_called_with()

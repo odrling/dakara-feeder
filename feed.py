@@ -35,6 +35,13 @@ def get_parser():
     )
 
     parser.add_argument(
+        "--no-progress",
+        dest="progress",
+        action="store_false",
+        help="do not display progress bars",
+    )
+
+    parser.add_argument(
         "--config",
         help="path to the config file, default: '{}'".format(CONFIG_FILE_PATH),
         default=CONFIG_FILE_PATH,
@@ -50,14 +57,14 @@ def feed(args):
         args (argparse.Namespace): arguments from command line.
     """
     # prepare execution
-    create_logger()
+    create_logger(wrap=True)
     config = load_config(
         Path(args.config), args.debug, mandatory_keys=["kara_folder", "server"]
     )
     set_loglevel(config)
 
     # do the actual feeding
-    feeder = DakaraFeeder(config, force_update=args.force)
+    feeder = DakaraFeeder(config, force_update=args.force, progress=args.progress)
     feeder.load()
     feeder.feed()
 
