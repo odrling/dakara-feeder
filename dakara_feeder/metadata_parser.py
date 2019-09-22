@@ -46,6 +46,14 @@ class NullMetadataParser(MetadataParser):
     """Dummy metedata parser
 
     This is a null parser that always returns a timedelta 0 duration.
+
+    It can be used with:
+
+    >>> from Path import path
+    >>> file_path = Path("path/to/file")
+    >>> metadata = NullMetadataParser.parse(file_path)
+    >>> metadata.duration
+    datetime.timedelta(0)
     """
 
     @staticmethod
@@ -68,6 +76,14 @@ class MediainfoMetadataParser(MetadataParser):
     pymediainfo module.
 
     It does not seem to work on Windows, as the mediainfo DLL cannot be found.
+
+    It can be used with:
+
+    >>> from Path import path
+    >>> file_path = Path("path/to/file")
+    >>> metadata = MediainfoMetadataParser.parse(file_path)
+    >>> metadata.duration
+    datetime.timedelta(seconds=42)
     """
 
     @staticmethod
@@ -122,6 +138,14 @@ class FFProbeMetadataParser(MetadataParser):
     Freely inspired from [this proposed
     wrapper](https://stackoverflow.com/a/36743499) and the [code of
     ffprobe3](https://github.com/DheerendraRathor/ffprobe3/blob/master/ffprobe3/ffprobe.py).
+
+    It can be used with:
+
+    >>> from Path import path
+    >>> file_path = Path("path/to/file")
+    >>> metadata = FFProbeMetadataParser.parse(file_path)
+    >>> metadata.duration
+    datetime.timedelta(seconds=42)
     """
 
     @staticmethod

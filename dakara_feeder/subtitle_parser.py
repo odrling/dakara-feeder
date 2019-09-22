@@ -43,6 +43,12 @@ class SubtitleParser(ABC):
 class TXTSubtitleParser(SubtitleParser):
     """Subtitle parser for txt files
 
+    >>> from Path import path
+    >>> file_path = Path("path/to/file")
+    >>> subtitle = TXTSubtitleParser.parse(file_path)
+    >>> subtitle.get_lyrics()
+    "Mary had a little lamb…"
+
     Args:
         content (text): Full text of the lyrics.
     """
@@ -74,6 +80,14 @@ class Pysubs2SubtitleParser(SubtitleParser):
     This parser extracts cleaned lyrics from the provided subtitle file.
 
     It uses the `pysubs2` package to parse the ASS file.
+
+    It can be used with:
+
+    >>> from Path import path
+    >>> file_path = Path("path/to/file")
+    >>> subtitle = Pysubs2SubtitleParser.parse(file_path)
+    >>> subtitle.get_lyrics()
+    "Mary had a little lamb…"
 
     Attributes:
         content (pysubs2.SSAFile): parsed subtitle.
