@@ -38,7 +38,9 @@ class DakaraFeederTestCase(TestCase):
             SongPaths(Path("directory_0/song_0.mp4")),
             SongPaths(Path("directory_2/song_2.mp4"), Path("directory_2/song_2.ass")),
         ]
-        mocked_metadata_parse.return_value.duration = timedelta(seconds=1)
+        mocked_metadata_parse.return_value.get_duration.return_value = timedelta(
+            seconds=1
+        )
         mocked_subtitle_parse.return_value.get_lyrics.return_value = "lyri lyri"
 
         # create the config
@@ -115,7 +117,9 @@ class DakaraFeederTestCase(TestCase):
             SongPaths(Path("directory_0/song.mp4")),
             SongPaths(Path("directory_1/musics.mp4")),
         ]
-        mocked_metadata_parse.return_value.duration = timedelta(seconds=1)
+        mocked_metadata_parse.return_value.get_duration.return_value = timedelta(
+            seconds=1
+        )
 
         # create the config
         config = {"server": {}, "kara_folder": "basepath"}
@@ -178,7 +182,9 @@ class DakaraFeederTestCase(TestCase):
         mocked_list_directory.return_value = [
             SongPaths(Path("music_1.mp4"), Path("music_1.ass"))
         ]
-        mocked_metadata_parse.return_value.duration = timedelta(seconds=1)
+        mocked_metadata_parse.return_value.get_duration.return_value = timedelta(
+            seconds=1
+        )
         mocked_subtitle_parse.return_value.get_lyrics.return_value = "lyri lyri"
 
         # create the config
@@ -242,7 +248,9 @@ class DakaraFeederTestCase(TestCase):
             SongPaths(Path("directory_0/song_0.mp4")),
             SongPaths(Path("directory_1/song_1.mp4")),
         ]
-        mocked_metadata_parse.return_value.duration = timedelta(seconds=1)
+        mocked_metadata_parse.return_value.get_duration.return_value = timedelta(
+            seconds=1
+        )
 
         # create the config
         config = {"server": {}, "kara_folder": "basepath"}
@@ -327,7 +335,9 @@ class DakaraFeederTestCase(TestCase):
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = []
         mocked_list_directory.return_value = [SongPaths(Path("directory_0/song_0.mp4"))]
-        mocked_metadata_parse.return_value.duration = timedelta(seconds=1)
+        mocked_metadata_parse.return_value.get_duration.return_value = timedelta(
+            seconds=1
+        )
 
         class Song(BaseSong):
             def get_artists(self):

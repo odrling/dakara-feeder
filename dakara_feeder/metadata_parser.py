@@ -33,9 +33,8 @@ class MetadataParser(ABC):
             filename (str): path of the file to parse.
         """
 
-    @property
     @abstractmethod
-    def duration(self):
+    def get_duration(self):
         """Get duration as timedelta object
 
         Returns timedelta 0 if unable to get duration.
@@ -52,7 +51,7 @@ class NullMetadataParser(MetadataParser):
     >>> from Path import path
     >>> file_path = Path("path/to/file")
     >>> metadata = NullMetadataParser.parse(file_path)
-    >>> metadata.duration
+    >>> metadata.get_duration()
     datetime.timedelta(0)
     """
 
@@ -64,8 +63,7 @@ class NullMetadataParser(MetadataParser):
     def parse(cls, filename):
         return cls(filename)
 
-    @property
-    def duration(self):
+    def get_duration(self):
         return timedelta(0)
 
 
@@ -82,7 +80,7 @@ class MediainfoMetadataParser(MetadataParser):
     >>> from Path import path
     >>> file_path = Path("path/to/file")
     >>> metadata = MediainfoMetadataParser.parse(file_path)
-    >>> metadata.duration
+    >>> metadata.get_duration()
     datetime.timedelta(seconds=42)
     """
 
@@ -114,8 +112,7 @@ class MediainfoMetadataParser(MetadataParser):
 
         return cls(metadata)
 
-    @property
-    def duration(self):
+    def get_duration(self):
         """Get duration as timedelta object
 
         Returns timedelta 0 if unable to get duration.
@@ -144,7 +141,7 @@ class FFProbeMetadataParser(MetadataParser):
     >>> from Path import path
     >>> file_path = Path("path/to/file")
     >>> metadata = FFProbeMetadataParser.parse(file_path)
-    >>> metadata.duration
+    >>> metadata.get_duration()
     datetime.timedelta(seconds=42)
     """
 
@@ -196,8 +193,7 @@ class FFProbeMetadataParser(MetadataParser):
 
         return cls(json.loads(process.stdout.decode(sys.stdout.encoding)))
 
-    @property
-    def duration(self):
+    def get_duration(self):
         """Get duration as timedelta object
 
         Returns:

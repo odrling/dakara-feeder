@@ -80,7 +80,7 @@ class MediainfoMetadataParserTestCase(TestCase):
         parser = MediainfoMetadataParser.parse(
             get_file("dakara_feeder.tests.resources", "dummy.mkv")
         )
-        self.assertEqual(parser.duration, timedelta(seconds=2))
+        self.assertEqual(parser.get_duration(), timedelta(seconds=2))
 
 
 class FFProbeMetadataParserTestCase(TestCase):
@@ -152,4 +152,4 @@ class FFProbeMetadataParserTestCase(TestCase):
         parser = FFProbeMetadataParser.parse(
             get_file("dakara_feeder.tests.resources", "dummy.mkv")
         )
-        self.assertEqual(parser.duration, timedelta(seconds=2))
+        self.assertEqual(parser.get_duration(), timedelta(seconds=2))

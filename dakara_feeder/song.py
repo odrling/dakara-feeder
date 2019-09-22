@@ -109,7 +109,7 @@ class BaseSong:
             float: Duration of the song in seconds.
         """
         parser = FFProbeMetadataParser.parse(self.base_directory / self.video_path)
-        return parser.duration.total_seconds()
+        return parser.get_duration().total_seconds()
 
     def get_artists(self):
         """Get the list of artists
