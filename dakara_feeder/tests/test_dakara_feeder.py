@@ -88,9 +88,7 @@ class DakaraFeederTestCase(TestCase):
             logger_progress.output,
             [
                 "INFO:dakara_base.progress_bar:Parsing songs to add",
-                "INFO:dakara_base.progress_bar:Parsing songs to update",
                 "INFO:dakara_base.progress_bar:Uploading added songs",
-                "INFO:dakara_base.progress_bar:Uploading updated songs",
                 "INFO:dakara_base.progress_bar:Deleting removed songs",
             ],
         )

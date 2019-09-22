@@ -86,37 +86,50 @@ class DakaraFeeder:
 
         # songs to add
         # recover the song paths with the path of the video
-        added_songs = [
-            Song(self.kara_folder, new_songs_paths_map[song_path]).get_representation()
-            for song_path in self.bar(added_songs_path, text="Parsing songs to add")
-        ]
+        added_songs = []
+        if added_songs_path:
+            added_songs = [
+                Song(
+                    self.kara_folder, new_songs_paths_map[song_path]
+                ).get_representation()
+                for song_path in self.bar(added_songs_path, text="Parsing songs to add")
+            ]
 
         # songs to update
         # recover the song paths with the path of the video
-        updated_songs = [
-            (
-                Song(
-                    self.kara_folder, new_songs_paths_map[new_song_path]
-                ).get_representation(),
-                old_songs_id_by_path[old_song_path],
-            )
-            for new_song_path, old_song_path in self.bar(
-                updated_songs_path, text="Parsing songs to update"
-            )
-        ]
+        updated_songs = []
+        if updated_songs_path:
+            updated_songs = [
+                (
+                    Song(
+                        self.kara_folder, new_songs_paths_map[new_song_path]
+                    ).get_representation(),
+                    old_songs_id_by_path[old_song_path],
+                )
+                for new_song_path, old_song_path in self.bar(
+                    updated_songs_path, text="Parsing songs to update"
+                )
+            ]
 
         # create added songs on server
         # send them by chunks
-        for songs_chunk in self.bar(
-            divide_chunks(added_songs, self.songs_per_chunk),
-            text="Uploading added songs",
-        ):
-            self.dakara_server.post_song(songs_chunk)
+        if added_songs:
+            for songs_chunk in self.bar(
+                list(divide_chunks(added_songs, self.songs_per_chunk)),
+                text="Uploading added songs",
+            ):
+                self.dakara_server.post_song(songs_chunk)
 
         # update renamed songs on server
-        for song, song_id in self.bar(updated_songs, text="Uploading updated songs"):
-            self.dakara_server.put_song(song_id, song)
+        if updated_songs:
+            for song, song_id in self.bar(
+                updated_songs, text="Uploading updated songs"
+            ):
+                self.dakara_server.put_song(song_id, song)
 
         # remove deleted songs on server
-        for song_path in self.bar(deleted_songs_path, text="Deleting removed songs"):
-            self.dakara_server.delete_song(old_songs_id_by_path[song_path])
+        if deleted_songs_path:
+            for song_path in self.bar(
+                deleted_songs_path, text="Deleting removed songs"
+            ):
+                self.dakara_server.delete_song(old_songs_id_by_path[song_path])
