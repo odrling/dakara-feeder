@@ -28,7 +28,6 @@ class SubtitleParser(ABC):
         Returns:
             SubtitleParser: instance of the class for the given file.
         """
-        return cls()
 
     @abstractmethod
     def get_lyrics(self):
@@ -37,7 +36,6 @@ class SubtitleParser(ABC):
         Returns:
             str: text of the lyrics.
         """
-        return ""
 
 
 class TXTSubtitleParser(SubtitleParser):
