@@ -8,6 +8,7 @@ from path import Path
 from dakara_feeder.dakara_feeder import DakaraFeeder
 from dakara_feeder.directory_lister import SongPaths
 from dakara_feeder.metadata_parser import FFProbeMetadataParser
+from dakara_feeder.song import BaseSong
 from dakara_feeder.subtitle_parser import Pysubs2SubtitleParser
 
 
@@ -44,6 +45,7 @@ class DakaraFeederTestCase(TestCase):
         config = {"server": {}, "kara_folder": "basepath"}
         # create the object
         feeder = DakaraFeeder(config, progress=False)
+        feeder.load()
 
         # call the method
         with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger_feeder:
@@ -119,6 +121,7 @@ class DakaraFeederTestCase(TestCase):
         config = {"server": {}, "kara_folder": "basepath"}
         # create the object
         feeder = DakaraFeeder(config, progress=False)
+        feeder.load()
 
         # call the method
         with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger:
@@ -182,6 +185,7 @@ class DakaraFeederTestCase(TestCase):
         config = {"server": {}, "kara_folder": "basepath"}
         # create the object
         feeder = DakaraFeeder(config, force_update=True, progress=False)
+        feeder.load()
 
         # call the method
         with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger:
@@ -244,6 +248,7 @@ class DakaraFeederTestCase(TestCase):
         config = {"server": {}, "kara_folder": "basepath"}
         # create the object
         feeder = DakaraFeeder(config, progress=False)
+        feeder.load()
 
         # call the method
         with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger:
@@ -306,6 +311,65 @@ class DakaraFeederTestCase(TestCase):
             ],
         )
 
+    @patch("dakara_feeder.dakara_feeder.get_custom_song")
+    @patch.object(FFProbeMetadataParser, "parse", autoset=True)
+    @patch("dakara_feeder.dakara_feeder.list_directory", autoset=True)
+    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
+    def test_feed_custom_song_class(
+        self,
+        mocked_dakara_server_class,
+        mocked_list_directory,
+        mocked_metadata_parse,
+        mocked_get_custom_song,
+    ):
+        """Test to feed using a custom song class
+        """
+        # create the mocks
+        mocked_dakara_server_class.return_value.get_songs.return_value = []
+        mocked_list_directory.return_value = [SongPaths(Path("directory_0/song_0.mp4"))]
+        mocked_metadata_parse.return_value.duration = timedelta(seconds=1)
+
+        class Song(BaseSong):
+            def get_artists(self):
+                return ["artist1", "artist2"]
+
+        mocked_get_custom_song.return_value = Song
+
+        # create the config
+        config = {
+            "server": {},
+            "custom_song_class": "custom_song_module",
+            "kara_folder": "basepath",
+        }
+        # create the object
+        feeder = DakaraFeeder(config, progress=False)
+        feeder.load()
+
+        # call the method
+        with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG"):
+            with self.assertLogs("dakara_base.progress_bar"):
+                feeder.feed()
+
+        # assert the mocked calls
+        mocked_dakara_server_class.return_value.post_song.assert_called_with(
+            [
+                {
+                    "title": "song_0",
+                    "filename": "song_0.mp4",
+                    "directory": "directory_0",
+                    "duration": 1,
+                    "artists": ["artist1", "artist2"],
+                    "works": [],
+                    "tags": [],
+                    "version": "",
+                    "detail": "",
+                    "detail_video": "",
+                    "lyrics": "",
+                }
+            ]
+        )
+        mocked_get_custom_song.assert_called_with("custom_song_module")
+
 
 class DakaraFeederIntegrationTestCase(TestCase):
     """Integration test for the Feeder class
@@ -324,6 +388,7 @@ class DakaraFeederIntegrationTestCase(TestCase):
             "kara_folder": get_file("dakara_feeder.tests.resources", ""),
         }
         feeder = DakaraFeeder(config, progress=False)
+        feeder.load()
 
         # call the method
         with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG"):

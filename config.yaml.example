@@ -19,6 +19,15 @@ server:
 # Path of the karaoke folder
 kara_folder: /path/to/folder
 
+# Custom song class to use
+# If you want to extract additional data when parsing files (video, subtitle or
+# other), you can write your own Song class, derived from
+# `dakara_feeder.song.BaseSong`. See documentation of BaseSong for more details
+# on how to proceed.
+# Indicate the module name of the class to use.
+# Default is BaseSong, which is pretty basic.
+# custom_song_class: module_name.Song
+
 # Other parameters
 
 # Minimal level of messages to log

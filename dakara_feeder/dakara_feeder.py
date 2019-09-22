@@ -3,11 +3,12 @@ import logging
 from path import Path
 from dakara_base.progress_bar import progress_bar, null_bar
 
+from dakara_feeder.customization import get_custom_song
 from dakara_feeder.dakara_server import DakaraServer
 from dakara_feeder.diff_generator import generate_diff, match_similar
 from dakara_feeder.directory_lister import list_directory
 from dakara_feeder.similarity_calculator import calculate_file_path_similarity
-from dakara_feeder.song import Song
+from dakara_feeder.song import BaseSong
 from dakara_feeder.utils import divide_chunks
 
 
@@ -42,10 +43,17 @@ class DakaraFeeder:
         self.force_update = force_update
         self.songs_per_chunk = config["server"].get("songs_per_chunk", SONGS_PER_CHUNK)
         self.bar = progress_bar if progress else null_bar
+        self.song_class_module_name = config.get("custom_song_class")
+        self.Song = None
 
     def load(self):
         """Execute side-effect initialization tasks
         """
+        self.Song = (
+            get_custom_song(self.song_class_module_name)
+            if self.song_class_module_name
+            else BaseSong
+        )
         self.dakara_server.authenticate()
 
     def feed(self):
@@ -89,7 +97,7 @@ class DakaraFeeder:
         added_songs = []
         if added_songs_path:
             added_songs = [
-                Song(
+                self.Song(
                     self.kara_folder, new_songs_paths_map[song_path]
                 ).get_representation()
                 for song_path in self.bar(added_songs_path, text="Parsing songs to add")
@@ -101,7 +109,7 @@ class DakaraFeeder:
         if updated_songs_path:
             updated_songs = [
                 (
-                    Song(
+                    self.Song(
                         self.kara_folder, new_songs_paths_map[new_song_path]
                     ).get_representation(),
                     old_songs_id_by_path[old_song_path],

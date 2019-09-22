@@ -2,7 +2,7 @@ from dakara_feeder.metadata_parser import FFProbeMetadataParser
 from dakara_feeder.subtitle_parser import Pysubs2SubtitleParser
 
 
-class Song:
+class BaseSong:
     """Class describing a song
 
     Args.
@@ -24,6 +24,9 @@ class Song:
 
     def post_process(self, representation):
         pass
+
+    def get_title(self):
+        return self.video_path.stem
 
     def get_duration(self):
         parser = FFProbeMetadataParser.parse(self.base_directory / self.video_path)
@@ -62,7 +65,7 @@ class Song:
         """
         self.pre_process()
         representation = {
-            "title": self.video_path.stem,
+            "title": self.get_title(),
             "filename": str(self.video_path.basename()),
             "directory": str(self.video_path.dirname()),
             "duration": self.get_duration(),
