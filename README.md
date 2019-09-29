@@ -46,17 +46,17 @@ The package provides the following function:
 
 * `dakara-feed`: This will find songs in the configured directory, parse them and send their data to a running instance of the Dakara server. For help:
 
-        ```sh
-        dakara-feed -h
-        ```
+  ```sh
+  dakara-feed -h
+  ```
 
-        Before calling the function, you should create a config file with:
+  Before calling the function, you should create a config file with:
 
-        ```sh
-        dakara-feed create-config
-        ```
+  ```sh
+  dakara-feed create-config
+  ```
 
-        The data extracted from songs are very limited in this package, as data can be stored in various ways in song files. You are encouraged to make your own parser, see next subsection.
+  The data extracted from songs are very limited in this package, as data can be stored in various ways in song files. You are encouraged to make your own parser, see next subsection.
 
 ### Making a custom parser
 
