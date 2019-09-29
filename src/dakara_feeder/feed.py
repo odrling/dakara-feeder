@@ -7,9 +7,7 @@ from dakara_base.exceptions import DakaraError
 from dakara_base.config import load_config, create_logger, set_loglevel
 
 from dakara_feeder.dakara_feeder import DakaraFeeder
-
-
-CONFIG_FILE_PATH = "config.yaml"
+from dakara_feeder.config import CONFIG_FILE, dump_config
 
 
 logger = logging.getLogger(__name__)
@@ -43,8 +41,12 @@ def get_parser():
 
     parser.add_argument(
         "--config",
-        help="path to the config file, default: '{}'".format(CONFIG_FILE_PATH),
-        default=CONFIG_FILE_PATH,
+        help="path to the config file, default: '{}'".format(CONFIG_FILE),
+        default=CONFIG_FILE,
+    )
+
+    parser.add_argument(
+        "--dump-config", help="Create new config file", action="store_true"
     )
 
     return parser
@@ -58,6 +60,12 @@ def feed(args):
     """
     # prepare execution
     create_logger(wrap=True)
+
+    # if dump config
+    if args.dump_config:
+        dump_config()
+        return
+
     config = load_config(
         Path(args.config), args.debug, mandatory_keys=["kara_folder", "server"]
     )
@@ -69,7 +77,7 @@ def feed(args):
     feeder.feed()
 
 
-if __name__ == "__main__":
+def main():
     parser = get_parser()
     args = parser.parse_args()
 
@@ -103,3 +111,7 @@ if __name__ == "__main__":
         exit(128)
 
     exit(0)
+
+
+if __name__ == "__main__":
+    main()

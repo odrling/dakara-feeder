@@ -1,0 +1,6 @@
+recursive-include tests *.py
+recursive-include tests/resources *.ass
+recursive-include tests/resources *.ass_expected
+recursive-include tests/resources *.mkv
+include LICENSE
+include src/dakara_feeder/resources/config.yaml

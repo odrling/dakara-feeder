@@ -23,7 +23,7 @@ class Pysubs2SubtitleParserTestCase(TestCase):
 
         This method is called from other tests methods.
         """
-        file_path = get_file("dakara_feeder.tests.resources.subtitles", file_name)
+        file_path = get_file("tests.resources.subtitles", file_name)
 
         # open and parse given file
         parser = Pysubs2SubtitleParser.parse(file_path)

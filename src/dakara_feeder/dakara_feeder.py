@@ -34,6 +34,10 @@ class DakaraFeeder:
         songs_per_chunk (int): number of songs per chunk to send to server when
             creating songs.
         bar (function): progress bar to use.
+        song_class_module_name (str): module name of the custom song class to
+            use.
+        Song (class): custom song class to use. Must be a subclass of
+            `dakara_feeder.song.BaseSong`.
     """
 
     def __init__(self, config, force_update=False, progress=True):

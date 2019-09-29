@@ -77,9 +77,7 @@ class MediainfoMetadataParserTestCase(TestCase):
     def test_get_duration(self):
         """Test to get duration
         """
-        parser = MediainfoMetadataParser.parse(
-            get_file("dakara_feeder.tests.resources", "dummy.mkv")
-        )
+        parser = MediainfoMetadataParser.parse(get_file("tests.resources", "dummy.mkv"))
         self.assertEqual(parser.get_duration(), timedelta(seconds=2))
 
 
@@ -149,7 +147,5 @@ class FFProbeMetadataParserTestCase(TestCase):
     def test_get_duration(self):
         """Test to get duration
         """
-        parser = FFProbeMetadataParser.parse(
-            get_file("dakara_feeder.tests.resources", "dummy.mkv")
-        )
+        parser = FFProbeMetadataParser.parse(get_file("tests.resources", "dummy.mkv"))
         self.assertEqual(parser.get_duration(), timedelta(seconds=2))

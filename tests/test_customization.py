@@ -128,30 +128,26 @@ class ImpostCustomObjectTestCase(TestCase):
     def test_import_module(self):
         """Test to import a module
         """
-        module = customization.import_custom_object(
-            "dakara_feeder.tests.resources.my_module"
-        )
+        module = customization.import_custom_object("tests.resources.my_module")
         self.assertTrue(inspect.ismodule(module))
 
     def test_import_parent_module(self):
         """Test to import a parent module
         """
-        module = customization.import_custom_object("dakara_feeder.tests.resources")
+        module = customization.import_custom_object("tests.resources")
         self.assertTrue(inspect.ismodule(module))
 
     def test_import_class(self):
         """Test to import a class
         """
-        klass = customization.import_custom_object(
-            "dakara_feeder.tests.resources.my_module.MyClass"
-        )
+        klass = customization.import_custom_object("tests.resources.my_module.MyClass")
         self.assertTrue(inspect.isclass(klass))
 
     def test_import_static_attribute(self):
         """Test to import a class static attribute
         """
         attribute = customization.import_custom_object(
-            "dakara_feeder.tests.resources.my_module.MyClass.my_attribute"
+            "tests.resources.my_module.MyClass.my_attribute"
         )
         self.assertEqual(attribute, 42)
 
@@ -168,15 +164,12 @@ class ImpostCustomObjectTestCase(TestCase):
         """Test to import a non-existing module
         """
         with self.assertRaises(customization.InvalidObjectModuleNameError) as error:
-            customization.import_custom_object(
-                "dakara_feeder.tests.resources.notexistingmodule"
-            )
+            customization.import_custom_object("tests.resources.notexistingmodule")
 
         # assert error
         self.assertEqual(
             str(error.exception),
-            "No module or object notexistingmodule found in "
-            "dakara_feeder.tests.resources",
+            "No module or object notexistingmodule found in " "tests.resources",
         )
 
     def test_error_object(self):
@@ -184,14 +177,14 @@ class ImpostCustomObjectTestCase(TestCase):
         """
         with self.assertRaises(customization.InvalidObjectModuleNameError) as error:
             customization.import_custom_object(
-                "dakara_feeder.tests.resources.my_module.notexistingattribute"
+                "tests.resources.my_module.notexistingattribute"
             )
 
         # assert error
         self.assertEqual(
             str(error.exception),
             "No module or object notexistingattribute found in "
-            "dakara_feeder.tests.resources.my_module",
+            "tests.resources.my_module",
         )
 
     def test_error_sub_object(self):
@@ -199,12 +192,12 @@ class ImpostCustomObjectTestCase(TestCase):
         """
         with self.assertRaises(customization.InvalidObjectModuleNameError) as error:
             customization.import_custom_object(
-                "dakara_feeder.tests.resources.my_module.MyClass.notexistingattribute"
+                "tests.resources.my_module.MyClass.notexistingattribute"
             )
 
         # assert error
         self.assertEqual(
             str(error.exception),
             "No module or object notexistingattribute found in "
-            "dakara_feeder.tests.resources.my_module.MyClass",
+            "tests.resources.my_module.MyClass",
         )

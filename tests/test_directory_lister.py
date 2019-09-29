@@ -104,7 +104,7 @@ class ListDirectoryTestCase(TestCase):
         """
         # call the function
         with self.assertLogs("dakara_feeder.directory_lister", "DEBUG"):
-            directory = get_file("dakara_feeder.tests.resources", "")
+            directory = get_file("tests.resources", "")
             listing = list_directory(directory)
 
         # check the structure

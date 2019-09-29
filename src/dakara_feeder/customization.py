@@ -1,6 +1,9 @@
 import importlib
 import inspect
 import logging
+import os
+import sys
+from contextlib import contextmanager
 
 from dakara_base.exceptions import DakaraError
 
@@ -57,6 +60,23 @@ def get_custom_song(class_module_name):
     return custom_class
 
 
+@contextmanager
+def current_dir_in_path():
+    """ Temporarily add current directory to top of the Python path
+    """
+    # get copy of system path
+    old_path_list = sys.path.copy()
+
+    try:
+        # prepend the current dir in path
+        sys.path.insert(0, os.getcwd())
+        yield None
+
+    finally:
+        # restore system path
+        sys.path = old_path_list
+
+
 def import_custom_object(object_module_name):
     """Import a custom object from a given module name
 
@@ -75,7 +95,8 @@ def import_custom_object(object_module_name):
 
         # try to import the module
         try:
-            module = importlib.import_module(module_name)
+            with current_dir_in_path():
+                module = importlib.import_module(module_name)
 
         # if not continue with parent module
         except ModuleNotFoundError:

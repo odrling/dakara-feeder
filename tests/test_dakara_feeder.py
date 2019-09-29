@@ -393,10 +393,7 @@ class DakaraFeederIntegrationTestCase(TestCase):
         mocked_dakara_server_class.return_value.get_songs.return_value = []
 
         # create the object
-        config = {
-            "server": {},
-            "kara_folder": get_file("dakara_feeder.tests.resources", ""),
-        }
+        config = {"server": {}, "kara_folder": get_file("tests.resources", "")}
         feeder = DakaraFeeder(config, progress=False)
         feeder.load()
 
