@@ -68,7 +68,7 @@ Here is a basic example. It considers that the song video file is formatted in t
 # my_song.py
 from dakara_feeder.song import BaseSong
 
-class Song:
+class Song(BaseSong):
     def get_title(self):
         return self.video_path.stem.split(" - ")[0]
 
