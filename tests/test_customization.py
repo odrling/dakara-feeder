@@ -121,7 +121,49 @@ class GetCustomSongTestCase(TestCase):
         self.assertEqual(str(error.exception), "song.MySong is not a Song subclass")
 
 
-class ImpostCustomObjectTestCase(TestCase):
+class CurrentDirInPathTestCase(TestCase):
+    """Test the helper to put current directory in Python path
+    """
+
+    @patch("dakara_feeder.customization.os.getcwd")
+    @patch("dakara_feeder.customization.sys")
+    def test_normal(self, mocked_sys, mocked_getcwd):
+        """Test the helper with no alteration of the path
+        """
+        # setup mocks
+        mocked_getcwd.return_value = "current/directory"
+        mocked_sys.path = ["some/directory"]
+
+        # use the context manager
+        with customization.current_dir_in_path():
+            self.assertListEqual(
+                mocked_sys.path, ["current/directory", "some/directory"]
+            )
+
+        # assert the mock
+        self.assertListEqual(mocked_sys.path, ["some/directory"])
+
+    @patch("dakara_feeder.customization.os.getcwd")
+    @patch("dakara_feeder.customization.sys")
+    def test_alteration(self, mocked_sys, mocked_getcwd):
+        """Test the helper with alteration of the path
+        """
+        # setup mocks
+        mocked_getcwd.return_value = "current/directory"
+        mocked_sys.path = []
+
+        # use the context manager
+        with customization.current_dir_in_path():
+            mocked_sys.path.append("other/directory")
+            self.assertListEqual(
+                mocked_sys.path, ["current/directory", "other/directory"]
+            )
+
+        # assert the mock
+        self.assertListEqual(mocked_sys.path, [])
+
+
+class ImportCustomObjectTestCase(TestCase):
     """Test the importer for custom objects
     """
 

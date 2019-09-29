@@ -62,7 +62,10 @@ def get_custom_song(class_module_name):
 
 @contextmanager
 def current_dir_in_path():
-    """ Temporarily add current directory to top of the Python path
+    """Temporarily add current directory to top of the Python path
+
+    Python path is reseted to its initial state when leaving the context
+    manager.
     """
     # get copy of system path
     old_path_list = sys.path.copy()
