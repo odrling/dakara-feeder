@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""Entry point for the dakara-feed command
+"""
+
+
 import logging
 from argparse import ArgumentParser
 
@@ -92,21 +96,18 @@ def main():
 
     try:
         args.function(args)
+        value = 0
 
     except KeyboardInterrupt:
         logger.info("Quit by user")
-        exit(255)
-
-    except SystemExit:
-        logger.info("Quit by system")
-        exit(254)
+        value = 255
 
     except DakaraError as error:
         if args.debug:
             raise
 
         logger.critical(error)
-        exit(1)
+        value = 1
 
     except BaseException as error:
         if args.debug:
@@ -117,9 +118,9 @@ def main():
             "Please fill a bug report at "
             "https://github.com/DakaraProject/dakara-feeder/issues"
         )
-        exit(128)
+        value = 128
 
-    exit(0)
+    exit(value)
 
 
 if __name__ == "__main__":
