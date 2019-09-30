@@ -1,5 +1,8 @@
 # Dakara Feeder
 
+[![Travis CI Build Status](https://travis-ci.org/DakaraProject/dakara-feeder.svg?branch=develop)](https://travis-ci.org/DakaraProject/dakara-feeder)
+[![Appveyor CI Build status](https://ci.appveyor.com/api/projects/status/7vxx2dyu8y25v6of?svg=true)](https://ci.appveyor.com/project/neraste/dakara-feeder/branch/develop)
+[![Codecov coverage analysis](https://codecov.io/gh/DakaraProject/dakara-feeder/branch/develop/graph/badge.svg)](https://codecov.io/gh/DakaraProject/dakara-feeder)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 Allows to feed the database of the Dakara server remotely.
