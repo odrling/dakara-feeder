@@ -16,7 +16,7 @@ from dakara_feeder.metadata_parser import (
 )
 
 
-@skipIf(sys.platform.startswith("win"), "Disabled for Windows")
+# @skipIf(sys.platform.startswith("win"), "Disabled for Windows")
 @skipUnless(MediaInfo.can_parse(), "MediaInfo not installed")
 class MediainfoMetadataParserTestCase(TestCase):
     """Test the Mediainfo metadata parser

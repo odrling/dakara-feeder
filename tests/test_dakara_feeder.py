@@ -31,12 +31,15 @@ class DakaraFeederTestCase(TestCase):
         """
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = [
-            {"id": 0, "path": Path("directory_0/song_0.mp4")},
-            {"id": 1, "path": Path("directory_1/music_1.mp4")},
+            {"id": 0, "path": Path("directory_0/song_0.mp4").normpath()},
+            {"id": 1, "path": Path("directory_1/music_1.mp4").normpath()},
         ]
         mocked_list_directory.return_value = [
-            SongPaths(Path("directory_0/song_0.mp4")),
-            SongPaths(Path("directory_2/song_2.mp4"), Path("directory_2/song_2.ass")),
+            SongPaths(Path("directory_0/song_0.mp4").normpath()),
+            SongPaths(
+                Path("directory_2/song_2.mp4").normpath(),
+                Path("directory_2/song_2.ass").normpath(),
+            ),
         ]
         mocked_metadata_parse.return_value.get_duration.return_value = timedelta(
             seconds=1
@@ -75,7 +78,9 @@ class DakaraFeederTestCase(TestCase):
             ]
         )
         mocked_dakara_server_class.return_value.delete_song.assert_called_with(1)
-        mocked_subtitle_parse.assert_called_with("basepath/directory_2/song_2.ass")
+        mocked_subtitle_parse.assert_called_with(
+            Path("basepath/directory_2/song_2.ass").normpath()
+        )
         mocked_subtitle_parse.return_value.get_lyrics.assert_called_with()
 
         self.assertListEqual(
@@ -107,15 +112,15 @@ class DakaraFeederTestCase(TestCase):
         """
         # mock content of server (old files)
         mocked_dakara_server_class.return_value.get_songs.return_value = [
-            {"id": 0, "path": Path("directory_0/song.mp4")},
-            {"id": 1, "path": Path("directory_1/music.mp4")},
+            {"id": 0, "path": Path("directory_0/song.mp4").normpath()},
+            {"id": 1, "path": Path("directory_1/music.mp4").normpath()},
         ]
 
         # mock content of file system (new files)
         # Simulate file music.mp4 renamed to musics.mp4
         mocked_list_directory.return_value = [
-            SongPaths(Path("directory_0/song.mp4")),
-            SongPaths(Path("directory_1/musics.mp4")),
+            SongPaths(Path("directory_0/song.mp4").normpath()),
+            SongPaths(Path("directory_1/musics.mp4").normpath()),
         ]
         mocked_metadata_parse.return_value.get_duration.return_value = timedelta(
             seconds=1
@@ -245,8 +250,8 @@ class DakaraFeederTestCase(TestCase):
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = []
         mocked_list_directory.return_value = [
-            SongPaths(Path("directory_0/song_0.mp4")),
-            SongPaths(Path("directory_1/song_1.mp4")),
+            SongPaths(Path("directory_0/song_0.mp4").normpath()),
+            SongPaths(Path("directory_1/song_1.mp4").normpath()),
         ]
         mocked_metadata_parse.return_value.get_duration.return_value = timedelta(
             seconds=1
@@ -334,7 +339,9 @@ class DakaraFeederTestCase(TestCase):
         """
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = []
-        mocked_list_directory.return_value = [SongPaths(Path("directory_0/song_0.mp4"))]
+        mocked_list_directory.return_value = [
+            SongPaths(Path("directory_0/song_0.mp4").normpath())
+        ]
         mocked_metadata_parse.return_value.get_duration.return_value = timedelta(
             seconds=1
         )
