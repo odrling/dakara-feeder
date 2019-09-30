@@ -47,13 +47,13 @@ test_script:
   - "if NOT %PYTHON_VERSION% == 3.5 (py -%PYTHON_VERSION% -m  black . --check)"
   - "py -%PYTHON_VERSION% -m flake8"
 
-# # commands to manage tests results
-# after_test:
-#   # show coverage stats
-#   - "py -%PYTHON_VERSION% -m coverage report -m"
-#
-#   # upload coverage stats to codecov.io
-#   # coverage must be called manually
-#   # codecov token is stored in appveyor settings
-#   - "py -%PYTHON_VERSION% -m coverage xml"
-#   - "py -%PYTHON_VERSION% -m codecov -X gcov --file coverage.xml"
+# commands to manage tests results
+after_test:
+  # show coverage stats
+  - "py -%PYTHON_VERSION% -m coverage report -m"
+
+  # upload coverage stats to codecov.io
+  # coverage must be called manually
+  # codecov token is stored in appveyor settings
+  - "py -%PYTHON_VERSION% -m coverage xml"
+  - "py -%PYTHON_VERSION% -m codecov -X gcov --file coverage.xml"
