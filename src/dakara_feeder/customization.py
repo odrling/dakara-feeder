@@ -8,6 +8,7 @@ from contextlib import contextmanager
 from dakara_base.exceptions import DakaraError
 
 from dakara_feeder.song import BaseSong
+from dakara_feeder.compatibility import *  # noqa F401,F403
 
 
 logger = logging.getLogger(__name__)
