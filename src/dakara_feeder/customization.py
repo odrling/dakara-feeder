@@ -102,7 +102,7 @@ def import_custom_object(object_module_name):
                 module = importlib.import_module(module_name)
 
         # if not continue with parent module
-        except ModuleNotFoundError:
+        except ImportError:
             continue
 
         # if found
@@ -127,7 +127,7 @@ def import_custom_object(object_module_name):
     return custom_object
 
 
-class InvalidObjectModuleNameError(DakaraError, ModuleNotFoundError, AttributeError):
+class InvalidObjectModuleNameError(DakaraError, ImportError, AttributeError):
     """Error when the object requested does not exist
     """
 
