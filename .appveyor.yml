@@ -10,7 +10,7 @@ branches:
 
 # enable cache for Python dependencies
 cache:
-  - "%LOCALAPPDATA%\pip\Cache"
+  - "%LOCALAPPDATA%\\pip\\Cache"
 
 environment:
   # setup special environment variable for Appveyor CI test environment
