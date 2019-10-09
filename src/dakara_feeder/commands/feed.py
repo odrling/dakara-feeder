@@ -91,6 +91,8 @@ def feed(args):
 
 
 def main():
+    """Main command
+    """
     parser = get_parser()
     args = parser.parse_args()
 
