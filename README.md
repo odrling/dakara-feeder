@@ -1,9 +1,11 @@
 # Dakara Feeder
 
-[![Travis CI Build Status](https://travis-ci.org/DakaraProject/dakara-feeder.svg?branch=develop)](https://travis-ci.org/DakaraProject/dakara-feeder)
+[![Travis CI Build Status](https://travis-ci.com/DakaraProject/dakara-feeder.svg?branch=develop)](https://travis-ci.com/DakaraProject/dakara-feeder)
 [![Appveyor CI Build status](https://ci.appveyor.com/api/projects/status/7vxx2dyu8y25v6of?svg=true)](https://ci.appveyor.com/project/neraste/dakara-feeder/branch/develop)
 [![Codecov coverage analysis](https://codecov.io/gh/DakaraProject/dakara-feeder/branch/develop/graph/badge.svg)](https://codecov.io/gh/DakaraProject/dakara-feeder)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
+[![PyPI version](https://badge.fury.io/py/ansicolortags.svg)](https://pypi.python.org/pypi/dakarafeeder/)
+[![PyPI Python versions](https://img.shields.io/pypi/pyversions/ansicolortags.svg)](https://pypi.python.org/pypi/dakarafeeder/)
 
 Allows to feed the database of the Dakara server remotely.
 
@@ -15,7 +17,7 @@ This repo is tied with the Dakara server, so you should setup it first:
 
 Other important parts of the project include:
 
-* [Dakara plaer VLC](https://github.com/DakaraProject/dakara-player-vlc/);
+* [Dakara VLC player](https://github.com/DakaraProject/dakara-player-vlc/);
 * [Dakara web client](https://github.com/DakaraProject/dakara-client-web/).
 
 
@@ -29,11 +31,11 @@ Linux and Windows are supported.
 
 ### Install
 
-<!-- Install the package with: -->
-<!--  -->
-<!-- ```sh -->
-<!-- pip install dakarafeeder -->
-<!-- ``` -->
+Install the package with:
+
+```sh
+pip install dakarafeeder
+```
 
 If you have downloaded the repo, you can install the package directly with:
 
@@ -45,7 +47,7 @@ python setup.py install
 
 ### Commands
 
-The package provides the following function:
+The package provides the following command:
 
 * `dakara-feed`: This will find songs in the configured directory, parse them and send their data to a running instance of the Dakara server. For help:
 
@@ -79,7 +81,7 @@ class Song(BaseSong):
         return [{"name": self.video_path.stem.split(" - ")[1]}]
 ```
 
-The file must be in the same directory you are calling `dakara-feed.`
+The file must be in the same directory you are calling `dakara-feed`, or in any directory reachable by Python.
 To register your customized `Song` class, you simply enable it in the config file:
 
 ```yaml
