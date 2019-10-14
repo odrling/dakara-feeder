@@ -1,4 +1,5 @@
 import logging
+from pkg_resources import parse_version
 
 from path import Path
 from dakara_base.progress_bar import progress_bar, null_bar
@@ -10,6 +11,7 @@ from dakara_feeder.directory_lister import list_directory
 from dakara_feeder.similarity_calculator import calculate_file_path_similarity
 from dakara_feeder.song import BaseSong
 from dakara_feeder.utils import divide_chunks
+from dakara_feeder.version import __version__, __date__
 
 
 logger = logging.getLogger(__name__)
@@ -48,17 +50,32 @@ class DakaraFeeder:
         self.songs_per_chunk = config["server"].get("songs_per_chunk", SONGS_PER_CHUNK)
         self.bar = progress_bar if progress else null_bar
         self.song_class_module_name = config.get("custom_song_class")
-        self.Song = None
+        self.song_class = BaseSong
 
     def load(self):
         """Execute side-effect initialization tasks
         """
-        self.Song = (
-            get_custom_song(self.song_class_module_name)
-            if self.song_class_module_name
-            else BaseSong
-        )
+        # check version
+        self.check_version()
+
+        # select song class
+        if self.song_class_module_name:
+            self.song_class = get_custom_song(self.song_class_module_name)
+
+        # authenticate to server
         self.dakara_server.authenticate()
+
+    @staticmethod
+    def check_version():
+        """Display version number and check if on release
+        """
+        # log player versio
+        logger.info("Dakara feeder %s (%s)", __version__, __date__)
+
+        # check version is a release
+        version = parse_version(__version__)
+        if version.is_prerelease:
+            logger.warning("You are running a dev version, use it at your own risks!")
 
     def feed(self):
         """Execute the feeding action
@@ -101,7 +118,7 @@ class DakaraFeeder:
         added_songs = []
         if added_songs_path:
             added_songs = [
-                self.Song(
+                self.song_class(
                     self.kara_folder, new_songs_paths_map[song_path]
                 ).get_representation()
                 for song_path in self.bar(added_songs_path, text="Parsing songs to add")
@@ -113,7 +130,7 @@ class DakaraFeeder:
         if updated_songs_path:
             updated_songs = [
                 (
-                    self.Song(
+                    self.song_class(
                         self.kara_folder, new_songs_paths_map[new_song_path]
                     ).get_representation(),
                     old_songs_id_by_path[old_song_path],
