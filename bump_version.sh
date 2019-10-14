@@ -31,9 +31,9 @@ version_date=$(date -I -u)
 setup_file=setup.cfg
 sed -i "s/^version = .*$/version = $version_number/" $setup_file
 
-# patch version date in __init__.py
-init_file=src/dakara_feeder/__init__.py
-sed -i "s/^__date__ = .*$/__date__ = \"$version_date\"/" $init_file
+# patch version date in version.py
+version_file=src/dakara_feeder/version.py
+sed -i "s/^__date__ = .*$/__date__ = \"$version_date\"/" $version_file
 
 # patch changelog
 changelog_file=CHANGELOG.md
@@ -46,7 +46,7 @@ appveyor_file=.appveyor.yml
 sed -i "s/^version: .*-{build}$/version: $version_number-{build}/" $appveyor_file
 
 # create commit and tag
-git add $setup_file $init_file $changelog_file $appveyor_file
+git add $setup_file $version_file $changelog_file $appveyor_file
 git commit -m "Version $version_number" --no-verify
 git tag "$version_number"
 
