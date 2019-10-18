@@ -1,5 +1,4 @@
 import logging
-from pkg_resources import parse_version
 
 from path import Path
 from dakara_base.progress_bar import progress_bar, null_bar
@@ -11,7 +10,7 @@ from dakara_feeder.directory_lister import list_directory
 from dakara_feeder.similarity_calculator import calculate_file_path_similarity
 from dakara_feeder.song import BaseSong
 from dakara_feeder.utils import divide_chunks
-from dakara_feeder.version import __version__, __date__
+from dakara_feeder.version import check_version
 
 
 logger = logging.getLogger(__name__)
@@ -56,7 +55,7 @@ class DakaraFeeder:
         """Execute side-effect initialization tasks
         """
         # check version
-        self.check_version()
+        check_version()
 
         # select song class
         if self.song_class_module_name:
@@ -64,18 +63,6 @@ class DakaraFeeder:
 
         # authenticate to server
         self.dakara_server.authenticate()
-
-    @staticmethod
-    def check_version():
-        """Display version number and check if on release
-        """
-        # log player versio
-        logger.info("Dakara feeder %s (%s)", __version__, __date__)
-
-        # check version is a release
-        version = parse_version(__version__)
-        if version.is_prerelease:
-            logger.warning("You are running a dev version, use it at your own risks!")
 
     def feed(self):
         """Execute the feeding action

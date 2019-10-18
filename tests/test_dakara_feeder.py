@@ -16,48 +16,9 @@ class DakaraFeederTestCase(TestCase):
     """Test the feeder class
     """
 
-    def test_check_version_release(self):
-        """Test to display the version for a release
-        """
-        with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger:
-            with patch.multiple(
-                "dakara_feeder.dakara_feeder",
-                __version__="0.0.0",
-                __date__="1970-01-01",
-            ):
-                DakaraFeeder.check_version()
-
-        # assert effect on logs
-        self.assertListEqual(
-            logger.output,
-            ["INFO:dakara_feeder.dakara_feeder:" "Dakara feeder 0.0.0 (1970-01-01)"],
-        )
-
-    def test_check_version_non_release(self):
-        """Test to display the version for a non release
-        """
-        with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger:
-            with patch.multiple(
-                "dakara_feeder.dakara_feeder",
-                __version__="0.1.0-dev",
-                __date__="1970-01-01",
-            ):
-                DakaraFeeder.check_version()
-
-        # assert effect on logs
-        self.assertListEqual(
-            logger.output,
-            [
-                "INFO:dakara_feeder.dakara_feeder:"
-                "Dakara feeder 0.1.0-dev (1970-01-01)",
-                "WARNING:dakara_feeder.dakara_feeder:"
-                "You are running a dev version, use it at your own risks!",
-            ],
-        )
-
     @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
     @patch("dakara_feeder.dakara_feeder.get_custom_song", autoset=True)
-    @patch.object(DakaraFeeder, "check_version", autoset=True)
+    @patch("dakara_feeder.dakara_feeder.check_version", autoset=True)
     def test_load_no_song_class(
         self, mocked_check_version, mocked_get_custom_song, mocked_dakara_server_class
     ):
@@ -85,7 +46,7 @@ class DakaraFeederTestCase(TestCase):
 
     @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
     @patch("dakara_feeder.dakara_feeder.get_custom_song", autoset=True)
-    @patch.object(DakaraFeeder, "check_version", autoset=True)
+    @patch("dakara_feeder.dakara_feeder.check_version", autoset=True)
     def test_load_with_song_class(
         self, mocked_check_version, mocked_get_custom_song, mocked_dakara_server_class
     ):
