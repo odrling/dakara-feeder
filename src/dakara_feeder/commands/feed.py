@@ -24,7 +24,7 @@ def get_parser():
         argparse.ArgumentParser: parser.
     """
     # main parser
-    parser = ArgumentParser(description="Feeder for the Dakara project")
+    parser = ArgumentParser(prog="feed", description="Feeder for the Dakara project")
 
     parser.set_defaults(function=feed)
 
