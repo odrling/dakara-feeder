@@ -12,6 +12,7 @@ from dakara_base.config import load_config, create_logger, set_loglevel
 
 from dakara_feeder import DakaraFeeder
 from dakara_feeder.config import CONFIG_FILE, create_config
+from dakara_feeder.version import __version__, __date__
 
 
 logger = logging.getLogger(__name__)
@@ -50,6 +51,12 @@ def get_parser():
         "--config",
         help="path to the config file, default: '{}'".format(CONFIG_FILE),
         default=CONFIG_FILE,
+    )
+
+    parser.add_argument(
+        "--version",
+        action="version",
+        version="%(prog)s {} ({})".format(__version__, __date__),
     )
 
     # subparsers
