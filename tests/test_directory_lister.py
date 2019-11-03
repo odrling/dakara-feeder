@@ -40,10 +40,10 @@ class ListDirectoryTestCase(TestCase):
             [
                 SongPaths(Path("file0.mkv"), Path("file0.ass")),
                 SongPaths(Path("file1.mkv"), Path("file1.ass")),
-                SongPaths(Path("subdirectory/file2.mkv").normpath()),
+                SongPaths(Path("subdirectory") / "file2.mkv"),
                 SongPaths(
-                    Path("subdirectory/file3.mkv").normpath(),
-                    Path("subdirectory/file3.ass").normpath(),
+                    Path("subdirectory") / "file3.mkv",
+                    Path("subdirectory") / "file3.ass",
                 ),
             ],
             listing,
@@ -84,8 +84,8 @@ class ListDirectoryTestCase(TestCase):
             [
                 SongPaths(Path("file0.mkv"), Path("file0.ass")),
                 SongPaths(
-                    Path("subdirectory/file0.mkv").normpath(),
-                    Path("subdirectory/file0.ass").normpath(),
+                    Path("subdirectory") / "file0.mkv",
+                    Path("subdirectory") / "file0.ass",
                 ),
             ],
             listing,

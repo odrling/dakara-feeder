@@ -53,8 +53,8 @@ class DakaraServerTestCase(TestCase):
         self.assertCountEqual(
             songs_list,
             [
-                {"path": Path("directory_0/song_0.mp4").normpath(), "id": 0},
-                {"path": Path("directory_1/song_1.mp4").normpath(), "id": 1},
+                {"path": Path("directory_0") / "song_0.mp4", "id": 0},
+                {"path": Path("directory_1") / "song_1.mp4", "id": 1},
             ],
         )
 
