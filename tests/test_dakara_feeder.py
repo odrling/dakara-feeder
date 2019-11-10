@@ -5,7 +5,7 @@ from unittest.mock import patch
 from dakara_base.resources_manager import get_file
 from path import Path
 
-from dakara_feeder.dakara_feeder import DakaraFeeder
+from dakara_feeder.dakara_feeder import DakaraFeeder, KaraFolderNotFound
 from dakara_feeder.directory_lister import SongPaths
 from dakara_feeder.metadata_parser import FFProbeMetadataParser
 from dakara_feeder.song import BaseSong
@@ -17,10 +17,15 @@ class DakaraFeederTestCase(TestCase):
     """
 
     @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
+    @patch.object(DakaraFeeder, "check_kara_folder_path", autoset=True)
     @patch("dakara_feeder.dakara_feeder.get_custom_song", autoset=True)
     @patch("dakara_feeder.dakara_feeder.check_version", autoset=True)
     def test_load_no_song_class(
-        self, mocked_check_version, mocked_get_custom_song, mocked_dakara_server_class
+        self,
+        mocked_check_version,
+        mocked_get_custom_song,
+        mocked_check_kara_folder_path,
+        mocked_dakara_server_class,
     ):
         """Test to run side-effect tasks
         """
@@ -42,13 +47,19 @@ class DakaraFeederTestCase(TestCase):
         # assert the call
         mocked_check_version.assert_called_with()
         mocked_get_custom_song.assert_not_called()
+        mocked_check_kara_folder_path.assert_called_with()
         mocked_dakara_server_class.return_value.authenticate.assert_called_with()
 
     @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
+    @patch.object(DakaraFeeder, "check_kara_folder_path", autoset=True)
     @patch("dakara_feeder.dakara_feeder.get_custom_song", autoset=True)
     @patch("dakara_feeder.dakara_feeder.check_version", autoset=True)
     def test_load_with_song_class(
-        self, mocked_check_version, mocked_get_custom_song, mocked_dakara_server_class
+        self,
+        mocked_check_version,
+        mocked_get_custom_song,
+        mocked_check_kara_folder_path,
+        mocked_dakara_server_class,
     ):
         """Test to run side-effect tasks
         """
@@ -58,6 +69,7 @@ class DakaraFeederTestCase(TestCase):
 
         # prepare mocks
         mocked_get_custom_song.return_value = MySong
+
         # create the config
         config = {
             "server": {},
@@ -79,6 +91,53 @@ class DakaraFeederTestCase(TestCase):
 
         # assert the call
         mocked_get_custom_song.assert_called_with("module.MySong")
+
+    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
+    @patch.object(Path, "isdir", autoset=True)
+    def test_check_kara_folder_path_exists(
+        self, mocked_isdir, mocked_dakara_server_class
+    ):
+        """Test to check when the kara folder exists
+        """
+        # setup the mock
+        mocked_isdir.return_value = True
+
+        # create the config
+        config = {"server": {}, "kara_folder": "basepath"}
+
+        # create the object
+        feeder = DakaraFeeder(config)
+
+        # call the method
+        feeder.check_kara_folder_path()
+
+        # assert the call
+        mocked_isdir.assert_called_with()
+
+    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
+    @patch.object(Path, "isdir", autoset=True)
+    def test_check_kara_folder_path_not_exists(
+        self, mocked_isdir, mocked_dakara_server_class
+    ):
+        """Test to check when the kara folder does not exists
+        """
+        # setup the mock
+        mocked_isdir.return_value = False
+
+        # create the config
+        config = {"server": {}, "kara_folder": "basepath"}
+
+        # create the object
+        feeder = DakaraFeeder(config)
+
+        # call the method
+        with self.assertRaises(KaraFolderNotFound) as error:
+            feeder.check_kara_folder_path()
+
+        # assert the error
+        self.assertEqual(
+            str(error.exception), "Karaoke folder 'basepath' does not exist"
+        )
 
     @patch.object(Pysubs2SubtitleParser, "parse", autoset=True)
     @patch.object(FFProbeMetadataParser, "parse", autoset=True)

@@ -6,7 +6,6 @@
 import logging
 from argparse import ArgumentParser
 
-from path import Path
 from dakara_base.exceptions import DakaraError
 from dakara_base.config import (
     load_config,
@@ -14,6 +13,7 @@ from dakara_base.config import (
     get_config_file,
     create_logger,
     set_loglevel,
+    ConfigNotFoundError,
 )
 
 from dakara_feeder import DakaraFeeder
@@ -56,14 +56,6 @@ def get_parser():
     )
 
     parser.add_argument(
-        "--config",
-        help="path to the config file, default: '{}'".format(
-            get_config_file(CONFIG_FILE)
-        ),
-        default=get_config_file(CONFIG_FILE),
-    )
-
-    parser.add_argument(
         "--version",
         action="version",
         version="%(prog)s {} ({})".format(__version__, __date__),
@@ -98,14 +90,34 @@ def feed(args):
     # prepare execution
     create_logger(wrap=True)
 
-    config = load_config(
-        Path(args.config), args.debug, mandatory_keys=["kara_folder", "server"]
-    )
+    try:
+        config = load_config(
+            get_config_file(CONFIG_FILE),
+            args.debug,
+            mandatory_keys=["kara_folder", "server"],
+        )
+
+    except ConfigNotFoundError as error:
+        raise ConfigNotFoundError(
+            "{}, please run 'dakara-feed create-config'".format(error)
+        ) from error
+
     set_loglevel(config)
 
     # do the actual feeding
     feeder = DakaraFeeder(config, force_update=args.force, progress=args.progress)
-    feeder.load()
+
+    try:
+        feeder.load()
+
+    except DakaraError:
+        logger.warning(
+            "Config may be incomplete, please check '{}'".format(
+                get_config_file(CONFIG_FILE)
+            )
+        )
+        raise
+
     feeder.feed()
 
 
@@ -115,7 +127,9 @@ def create_config(args):
     Args:
         args (argparse.Namespace): arguments from command line.
     """
+    create_logger(custom_log_format="%(message)s", custom_log_level="INFO")
     create_config_file("dakara_feeder.resources", CONFIG_FILE, args.force)
+    logger.info("Please edit this file")
 
 
 def main():
