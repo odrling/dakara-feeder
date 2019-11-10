@@ -8,11 +8,19 @@ from argparse import ArgumentParser
 
 from path import Path
 from dakara_base.exceptions import DakaraError
-from dakara_base.config import load_config, create_logger, set_loglevel
+from dakara_base.config import (
+    load_config,
+    create_config_file,
+    get_config_file,
+    create_logger,
+    set_loglevel,
+)
 
 from dakara_feeder import DakaraFeeder
-from dakara_feeder.config import CONFIG_FILE, create_config
 from dakara_feeder.version import __version__, __date__
+
+
+CONFIG_FILE = "feeder.yaml"
 
 
 logger = logging.getLogger(__name__)
@@ -49,8 +57,10 @@ def get_parser():
 
     parser.add_argument(
         "--config",
-        help="path to the config file, default: '{}'".format(CONFIG_FILE),
-        default=CONFIG_FILE,
+        help="path to the config file, default: '{}'".format(
+            get_config_file(CONFIG_FILE)
+        ),
+        default=get_config_file(CONFIG_FILE),
     )
 
     parser.add_argument(
@@ -64,7 +74,9 @@ def get_parser():
 
     # create config subparser
     create_config_subparser = subparsers.add_parser(
-        "create-config", help="Create a new config file in current directory"
+        "create-config",
+        description="Create a new config file in user directory",
+        help="Create a new config file in user directory",
     )
     create_config_subparser.set_defaults(function=create_config)
 
@@ -95,6 +107,15 @@ def feed(args):
     feeder = DakaraFeeder(config, force_update=args.force, progress=args.progress)
     feeder.load()
     feeder.feed()
+
+
+def create_config(args):
+    """Create the config
+
+    Args:
+        args (argparse.Namespace): arguments from command line.
+    """
+    create_config_file("dakara_feeder.resources", CONFIG_FILE, args.force)
 
 
 def main():
