@@ -49,25 +49,34 @@ python setup.py install
 
 ### Commands
 
-The package provides the following command:
+The package provides the `dakara-feed` command which will find songs in the configured directory, parse them and send their data to a running instance of the Dakara server:
 
-* `dakara-feed`: This will find songs in the configured directory, parse them and send their data to a running instance of the Dakara server.
-  One instance of the Dakara server should be running.
-  For more help:
+```sh
+dakara-feed
+# or
+python -m dakara_feed
+```
 
-  ```sh
-  dakara-feed -h
-  ```
+One instance of the Dakara server should be running.
+For more help:
 
-  Before calling the function, you should create a config file with:
+```sh
+dakara-feed -h
+# or
+python -m dakara_feed -h
+```
 
-  ```sh
-  dakara-feed create-config
-  ```
+Before calling the function, you should create a config file with:
 
-  and complete it with your values.
+```sh
+dakara-feed create-config
+# or
+python -m dakara_feed create-config
+```
 
-  The data extracted from songs are very limited in this package, as data can be stored in various ways in song files. You are encouraged to make your own parser, see next subsection.
+and complete it with your values. The file is stored in your user space: `~/.config/dakara` on Linux or `$APPDATA\Dakara` on Windows.
+
+The data extracted from songs are very limited in this package by default, as data can be stored in various ways in song files. You are encouraged to make your own parser, see next subsection.
 
 ### Making a custom parser
 
