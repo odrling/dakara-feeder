@@ -6,8 +6,8 @@ from dakara_base.config import ConfigNotFoundError
 from dakara_base.exceptions import DakaraError
 from path import Path
 
+from dakara_feeder import DakaraFeeder
 from dakara_feeder.commands import feed
-from dakara_feeder.dakara_feeder import DakaraFeeder
 
 
 class GetParserTestCase(TestCase):
@@ -200,12 +200,12 @@ class CreateConfigTestCase(TestCase):
         )
 
 
+@patch("dakara_feeder.commands.feed.exit")
+@patch.object(ArgumentParser, "parse_args")
 class MainTestCase(TestCase):
     """Test the main action
     """
 
-    @patch("dakara_feeder.commands.feed.exit")
-    @patch.object(ArgumentParser, "parse_args")
     def test_normal_exit(self, mocked_parse_args, mocked_exit):
         """Test a normal exit
         """
@@ -220,8 +220,6 @@ class MainTestCase(TestCase):
         function.assert_called_with(ANY)
         mocked_exit.assert_called_with(0)
 
-    @patch("dakara_feeder.commands.feed.exit")
-    @patch.object(ArgumentParser, "parse_args")
     def test_keyboard_interrupt(self, mocked_parse_args, mocked_exit):
         """Test a Ctrl+C exit
         """
@@ -243,8 +241,6 @@ class MainTestCase(TestCase):
             logger.output, ["INFO:dakara_feeder.commands.feed:Quit by user"]
         )
 
-    @patch("dakara_feeder.commands.feed.exit")
-    @patch.object(ArgumentParser, "parse_args")
     def test_known_error(self, mocked_parse_args, mocked_exit):
         """Test a known error exit
         """
@@ -266,8 +262,6 @@ class MainTestCase(TestCase):
             logger.output, ["CRITICAL:dakara_feeder.commands.feed:error"]
         )
 
-    @patch("dakara_feeder.commands.feed.exit")
-    @patch.object(ArgumentParser, "parse_args")
     def test_known_error_debug(self, mocked_parse_args, mocked_exit):
         """Test a known error exit in debug mode
         """
@@ -287,8 +281,6 @@ class MainTestCase(TestCase):
         # assert the error
         self.assertEqual(str(error.exception), "error")
 
-    @patch("dakara_feeder.commands.feed.exit")
-    @patch.object(ArgumentParser, "parse_args")
     def test_unknown_error(self, mocked_parse_args, mocked_exit):
         """Test an unknown error exit
         """
@@ -315,8 +307,6 @@ class MainTestCase(TestCase):
             ],
         )
 
-    @patch("dakara_feeder.commands.feed.exit")
-    @patch.object(ArgumentParser, "parse_args")
     def test_unknown_error_debug(self, mocked_parse_args, mocked_exit):
         """Test an unknown error exit in debug mode
         """

@@ -8,12 +8,12 @@ from argparse import ArgumentParser
 
 from dakara_base.exceptions import DakaraError
 from dakara_base.config import (
-    load_config,
-    create_config_file,
-    get_config_file,
-    create_logger,
-    set_loglevel,
     ConfigNotFoundError,
+    create_config_file,
+    create_logger,
+    get_config_file,
+    load_config,
+    set_loglevel,
 )
 
 from dakara_feeder import DakaraFeeder
@@ -87,9 +87,9 @@ def feed(args):
     Args:
         args (argparse.Namespace): arguments from command line.
     """
-    # prepare execution
     create_logger(wrap=True)
 
+    # load the config, display help to create config if it fails
     try:
         config = load_config(
             get_config_file(CONFIG_FILE),
@@ -103,10 +103,9 @@ def feed(args):
         ) from error
 
     set_loglevel(config)
-
-    # do the actual feeding
     feeder = DakaraFeeder(config, force_update=args.force, progress=args.progress)
 
+    # load the feeder, consider that the config is incomplete if it fails
     try:
         feeder.load()
 
@@ -118,6 +117,7 @@ def feed(args):
         )
         raise
 
+    # do the actual feeding
     feeder.feed()
 
 

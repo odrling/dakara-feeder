@@ -65,7 +65,7 @@ The package provides the following command:
   dakara-feed create-config
   ```
 
-  You should edit the config file with your values.
+  and complete it with your values.
 
   The data extracted from songs are very limited in this package, as data can be stored in various ways in song files. You are encouraged to make your own parser, see next subsection.
 
