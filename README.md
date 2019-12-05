@@ -1,6 +1,11 @@
 # Dakara Feeder
 
+[![Travis CI Build Status](https://travis-ci.com/DakaraProject/dakara-feeder.svg?branch=develop)](https://travis-ci.com/DakaraProject/dakara-feeder)
+[![Appveyor CI Build status](https://ci.appveyor.com/api/projects/status/7vxx2dyu8y25v6of?svg=true)](https://ci.appveyor.com/project/neraste/dakara-feeder/branch/develop)
+[![Codecov coverage analysis](https://codecov.io/gh/DakaraProject/dakara-feeder/branch/develop/graph/badge.svg)](https://codecov.io/gh/DakaraProject/dakara-feeder)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
+[![PyPI version](https://badge.fury.io/py/dakarafeeder.svg)](https://pypi.python.org/pypi/dakarafeeder/)
+[![PyPI Python versions](https://img.shields.io/pypi/pyversions/dakarafeeder.svg)](https://pypi.python.org/pypi/dakarafeeder/)
 
 Allows to feed the database of the Dakara server remotely.
 
@@ -12,9 +17,7 @@ This repo is tied with the Dakara server, so you should setup it first:
 
 Other important parts of the project include:
 
-* [Dakara plaer VLC](https://github.com/DakaraProject/dakara-player-vlc/);
-* [Dakara web client](https://github.com/DakaraProject/dakara-client-web/).
-
+* [Dakara VLC player](https://github.com/DakaraProject/dakara-player-vlc/).
 
 ### System requirements
 
@@ -24,13 +27,17 @@ Other important parts of the project include:
 
 Linux and Windows are supported.
 
+### Virtual environment
+
+It is strongly recommended to use the Dakara feeder within a virtual environment.
+
 ### Install
 
-<!-- Install the package with: -->
-<!--  -->
-<!-- ```sh -->
-<!-- pip install dakarafeeder -->
-<!-- ``` -->
+Install the package with:
+
+```sh
+pip install dakarafeeder
+```
 
 If you have downloaded the repo, you can install the package directly with:
 
@@ -42,21 +49,34 @@ python setup.py install
 
 ### Commands
 
-The package provides the following function:
+The package provides the `dakara-feed` command which will find songs in the configured directory, parse them and send their data to a running instance of the Dakara server:
 
-* `dakara-feed`: This will find songs in the configured directory, parse them and send their data to a running instance of the Dakara server. For help:
+```sh
+dakara-feed
+# or
+python -m dakara_feed
+```
 
-  ```sh
-  dakara-feed -h
-  ```
+One instance of the Dakara server should be running.
+For more help:
 
-  Before calling the function, you should create a config file with:
+```sh
+dakara-feed -h
+# or
+python -m dakara_feed -h
+```
 
-  ```sh
-  dakara-feed create-config
-  ```
+Before calling the function, you should create a config file with:
 
-  The data extracted from songs are very limited in this package, as data can be stored in various ways in song files. You are encouraged to make your own parser, see next subsection.
+```sh
+dakara-feed create-config
+# or
+python -m dakara_feed create-config
+```
+
+and complete it with your values. The file is stored in your user space: `~/.config/dakara` on Linux or `$APPDATA\Dakara` on Windows.
+
+The data extracted from songs are very limited in this package by default, as data can be stored in various ways in song files. You are encouraged to make your own parser, see next subsection.
 
 ### Making a custom parser
 
@@ -76,7 +96,7 @@ class Song(BaseSong):
         return [{"name": self.video_path.stem.split(" - ")[1]}]
 ```
 
-The file must be in the same directory you are calling `dakara-feed.`
+The file must be in the same directory you are calling `dakara-feed`, or in any directory reachable by Python.
 To register your customized `Song` class, you simply enable it in the config file:
 
 ```yaml
@@ -124,3 +144,28 @@ To check coverage, use the `coverage` command:
 coverage run setup.py test
 coverage report -m
 ```
+
+### Hooks
+
+Git hooks are included in the `hooks` directory.
+
+Use the following command to use this hook folder for the project:
+
+```
+git config core.hooksPath hooks
+```
+
+If you're using git < 2.9 you can make a symlink instead:
+
+```
+ln -s -f ../../hooks/pre-commit .git/hooks/pre-commit
+```
+
+### Code style
+
+The code follows the [PEP8](https://www.python.org/dev/peps/pep-0008/) style guide (88 chars per line).
+Quality of code is checked with [Flake8](https://pypi.org/project/flake8/).
+Style is enforced using [Black](https://github.com/ambv/black).
+You need to call Black before committing changes.
+You may want to configure your editor to call it automatically.
+Additionnal checking can be manually performed with [Pylint](https://www.pylint.org/).

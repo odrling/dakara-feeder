@@ -2,6 +2,7 @@ import logging
 
 from path import Path
 from dakara_base.progress_bar import progress_bar, null_bar
+from dakara_base.exceptions import DakaraError
 
 from dakara_feeder.customization import get_custom_song
 from dakara_feeder.dakara_server import DakaraServer
@@ -10,6 +11,7 @@ from dakara_feeder.directory_lister import list_directory
 from dakara_feeder.similarity_calculator import calculate_file_path_similarity
 from dakara_feeder.song import BaseSong
 from dakara_feeder.utils import divide_chunks
+from dakara_feeder.version import check_version
 
 
 logger = logging.getLogger(__name__)
@@ -29,7 +31,7 @@ class DakaraFeeder:
 
     Attributes:
         dakara_server (dakara_server.DakaraServer): client for the Dakara server.
-        kara_folder (path.Path): path to the scanned folder containing karaoke
+        kara_folder_path (path.Path): path to the scanned folder containing karaoke
             files.
         songs_per_chunk (int): number of songs per chunk to send to server when
             creating songs.
@@ -43,22 +45,36 @@ class DakaraFeeder:
     def __init__(self, config, force_update=False, progress=True):
         # create objects
         self.dakara_server = DakaraServer(config["server"], endpoint_prefix="api")
-        self.kara_folder = Path(config["kara_folder"])
+        self.kara_folder_path = Path(config["kara_folder"])
         self.force_update = force_update
         self.songs_per_chunk = config["server"].get("songs_per_chunk", SONGS_PER_CHUNK)
         self.bar = progress_bar if progress else null_bar
         self.song_class_module_name = config.get("custom_song_class")
-        self.Song = None
+        self.song_class = BaseSong
 
     def load(self):
         """Execute side-effect initialization tasks
         """
-        self.Song = (
-            get_custom_song(self.song_class_module_name)
-            if self.song_class_module_name
-            else BaseSong
-        )
+        # check version
+        check_version()
+
+        # select song class
+        if self.song_class_module_name:
+            self.song_class = get_custom_song(self.song_class_module_name)
+
+        # check directory exists
+        self.check_kara_folder_path()
+
+        # authenticate to server
         self.dakara_server.authenticate()
+
+    def check_kara_folder_path(self):
+        """Check the kara folder is valid
+        """
+        if not self.kara_folder_path.isdir():
+            raise KaraFolderNotFound(
+                "Karaoke folder '{}' does not exist".format(self.kara_folder_path)
+            )
 
     def feed(self):
         """Execute the feeding action
@@ -71,7 +87,7 @@ class DakaraFeeder:
         old_songs_path = list(old_songs_id_by_path.keys())
 
         # get list of songs on the local directory
-        new_songs_paths = list_directory(self.kara_folder)
+        new_songs_paths = list_directory(self.kara_folder_path)
         logger.info("Found %i songs in local directory", len(new_songs_paths))
         new_songs_video_path = [song.video for song in new_songs_paths]
 
@@ -101,8 +117,8 @@ class DakaraFeeder:
         added_songs = []
         if added_songs_path:
             added_songs = [
-                self.Song(
-                    self.kara_folder, new_songs_paths_map[song_path]
+                self.song_class(
+                    self.kara_folder_path, new_songs_paths_map[song_path]
                 ).get_representation()
                 for song_path in self.bar(added_songs_path, text="Parsing songs to add")
             ]
@@ -113,8 +129,8 @@ class DakaraFeeder:
         if updated_songs_path:
             updated_songs = [
                 (
-                    self.Song(
-                        self.kara_folder, new_songs_paths_map[new_song_path]
+                    self.song_class(
+                        self.kara_folder_path, new_songs_paths_map[new_song_path]
                     ).get_representation(),
                     old_songs_id_by_path[old_song_path],
                 )
@@ -145,3 +161,8 @@ class DakaraFeeder:
                 deleted_songs_path, text="Deleting removed songs"
             ):
                 self.dakara_server.delete_song(old_songs_id_by_path[song_path])
+
+
+class KaraFolderNotFound(DakaraError):
+    """Error raised when the kara folder cannot be found
+    """

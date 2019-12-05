@@ -17,7 +17,7 @@ class ListDirectoryTestCase(TestCase):
         """
         # mock directory structure
         mocked_walkfiles.return_value = (
-            item
+            item.normpath()
             for item in [
                 Path("directory/file0.mkv"),
                 Path("directory/file1.mkv"),
@@ -40,9 +40,10 @@ class ListDirectoryTestCase(TestCase):
             [
                 SongPaths(Path("file0.mkv"), Path("file0.ass")),
                 SongPaths(Path("file1.mkv"), Path("file1.ass")),
-                SongPaths(Path("subdirectory/file2.mkv")),
+                SongPaths(Path("subdirectory") / "file2.mkv"),
                 SongPaths(
-                    Path("subdirectory/file3.mkv"), Path("subdirectory/file3.ass")
+                    Path("subdirectory") / "file3.mkv",
+                    Path("subdirectory") / "file3.ass",
                 ),
             ],
             listing,
@@ -64,7 +65,7 @@ class ListDirectoryTestCase(TestCase):
         """
         # mock directory structure
         mocked_walkfiles.return_value = (
-            item
+            item.normpath()
             for item in [
                 Path("directory/file0.mkv"),
                 Path("directory/file0.ass"),
@@ -83,7 +84,8 @@ class ListDirectoryTestCase(TestCase):
             [
                 SongPaths(Path("file0.mkv"), Path("file0.ass")),
                 SongPaths(
-                    Path("subdirectory/file0.mkv"), Path("subdirectory/file0.ass")
+                    Path("subdirectory") / "file0.mkv",
+                    Path("subdirectory") / "file0.ass",
                 ),
             ],
             listing,

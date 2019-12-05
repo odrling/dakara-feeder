@@ -1,8 +1,5 @@
-try:
-    from dakara_feeder.dakara_feeder import DakaraFeeder
-
-except ImportError:
-    pass
+from dakara_feeder.dakara_feeder import DakaraFeeder
+from dakara_feeder.version import __version__, __date__
 
 
-__all__ = ["DakaraFeeder"]
+__all__ = ["DakaraFeeder", "__version__", "__date__"]
