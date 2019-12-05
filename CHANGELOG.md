@@ -30,6 +30,10 @@
 
 ## Unreleased
 
+### Fixed
+
+- An invalid subtitle file no longer halts the feed process but only logs a warning.
+
 ## 1.5.0 - 2019-12-05
 
 ### Added
