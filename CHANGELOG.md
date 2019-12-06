@@ -30,6 +30,11 @@
 
 ## Unreleased
 
+### Fixed
+
+- A subtitle file from which lyrics can't be parsed no longer halts the feed process but only logs an error.
+- A video file from which duration can't be extracted no longer halts the feed process but only logs an error.
+
 ## 1.5.0 - 2019-12-05
 
 ### Added

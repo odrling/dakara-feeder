@@ -1,5 +1,10 @@
-from dakara_feeder.metadata_parser import FFProbeMetadataParser
-from dakara_feeder.subtitle_parser import Pysubs2SubtitleParser
+import logging
+
+from dakara_feeder.metadata_parser import FFProbeMetadataParser, MediaParseError
+from dakara_feeder.subtitle_parser import Pysubs2SubtitleParser, SubtitleParseError
+
+
+logger = logging.getLogger(__name__)
 
 
 class BaseSong:
@@ -108,8 +113,14 @@ class BaseSong:
         Returns:
             float: Duration of the song in seconds.
         """
-        parser = FFProbeMetadataParser.parse(self.base_directory / self.video_path)
-        return parser.get_duration().total_seconds()
+        try:
+            parser = FFProbeMetadataParser.parse(self.base_directory / self.video_path)
+            return parser.get_duration().total_seconds()
+
+        except MediaParseError as error:
+            logger.error("Duration not parsed: {}".format(error))
+            # Set duration to zero when duration can't be extracted
+            return 0
 
     def get_artists(self):
         """Get the list of artists
@@ -227,8 +238,14 @@ class BaseSong:
         if not self.subtitle_path:
             return ""
 
-        parser = Pysubs2SubtitleParser.parse(self.base_directory / self.subtitle_path)
-        return parser.get_lyrics()
+        try:
+            parser = Pysubs2SubtitleParser.parse(
+                self.base_directory / self.subtitle_path
+            )
+            return parser.get_lyrics()
+        except SubtitleParseError as error:
+            logger.error("Lyrics not parsed: {}".format(error))
+            return ""
 
     def get_representation(self):
         """Get the simple representation of the song
