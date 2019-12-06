@@ -4,7 +4,7 @@ from pkg_resources import parse_version
 import importlib_metadata
 
 __version__ = importlib_metadata.version("dakarafeeder")
-__date__ = "2019-12-05"
+__date__ = "2019-12-06"
 
 logger = logging.getLogger(__name__)
 

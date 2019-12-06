@@ -30,6 +30,8 @@
 
 ## Unreleased
 
+## 1.5.1 - 2019-12-06
+
 ### Fixed
 
 - A subtitle file from which lyrics can't be parsed no longer halts the feed process but only logs an error.
