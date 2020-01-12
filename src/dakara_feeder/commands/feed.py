@@ -49,6 +49,13 @@ def get_parser():
     )
 
     parser.add_argument(
+        "--no-prune",
+        dest="prune",
+        action="store_false",
+        help="do not delete artists and works without songs at end of feed",
+    )
+
+    parser.add_argument(
         "--no-progress",
         dest="progress",
         action="store_false",
@@ -103,7 +110,9 @@ def feed(args):
         ) from error
 
     set_loglevel(config)
-    feeder = DakaraFeeder(config, force_update=args.force, progress=args.progress)
+    feeder = DakaraFeeder(
+        config, force_update=args.force, prune=args.prune, progress=args.progress
+    )
 
     # load the feeder, consider that the config is incomplete if it fails
     try:

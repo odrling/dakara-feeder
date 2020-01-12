@@ -111,7 +111,9 @@ class FeedTestCase(TestCase):
         # call the function
         with self.assertRaises(DakaraError) as error:
             with self.assertLogs("dakara_feeder.commands.feed") as logger:
-                feed.feed(Namespace(debug=False, force=False, progress=True))
+                feed.feed(
+                    Namespace(debug=False, force=False, progress=True, prune=True)
+                )
 
         # assert the error
         self.assertEqual(str(error.exception), "Config-related error")
@@ -159,7 +161,7 @@ class FeedTestCase(TestCase):
         mocked_load_config.return_value = config
 
         # call the function
-        feed.feed(Namespace(debug=False, force=False, progress=True))
+        feed.feed(Namespace(debug=False, force=False, progress=True, prune=True))
 
         # assert the call
         mocked_create_logger.assert_called_with(wrap=True)

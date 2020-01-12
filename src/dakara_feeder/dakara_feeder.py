@@ -27,6 +27,8 @@ class DakaraFeeder:
         config (dict): dictionary of config.
         force_update (bool): if True, the feeder will re-parse and re-upload
             songs that do not seem to have changed.
+        prune (bool): if True, artists and works without songs are deleted at
+            the end.
         progress (bool): if True, a progress bar is displayed during long tasks.
 
     Attributes:
@@ -42,11 +44,12 @@ class DakaraFeeder:
             `dakara_feeder.song.BaseSong`.
     """
 
-    def __init__(self, config, force_update=False, progress=True):
+    def __init__(self, config, force_update=False, prune=True, progress=True):
         # create objects
         self.dakara_server = DakaraServer(config["server"], endpoint_prefix="api")
         self.kara_folder_path = Path(config["kara_folder"])
         self.force_update = force_update
+        self.prune = prune
         self.songs_per_chunk = config["server"].get("songs_per_chunk", SONGS_PER_CHUNK)
         self.bar = progress_bar if progress else null_bar
         self.song_class_module_name = config.get("custom_song_class")
@@ -163,13 +166,14 @@ class DakaraFeeder:
                 self.dakara_server.delete_song(old_songs_id_by_path[song_path])
 
         # prune artists and works without songs
-        artists_deleted_count = self.dakara_server.prune_artists()
-        works_deleted_count = self.dakara_server.prune_works()
-        logger.info(
-            "Deleted {} artists and {} works without songs".format(
-                artists_deleted_count, works_deleted_count
+        if self.prune:
+            artists_deleted_count = self.dakara_server.prune_artists()
+            works_deleted_count = self.dakara_server.prune_works()
+            logger.info(
+                "Deleted {} artists and {} works without songs".format(
+                    artists_deleted_count, works_deleted_count
+                )
             )
-        )
 
 
 class KaraFolderNotFound(DakaraError):
