@@ -157,6 +157,8 @@ class DakaraFeederTestCase(TestCase):
             {"id": 0, "path": Path("directory_0") / "song_0.mp4"},
             {"id": 1, "path": Path("directory_1") / "music_1.mp4"},
         ]
+        mocked_dakara_server_class.return_value.prune_artists.return_value = 2
+        mocked_dakara_server_class.return_value.prune_works.return_value = 1
         mocked_list_directory.return_value = [
             SongPaths(Path("directory_0") / "song_0.mp4"),
             SongPaths(
@@ -200,6 +202,8 @@ class DakaraFeederTestCase(TestCase):
             ]
         )
         mocked_dakara_server_class.return_value.delete_song.assert_called_with(1)
+        mocked_dakara_server_class.return_value.prune_artists.assert_called_with()
+        mocked_dakara_server_class.return_value.prune_works.assert_called_with()
         mocked_subtitle_parse.assert_called_with(
             Path("basepath") / "directory_2" / "song_2.ass"
         )
@@ -213,6 +217,8 @@ class DakaraFeederTestCase(TestCase):
                 "INFO:dakara_feeder.dakara_feeder:Found 1 songs to add",
                 "INFO:dakara_feeder.dakara_feeder:Found 1 songs to delete",
                 "INFO:dakara_feeder.dakara_feeder:Found 0 songs to update",
+                "INFO:dakara_feeder.dakara_feeder:Deleted 2 artists and 1 works "
+                "without songs",
             ],
         )
         self.assertListEqual(
@@ -237,6 +243,8 @@ class DakaraFeederTestCase(TestCase):
             {"id": 0, "path": Path("directory_0") / "song.mp4"},
             {"id": 1, "path": Path("directory_1") / "music.mp4"},
         ]
+        mocked_dakara_server_class.return_value.prune_artists.return_value = 0
+        mocked_dakara_server_class.return_value.prune_works.return_value = 0
 
         # mock content of file system (new files)
         # Simulate file music.mp4 renamed to musics.mp4
@@ -286,6 +294,8 @@ class DakaraFeederTestCase(TestCase):
                 "INFO:dakara_feeder.dakara_feeder:Found 0 songs to add",
                 "INFO:dakara_feeder.dakara_feeder:Found 0 songs to delete",
                 "INFO:dakara_feeder.dakara_feeder:Found 1 songs to update",
+                "INFO:dakara_feeder.dakara_feeder:Deleted 0 artists and 0 works "
+                "without songs",
             ],
         )
 
@@ -306,6 +316,8 @@ class DakaraFeederTestCase(TestCase):
         mocked_dakara_server_class.return_value.get_songs.return_value = [
             {"id": 1, "path": Path("music_1.mp4")}
         ]
+        mocked_dakara_server_class.return_value.prune_artists.return_value = 0
+        mocked_dakara_server_class.return_value.prune_works.return_value = 0
         mocked_list_directory.return_value = [
             SongPaths(Path("music_1.mp4"), Path("music_1.ass"))
         ]
@@ -353,6 +365,8 @@ class DakaraFeederTestCase(TestCase):
                 "INFO:dakara_feeder.dakara_feeder:Found 0 songs to add",
                 "INFO:dakara_feeder.dakara_feeder:Found 0 songs to delete",
                 "INFO:dakara_feeder.dakara_feeder:Found 1 songs to update",
+                "INFO:dakara_feeder.dakara_feeder:Deleted 0 artists and 0 works "
+                "without songs",
             ],
         )
 
@@ -371,6 +385,8 @@ class DakaraFeederTestCase(TestCase):
         """
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = []
+        mocked_dakara_server_class.return_value.prune_artists.return_value = 0
+        mocked_dakara_server_class.return_value.prune_works.return_value = 0
         mocked_list_directory.return_value = [
             SongPaths(Path("directory_0") / "song_0.mp4"),
             SongPaths(Path("directory_1") / "song_1.mp4"),
@@ -443,6 +459,8 @@ class DakaraFeederTestCase(TestCase):
                 "INFO:dakara_feeder.dakara_feeder:Found 2 songs to add",
                 "INFO:dakara_feeder.dakara_feeder:Found 0 songs to delete",
                 "INFO:dakara_feeder.dakara_feeder:Found 0 songs to update",
+                "INFO:dakara_feeder.dakara_feeder:Deleted 0 artists and 0 works "
+                "without songs",
             ],
         )
 
@@ -456,6 +474,8 @@ class DakaraFeederTestCase(TestCase):
         """
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = []
+        mocked_dakara_server_class.return_value.prune_artists.return_value = 0
+        mocked_dakara_server_class.return_value.prune_works.return_value = 0
         mocked_list_directory.return_value = [
             SongPaths(Path("directory_0") / "song_0.mp4")
         ]
@@ -513,6 +533,8 @@ class DakaraFeederIntegrationTestCase(TestCase):
         """
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = []
+        mocked_dakara_server_class.return_value.prune_artists.return_value = 0
+        mocked_dakara_server_class.return_value.prune_works.return_value = 0
 
         # create the object
         config = {"server": {}, "kara_folder": get_file("tests.resources", "")}

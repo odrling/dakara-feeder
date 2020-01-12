@@ -30,6 +30,10 @@
 
 ## Unreleased
 
+### Added
+
+- Automatically prune artists and works without songs on server.
+
 ## 1.5.1 - 2019-12-06
 
 ### Fixed

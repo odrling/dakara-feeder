@@ -162,6 +162,15 @@ class DakaraFeeder:
             ):
                 self.dakara_server.delete_song(old_songs_id_by_path[song_path])
 
+        # prune artists and works without songs
+        artists_deleted_count = self.dakara_server.prune_artists()
+        works_deleted_count = self.dakara_server.prune_works()
+        logger.info(
+            "Deleted {} artists and {} works without songs".format(
+                artists_deleted_count, works_deleted_count
+            )
+        )
+
 
 class KaraFolderNotFound(DakaraError):
     """Error raised when the kara folder cannot be found

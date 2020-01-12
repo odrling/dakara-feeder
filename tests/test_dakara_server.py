@@ -127,3 +127,45 @@ class DakaraServerTestCase(TestCase):
 
         # assert the mock
         mocked_put.assert_called_with("library/songs/42/", json=song)
+
+    @patch.object(dakara_server.DakaraServer, "delete", autoset=True)
+    def test_prune_artists(self, mocked_delete):
+        """Test to prune artists
+        """
+        # mock objects
+        mocked_delete.return_value = {"deleted_count": 2}
+
+        # create the object
+        server = dakara_server.DakaraServer(
+            self.config, endpoint_prefix=self.endpoint_prefix
+        )
+
+        # call the method
+        deleted_count = server.prune_artists()
+
+        # assert the value
+        self.assertEqual(deleted_count, 2)
+
+        # assert the mock
+        mocked_delete.assert_called_with("library/artists/prune/")
+
+    @patch.object(dakara_server.DakaraServer, "delete", autoset=True)
+    def test_prune_works(self, mocked_delete):
+        """Test to prune works
+        """
+        # mock objects
+        mocked_delete.return_value = {"deleted_count": 2}
+
+        # create the object
+        server = dakara_server.DakaraServer(
+            self.config, endpoint_prefix=self.endpoint_prefix
+        )
+
+        # call the method
+        deleted_count = server.prune_works()
+
+        # assert the value
+        self.assertEqual(deleted_count, 2)
+
+        # assert the mock
+        mocked_delete.assert_called_with("library/works/prune/")

@@ -53,3 +53,21 @@ class DakaraServer(HTTPClient):
         """
         endpoint = "library/songs/{}/".format(song_id)
         self.put(endpoint, json=song)
+
+    def prune_artists(self):
+        """Prune artists without songs
+
+        Return:
+            Number of deleted artists.
+        """
+        endpoint = "library/artists/prune/"
+        return self.delete(endpoint)["deleted_count"]
+
+    def prune_works(self):
+        """Prune works without songs
+
+        Return:
+            Number of deleted works.
+        """
+        endpoint = "library/works/prune/"
+        return self.delete(endpoint)["deleted_count"]
