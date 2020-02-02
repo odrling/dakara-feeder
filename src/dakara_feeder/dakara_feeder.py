@@ -40,7 +40,7 @@ class DakaraFeeder:
         bar (function): progress bar to use.
         song_class_module_name (str): module name of the custom song class to
             use.
-        Song (class): custom song class to use. Must be a subclass of
+        song_class (class): custom song class to use. Must be a subclass of
             `dakara_feeder.song.BaseSong`.
     """
 
