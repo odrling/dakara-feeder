@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 
 from path import Path
 
@@ -169,3 +169,79 @@ class DakaraServerTestCase(TestCase):
 
         # assert the mock
         mocked_delete.assert_called_with("library/works/prune/")
+
+    @patch.object(dakara_server.DakaraServer, "post", autoset=True)
+    def test_create_tag(self, mocked_post):
+        """Test to create tag
+        """
+        # create the object
+        server = dakara_server.DakaraServer(
+            self.config, endpoint_prefix=self.endpoint_prefix
+        )
+
+        # create tag
+        tag = {"name": "tag1", "color_hue": 250}
+
+        # call the method
+        server.create_tag(tag)
+
+        # assert the call
+        mocked_post.assert_called_with("library/song-tags/", tag, function_on_error=ANY)
+
+    @patch("dakara_base.http_client.requests.post", autoset=True)
+    def test_create_tag_error_already_exists(self, mocked_post):
+        """Test to create tag that already exists
+        """
+        # create the mock
+        mocked_post.return_value.ok = False
+        mocked_post.return_value.status_code = 400
+
+        # create the object
+        server = dakara_server.DakaraServer(
+            self.config, endpoint_prefix=self.endpoint_prefix
+        )
+
+        # artificially connect the server
+        server.token = "token"
+
+        # create tag
+        tag = {"name": "tag1", "color_hue": 250}
+
+        # call the method
+        with self.assertRaises(dakara_server.TagAlreadyExistsError):
+            server.create_tag(tag)
+
+        # assert the call
+        mocked_post.assert_called_with(
+            self.url + "library/song-tags/", tag, headers=ANY
+        )
+
+    @patch("dakara_base.http_client.requests.post", autoset=True)
+    def test_create_tag_error_other(self, mocked_post):
+        """Test an unknown problem when creating a tag
+        """
+        # create the mock
+        mocked_post.return_value.ok = False
+        mocked_post.return_value.status_code = 999
+        mocked_post.return_value.text = "error message"
+
+        # create the object
+        server = dakara_server.DakaraServer(
+            self.config, endpoint_prefix=self.endpoint_prefix
+        )
+
+        # artificially connect the server
+        server.token = "token"
+
+        # create tag
+        tag = {"name": "tag1", "color_hue": 250}
+
+        # call the method
+        with self.assertRaises(dakara_server.ResponseInvalidError) as error:
+            server.create_tag(tag)
+
+        # assert the error
+        self.assertEqual(
+            str(error.exception),
+            "Error 999 when communicating with the server: error message",
+        )

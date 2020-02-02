@@ -1,6 +1,6 @@
 import logging
 
-from dakara_base.http_client import HTTPClient
+from dakara_base.http_client import HTTPClient, ResponseInvalidError
 from path import Path
 
 
@@ -71,3 +71,32 @@ class DakaraServer(HTTPClient):
         """
         endpoint = "library/works/prune/"
         return self.delete(endpoint)["deleted_count"]
+
+    def create_tag(self, tag):
+        """Create a tag on the server
+
+        Args:
+            tag: JSON representation of a tag.
+
+        Raises:
+            TagAlreadyExistsError: if the tag exists on the server, i.e. if the
+                server returns 400.
+        """
+
+        def on_error(response):
+            if response.status_code == 400:
+                return TagAlreadyExistsError()
+
+            return ResponseInvalidError(
+                "Error {} when communicating with the server: {}".format(
+                    response.status_code, response.text
+                )
+            )
+
+        endpoint = "library/song-tags/"
+        self.post(endpoint, tag, function_on_error=on_error)
+
+
+class TagAlreadyExistsError(Exception):
+    """Error if a tag already exists
+    """
