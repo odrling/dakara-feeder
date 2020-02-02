@@ -12,11 +12,15 @@ from dakara_feeder.song import BaseSong
 from dakara_feeder.subtitle_parser import Pysubs2SubtitleParser
 
 
+@patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
 class DakaraFeederTestCase(TestCase):
     """Test the feeder class
     """
 
-    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
+    def setUp(self):
+        # create base config
+        self.config = {"server": {}, "kara_folder": "basepath"}
+
     @patch.object(DakaraFeeder, "check_kara_folder_path", autoset=True)
     @patch("dakara_feeder.dakara_feeder.get_custom_song", autoset=True)
     @patch("dakara_feeder.dakara_feeder.check_version", autoset=True)
@@ -29,11 +33,8 @@ class DakaraFeederTestCase(TestCase):
     ):
         """Test to run side-effect tasks
         """
-        # create the config
-        config = {"server": {}, "kara_folder": "basepath"}
-
         # create the object
-        feeder = DakaraFeeder(config, progress=False)
+        feeder = DakaraFeeder(self.config, progress=False)
 
         # pre assert
         self.assertIs(feeder.song_class, BaseSong)
@@ -50,7 +51,6 @@ class DakaraFeederTestCase(TestCase):
         mocked_check_kara_folder_path.assert_called_with()
         mocked_dakara_server_class.return_value.authenticate.assert_called_with()
 
-    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
     @patch.object(DakaraFeeder, "check_kara_folder_path", autoset=True)
     @patch("dakara_feeder.dakara_feeder.get_custom_song", autoset=True)
     @patch("dakara_feeder.dakara_feeder.check_version", autoset=True)
@@ -92,7 +92,6 @@ class DakaraFeederTestCase(TestCase):
         # assert the call
         mocked_get_custom_song.assert_called_with("module.MySong")
 
-    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
     @patch.object(Path, "isdir", autoset=True)
     def test_check_kara_folder_path_exists(
         self, mocked_isdir, mocked_dakara_server_class
@@ -102,11 +101,8 @@ class DakaraFeederTestCase(TestCase):
         # setup the mock
         mocked_isdir.return_value = True
 
-        # create the config
-        config = {"server": {}, "kara_folder": "basepath"}
-
         # create the object
-        feeder = DakaraFeeder(config)
+        feeder = DakaraFeeder(self.config)
 
         # call the method
         feeder.check_kara_folder_path()
@@ -114,7 +110,6 @@ class DakaraFeederTestCase(TestCase):
         # assert the call
         mocked_isdir.assert_called_with()
 
-    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
     @patch.object(Path, "isdir", autoset=True)
     def test_check_kara_folder_path_not_exists(
         self, mocked_isdir, mocked_dakara_server_class
@@ -124,11 +119,8 @@ class DakaraFeederTestCase(TestCase):
         # setup the mock
         mocked_isdir.return_value = False
 
-        # create the config
-        config = {"server": {}, "kara_folder": "basepath"}
-
         # create the object
-        feeder = DakaraFeeder(config)
+        feeder = DakaraFeeder(self.config)
 
         # call the method
         with self.assertRaises(KaraFolderNotFound) as error:
@@ -142,13 +134,12 @@ class DakaraFeederTestCase(TestCase):
     @patch.object(Pysubs2SubtitleParser, "parse", autoset=True)
     @patch.object(FFProbeMetadataParser, "parse", autoset=True)
     @patch("dakara_feeder.dakara_feeder.list_directory", autoset=True)
-    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
     def test_feed(
         self,
-        mocked_dakara_server_class,
         mocked_list_directory,
         mocked_metadata_parse,
         mocked_subtitle_parse,
+        mocked_dakara_server_class,
     ):
         """Test to feed
         """
@@ -170,11 +161,8 @@ class DakaraFeederTestCase(TestCase):
         )
         mocked_subtitle_parse.return_value.get_lyrics.return_value = "lyri lyri"
 
-        # create the config
-        config = {"server": {}, "kara_folder": "basepath"}
-
         # create the object
-        feeder = DakaraFeeder(config, progress=False)
+        feeder = DakaraFeeder(self.config, progress=False)
 
         # call the method
         with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger_feeder:
@@ -232,9 +220,8 @@ class DakaraFeederTestCase(TestCase):
 
     @patch.object(FFProbeMetadataParser, "parse", autoset=True)
     @patch("dakara_feeder.dakara_feeder.list_directory", autoset=True)
-    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
     def test_renamed_file(
-        self, mocked_dakara_server_class, mocked_list_directory, mocked_metadata_parse
+        self, mocked_list_directory, mocked_metadata_parse, mocked_dakara_server_class
     ):
         """Test feed when a file has been renamed
         """
@@ -256,11 +243,8 @@ class DakaraFeederTestCase(TestCase):
             seconds=1
         )
 
-        # create the config
-        config = {"server": {}, "kara_folder": "basepath"}
-
         # create the object
-        feeder = DakaraFeeder(config, progress=False)
+        feeder = DakaraFeeder(self.config, progress=False)
 
         # call the method
         with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger:
@@ -302,13 +286,12 @@ class DakaraFeederTestCase(TestCase):
     @patch.object(Pysubs2SubtitleParser, "parse", autoset=True)
     @patch.object(FFProbeMetadataParser, "parse", autoset=True)
     @patch("dakara_feeder.dakara_feeder.list_directory", autoset=True)
-    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
     def test_feed_with_force_update(
         self,
-        mocked_dakara_server_class,
         mocked_list_directory,
         mocked_metadata_parse,
         mocked_subtitle_parse,
+        mocked_dakara_server_class,
     ):
         """Test to feed
         """
@@ -326,11 +309,8 @@ class DakaraFeederTestCase(TestCase):
         )
         mocked_subtitle_parse.return_value.get_lyrics.return_value = "lyri lyri"
 
-        # create the config
-        config = {"server": {}, "kara_folder": "basepath"}
-
         # create the object
-        feeder = DakaraFeeder(config, force_update=True, progress=False)
+        feeder = DakaraFeeder(self.config, force_update=True, progress=False)
 
         # call the method
         with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger:
@@ -373,13 +353,12 @@ class DakaraFeederTestCase(TestCase):
     @patch.object(Pysubs2SubtitleParser, "parse", autoset=True)
     @patch.object(FFProbeMetadataParser, "parse", autoset=True)
     @patch("dakara_feeder.dakara_feeder.list_directory", autoset=True)
-    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
     def test_feed_with_no_prune(
         self,
-        mocked_dakara_server_class,
         mocked_list_directory,
         mocked_metadata_parse,
         mocked_subtitle_parse,
+        mocked_dakara_server_class,
     ):
         """Test to feed without prune artists and works without songs
         """
@@ -395,11 +374,8 @@ class DakaraFeederTestCase(TestCase):
         )
         mocked_subtitle_parse.return_value.get_lyrics.return_value = "lyri lyri"
 
-        # create the config
-        config = {"server": {}, "kara_folder": "basepath"}
-
         # create the object
-        feeder = DakaraFeeder(config, progress=False, prune=False)
+        feeder = DakaraFeeder(self.config, progress=False, prune=False)
 
         # call the method
         with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger_feeder:
@@ -428,13 +404,12 @@ class DakaraFeederTestCase(TestCase):
     @patch.object(Pysubs2SubtitleParser, "parse", autoset=True)
     @patch.object(FFProbeMetadataParser, "parse", autoset=True)
     @patch("dakara_feeder.dakara_feeder.list_directory", autoset=True)
-    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
     def test_create_two_songs(
         self,
-        mocked_dakara_server_class,
         mocked_list_directory,
         mocked_metadata_parse,
         mocked_subtitle_parse,
+        mocked_dakara_server_class,
     ):
         """Test to create two songs
         """
@@ -450,11 +425,8 @@ class DakaraFeederTestCase(TestCase):
             seconds=1
         )
 
-        # create the config
-        config = {"server": {}, "kara_folder": "basepath"}
-
         # create the object
-        feeder = DakaraFeeder(config, progress=False)
+        feeder = DakaraFeeder(self.config, progress=False)
 
         # call the method
         with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG") as logger:
@@ -521,9 +493,8 @@ class DakaraFeederTestCase(TestCase):
 
     @patch.object(FFProbeMetadataParser, "parse", autoset=True)
     @patch("dakara_feeder.dakara_feeder.list_directory", autoset=True)
-    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
     def test_feed_custom_song_class(
-        self, mocked_dakara_server_class, mocked_list_directory, mocked_metadata_parse
+        self, mocked_list_directory, mocked_metadata_parse, mocked_dakara_server_class
     ):
         """Test to feed using a custom song class
         """
