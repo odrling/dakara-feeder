@@ -6,7 +6,7 @@ from dakara_base.config import ConfigNotFoundError
 from dakara_base.exceptions import DakaraError
 from path import Path
 
-from dakara_feeder import DakaraFeeder
+from dakara_feeder import SongsFeeder
 from dakara_feeder.commands import feed
 
 
@@ -45,8 +45,8 @@ class FeedTestCase(TestCase):
     """Test the feed action
     """
 
-    @patch.object(DakaraFeeder, "feed")
-    @patch.object(DakaraFeeder, "load")
+    @patch.object(SongsFeeder, "feed")
+    @patch.object(SongsFeeder, "load")
     @patch("dakara_feeder.commands.feed.load_config")
     @patch("dakara_feeder.commands.feed.get_config_file")
     @patch("dakara_feeder.commands.feed.create_logger")
@@ -78,8 +78,8 @@ class FeedTestCase(TestCase):
         mocked_load.assert_not_called()
         mocked_feed.assert_not_called()
 
-    @patch.object(DakaraFeeder, "feed")
-    @patch.object(DakaraFeeder, "load")
+    @patch.object(SongsFeeder, "feed")
+    @patch.object(SongsFeeder, "load")
     @patch("dakara_feeder.commands.feed.set_loglevel")
     @patch("dakara_feeder.commands.feed.load_config")
     @patch("dakara_feeder.commands.feed.get_config_file")
@@ -131,8 +131,8 @@ class FeedTestCase(TestCase):
         mocked_load.assert_called_with()
         mocked_feed.assert_not_called()
 
-    @patch.object(DakaraFeeder, "feed")
-    @patch.object(DakaraFeeder, "load")
+    @patch.object(SongsFeeder, "feed")
+    @patch.object(SongsFeeder, "load")
     @patch("dakara_feeder.commands.feed.set_loglevel")
     @patch("dakara_feeder.commands.feed.load_config")
     @patch("dakara_feeder.commands.feed.get_config_file")

@@ -16,7 +16,7 @@ from dakara_base.config import (
     set_loglevel,
 )
 
-from dakara_feeder import DakaraFeeder
+from dakara_feeder import SongsFeeder
 from dakara_feeder.version import __version__, __date__
 
 
@@ -110,7 +110,7 @@ def feed(args):
         ) from error
 
     set_loglevel(config)
-    feeder = DakaraFeeder(
+    feeder = SongsFeeder(
         config, force_update=args.force, prune=args.prune, progress=args.progress
     )
 

@@ -20,8 +20,8 @@ logger = logging.getLogger(__name__)
 SONGS_PER_CHUNK = 100
 
 
-class DakaraFeeder:
-    """Class for the Dakara feeder
+class SongsFeeder:
+    """Class for the Dakara songs feeder
 
     Args:
         config (dict): dictionary of config.
