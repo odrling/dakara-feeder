@@ -5,6 +5,7 @@ from path import Path
 from dakara_base.exceptions import DakaraError
 from dakara_base.progress_bar import progress_bar, null_bar
 from dakara_feeder.dakara_server import DakaraServer, TagAlreadyExistsError
+from dakara_feeder.utils import clean_dict
 from dakara_feeder.version import check_version
 from dakara_feeder.yaml_opener import get_yaml_file_content
 
@@ -56,7 +57,7 @@ class TagsFeeder:
                 raise InvalidTag("Tag {} must have a color hue".format(index))
 
             # create corret tag (remove unnecessary keys)
-            tag_correct = {"name": tag["name"], "color_hue": tag["color_hue"]}
+            tag_correct = clean_dict(tag, ["name", "color_hue"])
 
             # try to create tag on server
             try:

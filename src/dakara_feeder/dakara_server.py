@@ -96,7 +96,36 @@ class DakaraServer(HTTPClient):
         endpoint = "library/song-tags/"
         self.post(endpoint, tag, function_on_error=on_error)
 
+    def create_work_type(self, work_type):
+        """Create a work type on the server
+
+        Args:
+            work_type: JSON representation of a work type.
+
+        Raises:
+            WorkTypeAlreadyExistsError: if the work type exists on the server,
+                i.e. if the server returns 400.
+        """
+
+        def on_error(response):
+            if response.status_code == 400:
+                return WorkTypeAlreadyExistsError()
+
+            return ResponseInvalidError(
+                "Error {} when communicating with the server: {}".format(
+                    response.status_code, response.text
+                )
+            )
+
+        endpoint = "library/work-types/"
+        self.post(endpoint, work_type, function_on_error=on_error)
+
 
 class TagAlreadyExistsError(Exception):
     """Error if a tag already exists
+    """
+
+
+class WorkTypeAlreadyExistsError(Exception):
+    """Error if a work type already exists
     """

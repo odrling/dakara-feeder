@@ -245,3 +245,81 @@ class DakaraServerTestCase(TestCase):
             str(error.exception),
             "Error 999 when communicating with the server: error message",
         )
+
+    @patch.object(dakara_server.DakaraServer, "post", autoset=True)
+    def test_create_work_type(self, mocked_post):
+        """Test to create work type
+        """
+        # create the object
+        server = dakara_server.DakaraServer(
+            self.config, endpoint_prefix=self.endpoint_prefix
+        )
+
+        # create work type
+        work_type = {"query_name": "wt1", "name": "Work Type 1"}
+
+        # call the method
+        server.create_work_type(work_type)
+
+        # assert the call
+        mocked_post.assert_called_with(
+            "library/work-types/", work_type, function_on_error=ANY
+        )
+
+    @patch("dakara_base.http_client.requests.post", autoset=True)
+    def test_create_work_type_error_already_exists(self, mocked_post):
+        """Test to create work type that already exists
+        """
+        # create the mock
+        mocked_post.return_value.ok = False
+        mocked_post.return_value.status_code = 400
+
+        # create the object
+        server = dakara_server.DakaraServer(
+            self.config, endpoint_prefix=self.endpoint_prefix
+        )
+
+        # artificially connect the server
+        server.token = "token"
+
+        # create work type
+        work_type = {"query_name": "wt1", "name": "Work Type 1"}
+
+        # call the method
+        with self.assertRaises(dakara_server.WorkTypeAlreadyExistsError):
+            server.create_work_type(work_type)
+
+        # assert the call
+        mocked_post.assert_called_with(
+            self.url + "library/work-types/", work_type, headers=ANY
+        )
+
+    @patch("dakara_base.http_client.requests.post", autoset=True)
+    def test_create_work_type_error_other(self, mocked_post):
+        """Test an unknown problem when creating a work type
+        """
+        # create the mock
+        mocked_post.return_value.ok = False
+        mocked_post.return_value.status_code = 999
+        mocked_post.return_value.text = "error message"
+
+        # create the object
+        server = dakara_server.DakaraServer(
+            self.config, endpoint_prefix=self.endpoint_prefix
+        )
+
+        # artificially connect the server
+        server.token = "token"
+
+        # create work type
+        work_type = {"query_name": "wt1", "name": "Work Type 1"}
+
+        # call the method
+        with self.assertRaises(dakara_server.ResponseInvalidError) as error:
+            server.create_work_type(work_type)
+
+        # assert the error
+        self.assertEqual(
+            str(error.exception),
+            "Error 999 when communicating with the server: error message",
+        )
