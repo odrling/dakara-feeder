@@ -1,12 +1,12 @@
 import logging
 
-import yaml
 from path import Path
 
 from dakara_base.exceptions import DakaraError
 from dakara_base.progress_bar import progress_bar, null_bar
 from dakara_feeder.dakara_server import DakaraServer, TagAlreadyExistsError
 from dakara_feeder.version import check_version
+from dakara_feeder.yaml_opener import get_yaml_file_content
 
 
 logger = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ class TagsFeeder:
         """Execute the feeding action
         """
         # load file and get the key
-        tags = self.get_tags_file_content()["tags"]
+        tags = get_yaml_file_content(self.tags_file_path, "tags")
 
         for index, tag in enumerate(self.bar(tags, text="Tags to create")):
             # check expected fields are present
@@ -68,40 +68,7 @@ class TagsFeeder:
                     tag["name"],
                 )
 
-    def get_tags_file_content(self):
-        """Load the tags file content
-
-        Returns:
-            dict: content of the tags file.
-
-        Raises:
-            TagsFileNotFound: if the tags file cannot be found.
-            InvalidTag: if the content of the tags file cannot be parsed.
-        """
-        try:
-            return yaml.load(self.tags_file_path.text(), Loader=yaml.Loader)
-
-        except FileNotFoundError as error:
-            raise TagsFileNotFound(
-                "Unable to find tags file {}".format(self.tags_file_path)
-            ) from error
-
-        except yaml.YAMLError as error:
-            raise InvalidTagsFile(
-                "Unable to parse tags file {}: {}".format(self.tags_file_path, error)
-            ) from error
-
 
 class InvalidTag(DakaraError):
     """Exception raised if a tag is invalid
-    """
-
-
-class InvalidTagsFile(DakaraError):
-    """Exception raised if the tag file is invalid
-    """
-
-
-class TagsFileNotFound(DakaraError, FileNotFoundError):
-    """Exception raised if the tag file does not exist
     """
