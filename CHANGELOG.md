@@ -33,6 +33,12 @@
 ### Added
 
 - Automatically prune artists and works without songs on server.
+- Feed tags with command `dakara-feed tags`.
+- Feed work types with command `dakara-feed work-types`.
+
+### Changed
+
+- Feed command for songs moved from `dakara-feed` to `dakara-feed songs`.
 
 ## 1.5.1 - 2019-12-06
 

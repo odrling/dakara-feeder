@@ -21,7 +21,7 @@ def get_subcommands():
     The subcommands must be listed in `dakara_feeder.commands.__init__`.
 
     Returns:
-        list: list of subcommand instances.
+        list: list of subcommand classes.
     """
     subcommands = []
     for item_name in sorted(commands.__all__):
