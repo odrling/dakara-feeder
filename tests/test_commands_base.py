@@ -47,6 +47,26 @@ class SubcommandTestCase(TestCase):
         self.assertEqual(args.arg1, "value")
         self.assertIs(args.function.__func__, subcommand.handle.__func__)
 
+    def test_create_subparser_minimal(self):
+        """Test to create a minimal subparser
+
+        I.e. without settings its subperser.
+        """
+
+        class MinimalTestSubcommand(Subcommand):
+            name = "name"
+            description = "description"
+
+            def handle(self, args):
+                pass
+
+        subcommand = MinimalTestSubcommand()
+        parser = ArgumentParser()
+        subparsers = parser.add_subparsers()
+        subcommand.create_subparser(subparsers)
+
+        parser.parse_args(["name"])
+
     @patch("dakara_feeder.commands.base.set_loglevel")
     @patch("dakara_feeder.commands.base.load_config")
     @patch("dakara_feeder.commands.base.get_config_file")
