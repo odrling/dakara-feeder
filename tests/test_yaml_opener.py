@@ -40,13 +40,10 @@ class GetYamlFileContentTestCase(TestCase):
         mocked_text.side_effect = FileNotFoundError()
 
         # call the method
-        with self.assertRaises(YamlFileNotFoundError) as error:
+        with self.assertRaisesRegex(
+            YamlFileNotFoundError, "Unable to find YAML file 'path/to/file'"
+        ):
             get_yaml_file_content(Path("path/to/file"))
-
-        # assert the error
-        self.assertEqual(
-            str(error.exception), 'Unable to find YAML file "path/to/file"'
-        )
 
     @patch("dakara_feeder.yaml_opener.yaml.load")
     def test_get_error_invalid(self, mocked_load, mocked_text):
@@ -58,14 +55,11 @@ class GetYamlFileContentTestCase(TestCase):
         mocked_load.side_effect = YAMLError("error message")
 
         # call the method
-        with self.assertRaises(YamlFileInvalidError) as error:
+        with self.assertRaisesRegex(
+            YamlFileInvalidError,
+            "Unable to parse YAML file 'path/to/file': error message",
+        ):
             get_yaml_file_content(Path("path/to/file"))
-
-        # assert the error
-        self.assertEqual(
-            str(error.exception),
-            'Unable to parse YAML file "path/to/file": error message',
-        )
 
     def test_get_key(self, mocked_text):
         """Test to get the key of a YAML file
@@ -91,11 +85,8 @@ class GetYamlFileContentTestCase(TestCase):
         mocked_text.return_value = str(content)
 
         # call the method
-        with self.assertRaises(YamlContentInvalidError) as error:
+        with self.assertRaisesRegex(
+            YamlContentInvalidError,
+            "Unable to find key 'other' in YAML file 'path/to/file'",
+        ):
             get_yaml_file_content(Path("path/to/file"), "other")
-
-        # assert the error
-        self.assertEqual(
-            str(error.exception),
-            'Unable to find key "other" in YAML file "path/to/file"',
-        )

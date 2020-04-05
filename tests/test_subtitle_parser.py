@@ -60,11 +60,10 @@ class Pysubs2SubtitleParserTestCase(TestCase):
         """Test when the ass file to parse does not exist
         """
         # call the method
-        with self.assertRaises(SubtitleNotFoundError) as error:
+        with self.assertRaisesRegex(
+            SubtitleNotFoundError, "Subtitle file nowhere not found"
+        ):
             Pysubs2SubtitleParser.parse(Path("nowhere"))
-
-        # assert the error
-        self.assertEqual(str(error.exception), "Subtitle file nowhere not found")
 
     @patch("dakara_feeder.subtitle_parser.pysubs2.load")
     def test_parse_error(self, mocked_load):
@@ -74,10 +73,7 @@ class Pysubs2SubtitleParserTestCase(TestCase):
         mocked_load.side_effect = Exception("invalid")
 
         # call the method
-        with self.assertRaises(SubtitleParseError) as error:
+        with self.assertRaisesRegex(
+            SubtitleParseError, "Error when parsing subtitle file nowhere: invalid"
+        ):
             Pysubs2SubtitleParser.parse(Path("nowhere"))
-
-        # assert the error
-        self.assertEqual(
-            str(error.exception), "Error when parsing subtitle file nowhere: invalid"
-        )

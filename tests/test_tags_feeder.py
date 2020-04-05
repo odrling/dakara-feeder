@@ -62,11 +62,8 @@ class TagsFeederTestCase(TestCase):
         feeder = TagsFeeder(self.config, "path/to/file", progress=False)
 
         # call the method
-        with self.assertRaises(InvalidTag) as error:
+        with self.assertRaisesRegex(InvalidTag, "Tag 0 must have a name"):
             feeder.feed()
-
-        # assert the error
-        self.assertEqual(str(error.exception), "Tag 0 must have a name")
 
     @patch("dakara_feeder.tags_feeder.get_yaml_file_content", autoset=True)
     def test_feed_error_no_hue(
@@ -82,11 +79,8 @@ class TagsFeederTestCase(TestCase):
         feeder = TagsFeeder(self.config, "path/to/file", progress=False)
 
         # call the method
-        with self.assertRaises(InvalidTag) as error:
+        with self.assertRaisesRegex(InvalidTag, "Tag 0 must have a color hue"):
             feeder.feed()
-
-        # assert the error
-        self.assertEqual(str(error.exception), "Tag 0 must have a color hue")
 
     @patch("dakara_feeder.tags_feeder.get_yaml_file_content", autoset=True)
     def test_feed_error_tag_exists(

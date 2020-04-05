@@ -123,13 +123,10 @@ class SongsFeederTestCase(TestCase):
         feeder = SongsFeeder(self.config)
 
         # call the method
-        with self.assertRaises(KaraFolderNotFound) as error:
+        with self.assertRaisesRegex(
+            KaraFolderNotFound, "Karaoke folder 'basepath' does not exist"
+        ):
             feeder.check_kara_folder_path()
-
-        # assert the error
-        self.assertEqual(
-            str(error.exception), "Karaoke folder 'basepath' does not exist"
-        )
 
     @patch.object(Pysubs2SubtitleParser, "parse", autoset=True)
     @patch.object(FFProbeMetadataParser, "parse", autoset=True)

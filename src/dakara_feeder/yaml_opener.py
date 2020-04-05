@@ -25,12 +25,12 @@ def get_yaml_file_content(file_path, key=None):
 
     except FileNotFoundError as error:
         raise YamlFileNotFoundError(
-            'Unable to find YAML file "{}"'.format(file_path)
+            "Unable to find YAML file '{}'".format(file_path)
         ) from error
 
     except yaml.YAMLError as error:
         raise YamlFileInvalidError(
-            'Unable to parse YAML file "{}": {}'.format(file_path, error)
+            "Unable to parse YAML file '{}': {}".format(file_path, error)
         ) from error
 
     if key is None:
@@ -41,7 +41,7 @@ def get_yaml_file_content(file_path, key=None):
 
     except KeyError as error:
         raise YamlContentInvalidError(
-            'Unable to find key "{}" in YAML file "{}"'.format(key, file_path)
+            "Unable to find key '{}' in YAML file '{}'".format(key, file_path)
         ) from error
 
 

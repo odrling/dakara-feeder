@@ -50,11 +50,8 @@ class MediainfoMetadataParserTestCase(TestCase):
         """Test to extract metadata from a file that does not exist
         """
         # call the method
-        with self.assertRaises(MediaNotFoundError) as error:
+        with self.assertRaisesRegex(MediaNotFoundError, "Media file nowhere not found"):
             MediainfoMetadataParser.parse(Path("nowhere"))
-
-        # assert the error
-        self.assertEqual(str(error.exception), "Media file nowhere not found")
 
     @patch.object(MediaInfo, "parse", autoset=True)
     def test_parse_invalid_error(self, mocked_parse):
@@ -64,13 +61,10 @@ class MediainfoMetadataParserTestCase(TestCase):
         mocked_parse.side_effect = Exception("invalid")
 
         # call the method
-        with self.assertRaises(MediaParseError) as error:
+        with self.assertRaisesRegex(
+            MediaParseError, "Error when processing media file nowhere: invalid"
+        ):
             MediainfoMetadataParser.parse(Path("nowhere"))
-
-        # assert the error
-        self.assertEqual(
-            str(error.exception), "Error when processing media file nowhere: invalid"
-        )
 
     def test_get_duration(self):
         """Test to get duration
@@ -117,11 +111,8 @@ class FFProbeMetadataParserTestCase(TestCase):
         mocked_exists.return_value = False
 
         # call the method
-        with self.assertRaises(MediaNotFoundError) as error:
+        with self.assertRaisesRegex(MediaNotFoundError, "Media file nowhere not found"):
             FFProbeMetadataParser.parse(Path("nowhere"))
-
-        # assert the error
-        self.assertEqual(str(error.exception), "Media file nowhere not found")
 
         # assert the call
         mocked_exists.assert_called_with()
@@ -134,13 +125,10 @@ class FFProbeMetadataParserTestCase(TestCase):
         mocked_exists.return_value = True
 
         # call the method
-        with self.assertRaises(MediaParseError) as error:
+        with self.assertRaisesRegex(
+            MediaParseError, "Error when processing media file nowhere"
+        ):
             FFProbeMetadataParser.parse(Path("nowhere"))
-
-        # assert the error
-        self.assertEqual(
-            str(error.exception), "Error when processing media file nowhere"
-        )
 
     def test_get_duration(self):
         """Test to get duration

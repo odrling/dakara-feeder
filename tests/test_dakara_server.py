@@ -315,11 +315,8 @@ class DakaraServerTestCase(TestCase):
         work_type = {"query_name": "wt1", "name": "Work Type 1"}
 
         # call the method
-        with self.assertRaises(dakara_server.ResponseInvalidError) as error:
-            server.create_work_type(work_type)
-
-        # assert the error
-        self.assertEqual(
-            str(error.exception),
+        with self.assertRaisesRegex(
+            dakara_server.ResponseInvalidError,
             "Error 999 when communicating with the server: error message",
-        )
+        ):
+            server.create_work_type(work_type)

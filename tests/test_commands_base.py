@@ -115,14 +115,11 @@ class SubcommandTestCase(TestCase):
         mocked_load_config.side_effect = ConfigNotFoundError("Config file not found")
 
         # call the function
-        with self.assertRaises(ConfigNotFoundError) as error:
-            Subcommand.load_config()
-
-        # assert the error
-        self.assertEqual(
-            str(error.exception),
+        with self.assertRaisesRegex(
+            ConfigNotFoundError,
             "Config file not found, please run 'dakara-feed create-config'",
-        )
+        ):
+            Subcommand.load_config()
 
         # assert the call
         mocked_create_logger.assert_called_with(wrap=True)
@@ -159,16 +156,13 @@ class SubcommandTestCase(TestCase):
         mocked_get_config_file.return_value = Path("path") / "to" / "config"
 
         # call the function
-        with self.assertRaises(DakaraError) as error:
-            Subcommand.load_feeder(feeder)
-
-        # assert the error
-        self.assertEqual(
-            str(error.exception),
+        with self.assertRaisesRegex(
+            DakaraError,
             "Any error message\nConfig may be incomplete, please check '{}'".format(
                 Path("path") / "to" / "config"
             ),
-        )
+        ):
+            Subcommand.load_feeder(feeder)
 
         # assert the call
         mocked_get_config_file.assert_called_with(ANY)

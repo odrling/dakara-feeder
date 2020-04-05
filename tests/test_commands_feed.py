@@ -98,19 +98,16 @@ class MainTestCase(TestCase):
         """
         # create mocks
         def function(args):
-            raise DakaraError("error")
+            raise DakaraError("error message")
 
         mocked_parse_args.return_value = Namespace(function=function, debug=True)
 
         # call the function
-        with self.assertRaises(DakaraError) as error:
+        with self.assertRaisesRegex(DakaraError, "error message"):
             feed.main()
 
         # assert the call
         mocked_exit.assert_not_called()
-
-        # assert the error
-        self.assertEqual(str(error.exception), "error")
 
     def test_unknown_error(self, mocked_parse_args, mocked_exit):
         """Test an unknown error exit
@@ -143,16 +140,13 @@ class MainTestCase(TestCase):
         """
         # create mocks
         def function(args):
-            raise Exception("error")
+            raise Exception("error message")
 
         mocked_parse_args.return_value = Namespace(function=function, debug=True)
 
         # call the function
-        with self.assertRaises(Exception) as error:
+        with self.assertRaisesRegex(Exception, "error message"):
             feed.main()
 
         # assert the call
         mocked_exit.assert_not_called()
-
-        # assert the error
-        self.assertEqual(str(error.exception), "error")
