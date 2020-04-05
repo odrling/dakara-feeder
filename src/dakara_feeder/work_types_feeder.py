@@ -57,6 +57,16 @@ class WorkTypesFeeder:
                     "Work type {} must have a query name".format(index)
                 )
 
+            if "name" not in work_type:
+                raise WorkTypeInvalidError(
+                    "Work type {} must have a name".format(index)
+                )
+
+            if "name_plural" not in work_type:
+                raise WorkTypeInvalidError(
+                    "Work type {} must have a plural name".format(index)
+                )
+
             # create corret work type (remove unnecessary keys)
             work_type_correct = clean_dict(
                 work_type, ["query_name", "name", "name_plural", "icon_name"]
