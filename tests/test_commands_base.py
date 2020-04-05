@@ -156,13 +156,16 @@ class SubcommandTestCase(TestCase):
         mocked_get_config_file.return_value = Path("path") / "to" / "config"
 
         # call the function
-        with self.assertRaisesRegex(
-            DakaraError,
+        with self.assertRaises(DakaraError) as error:
+            Subcommand.load_feeder(feeder)
+
+        # assert the error
+        self.assertEqual(
+            str(error.exception),
             "Any error message\nConfig may be incomplete, please check '{}'".format(
                 Path("path") / "to" / "config"
             ),
-        ):
-            Subcommand.load_feeder(feeder)
+        )
 
         # assert the call
         mocked_get_config_file.assert_called_with(ANY)
