@@ -133,6 +133,11 @@ class MediainfoMetadataParser(MetadataParser):
         return timedelta(milliseconds=int(duration))
 
     def get_audio_tracks_count(self):
+        """Get number of audio tracks
+
+        Returns:
+            int: Number of audio tracks.
+        """
         return len(
             list(filter(lambda e: e.track_type == "Audio", self.metadata.tracks))
         )
@@ -232,6 +237,11 @@ class FFProbeMetadataParser(MetadataParser):
         return timedelta(0)
 
     def get_audio_tracks_count(self):
+        """Get number of audio tracks
+
+        Returns:
+            int: Number of audio tracks.
+        """
         if "streams" not in self.metadata:
             return 0
 

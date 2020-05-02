@@ -20,15 +20,16 @@ class BaseSong:
     The main entry point of the class when used by the feeder is the
     `get_representation` method, that will call all the methods to get the song
     data:
-        - get_title;
-        - get_duration;
-        - get_version;
-        - get_detail;
-        - get_detail_video;
-        - get_tags;
-        - get_artists;
-        - get_works;
-        - get_lyrics.
+        - `get_title`;
+        - `get_duration`;
+        - `get_has_instrumental`;
+        - `get_version`;
+        - `get_detail`;
+        - `get_detail_video`;
+        - `get_tags`;
+        - `get_artists`;
+        - `get_works`;
+        - `get_lyrics`.
 
     You should override those methods to suit your needs. See the documentation
     of each method to learn what data format the must return.
@@ -36,26 +37,50 @@ class BaseSong:
     When calling `get_representation`, two special methods are also called for
     performing custom actions, the first one just on entering
     `get_representation`, and the other just befor leaving it:
-        - pre_process;
-        - post_process.
+        - `pre_process`;
+        - `post_process`.
 
     You should override those two methods as well. Typically, `pre_process`
     should be overriden to perform preparative actions which result would be
     used by the `get_` methods. On the other hand, `post_process` should be
     overriden to perform final actions on the representation.
 
+    Metadata of the video file are extracted using a metadata parser and stored
+    in the `metadata` attribute. The metadata parser to chose is decided by
+    setting the class attribute `metadata_parser_class`. The class must
+    implement `dakara_feeder.metadata_parser.MetadataParser` base class. So far,
+    two implemenations are available in the project:
+        - `dakara_feeder.metadata_parser.FFProbeMetadataParser`, based on
+            FFProbe, part of FFMpeg (external dependency). This is the recommended
+            and the default parser;
+        - `dakara_feeder.metadata_parser.MediainfoMetadataParser`, based on
+            MediaInfo (external dependency). Slower, may not work on Windows.
+
+    Metadata are available when calling `pre_process`.
+
+    If the metadata cannot be extracted from the video file for any reason, the
+    `metadata` attribute will contain a
+    `dakara_feeder.metadata_parser.NullMetadataParser` that always return null
+    values (e.g. 0 seconds duration).
+
     Args.
         base_directory (path.Path): path to the scanned directory.
         paths (directory_lister.SongPaths): paths of the song file.
 
     Attributes:
+        metadata_parser_class (type): Class of the metadata parser to use.
+            Default to `dakara_feeder.metadata_parser.FFProbeMetadataParser`.
         base_directory (path.Path): path to the scanned directory.
         video_path (path.Path): path to the song file, relative to the base
+            directory.
+        audio_path (path.Path): path to the audio file, relative to the base
             directory.
         sublitle_path (path.Path): path to the subtitle file, relative to the
             base directory.
         others_path (list of path.Path): list of paths to the other files,
             relative to the base directory.
+        metadata (dakara_feeder.metadata_parser.MetadataParser): Object for
+            containing metadata of the video file.
     """
 
     metadata_parser_class = FFProbeMetadataParser
@@ -67,6 +92,17 @@ class BaseSong:
         self.subtitle_path = paths.subtitle
         self.others_path = paths.others
         self.metadata = NullMetadataParser.parse(self.video_path)
+
+    def parse_metadata(self):
+        """Use the requested metadata parser to parse video file
+        """
+        try:
+            self.metadata = self.metadata_parser_class.parse(
+                self.base_directory / self.video_path
+            )
+
+        except MediaParseError as error:
+            logger.error("Cannot parse metadata: {}".format(error))
 
     def pre_process(self):
         """Process preparative actions
@@ -103,34 +139,32 @@ class BaseSong:
         """
         return self.video_path.stem
 
-    def parse_metadata(self):
-        try:
-            self.metadata = self.metadata_parser_class.parse(
-                self.base_directory / self.video_path
-            )
-
-        except MediaParseError as error:
-            logger.error("Cannot parse metadata: {}".format(error))
-
     def get_duration(self):
         """Get the duration
 
         This method may be overriden. By default it returns the duration of the
         video file using FFProbe.
 
-        Duration can be extracted from the video file using a parser. Two
-        parsers are available in the project:
-            - `dakara_feeder.metadata_parser.FFProbeMetadataParser`, based on
-                FFProbe, part of FFMpeg (external dependency). This is the
-                recommended parser;
-            - `dakara_feeder.metadata_parser.MediainfoMetadataParser`, based on
-                MediaInfo (external dependency). Slower, does not work on
-                Windows.
 
         Returns:
             float: Duration of the song in seconds.
         """
         return self.metadata.get_duration().total_seconds()
+
+    def get_has_instrumental(self):
+        """Get the flag if the song has an instrumental track
+
+        Returns:
+            bool: True either if there is an extra audio file siding with the
+            video file, or if the video file has more than 2 audio tracks.
+        """
+        if self.audio_path:
+            return True
+
+        if self.metadata.get_audio_tracks_count() >= 2:
+            return True
+
+        return False
 
     def get_artists(self):
         """Get the list of artists
@@ -256,15 +290,6 @@ class BaseSong:
         except SubtitleParseError as error:
             logger.error("Lyrics not parsed: {}".format(error))
             return ""
-
-    def get_has_instrumental(self):
-        if self.audio_path:
-            return True
-
-        if self.metadata.get_audio_tracks_count() >= 2:
-            return True
-
-        return False
 
     def get_representation(self):
         """Get the simple representation of the song

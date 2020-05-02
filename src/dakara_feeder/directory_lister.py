@@ -50,6 +50,7 @@ def group_by_type(files):
     subtitles = []
     others = []
     for file in files:
+        # estimate MIME type of file using standard extensions
         mimetype, _ = mimetypes.guess_type(file)
         maintype = None
         if mimetype:
