@@ -86,6 +86,12 @@ class MediainfoMetadataParserTestCase(TestCase):
         parser = MediainfoMetadataParser.parse(get_file("tests.resources", "dummy.mkv"))
         self.assertEqual(parser.get_audio_tracks_count(), 2)
 
+    def test_get_number_subtitle_tracks(self):
+        """Test to get number of subtitle tracks
+        """
+        parser = MediainfoMetadataParser.parse(get_file("tests.resources", "dummy.mkv"))
+        self.assertEqual(parser.get_subtitle_tracks_count(), 1)
+
 
 class FFProbeMetadataParserTestCase(TestCase):
     """Test the FFProbe metadata parser
@@ -163,3 +169,9 @@ class FFProbeMetadataParserTestCase(TestCase):
         """
         parser = FFProbeMetadataParser.parse(get_file("tests.resources", "dummy.mkv"))
         self.assertEqual(parser.get_audio_tracks_count(), 2)
+
+    def test_get_number_subtitle_tracks(self):
+        """Test to get number of subtitle tracks
+        """
+        parser = FFProbeMetadataParser.parse(get_file("tests.resources", "dummy.mkv"))
+        self.assertEqual(parser.get_subtitle_tracks_count(), 1)
