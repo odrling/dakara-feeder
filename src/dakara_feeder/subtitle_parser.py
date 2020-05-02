@@ -1,9 +1,19 @@
 import re
 from abc import ABC, abstractmethod
-from collections import OrderedDict
 
 import pysubs2
 from dakara_base.exceptions import DakaraError
+
+
+def is_subtitle(filename):
+    """Check if the provided file is a subtitle
+
+    Check the admissible file extensions for pysubs2.
+
+    Returns:
+        bool: True if the filename is a subtitle.
+    """
+    return filename.ext in pysubs2.formats.FILE_EXTENSION_TO_FORMAT_IDENTIFIER
 
 
 class SubtitleParser(ABC):
@@ -39,7 +49,7 @@ class SubtitleParser(ABC):
 
 
 class TXTSubtitleParser(SubtitleParser):
-    """Subtitle parser for txt files
+    """Subtitle parser for plain txt files
 
     >>> from Path import path
     >>> file_path = Path("path/to/file")
@@ -184,16 +194,6 @@ class Pysubs2SubtitleParser(SubtitleParser):
             event_previous = event
 
         return "\n".join(lyrics)
-
-
-PARSER_BY_EXTENSION = OrderedDict(
-    (
-        (".ass", Pysubs2SubtitleParser),
-        (".ssa", Pysubs2SubtitleParser),
-        (".srt", Pysubs2SubtitleParser),
-        (".txt", TXTSubtitleParser),
-    )
-)
 
 
 class SubtitleParseError(DakaraError):

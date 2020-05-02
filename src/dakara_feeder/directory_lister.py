@@ -2,11 +2,10 @@ import logging
 import mimetypes
 from itertools import groupby
 
+from dakara_feeder.subtitle_parser import is_subtitle
+
 
 logger = logging.getLogger(__name__)
-
-
-SUBTITLE_EXTENSIONS = [".ass", ".ssa"]
 
 
 def list_directory(path):
@@ -53,8 +52,9 @@ def group_by_type(files):
         # estimate MIME type of file using standard extensions
         mimetype, _ = mimetypes.guess_type(file)
         maintype = None
+        subtype = None
         if mimetype:
-            maintype, _ = mimetype.split("/")
+            maintype, subtype = mimetype.split("/")
 
         if maintype == "video":
             videos.append(file)
@@ -64,7 +64,7 @@ def group_by_type(files):
             audios.append(file)
             continue
 
-        if file.ext.lower() in SUBTITLE_EXTENSIONS:
+        if is_subtitle(file):
             subtitles.append(file)
             continue
 
