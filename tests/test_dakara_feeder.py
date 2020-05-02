@@ -160,12 +160,14 @@ class DakaraFeederTestCase(TestCase):
         mocked_list_directory.return_value = [
             SongPaths(Path("directory_0") / "song_0.mp4"),
             SongPaths(
-                Path("directory_2") / "song_2.mp4", Path("directory_2") / "song_2.ass"
+                Path("directory_2") / "song_2.mp4",
+                subtitle=Path("directory_2") / "song_2.ass",
             ),
         ]
         mocked_metadata_parse.return_value.get_duration.return_value = timedelta(
             seconds=1
         )
+        mocked_metadata_parse.return_value.get_audio_tracks_count.return_value = 1
         mocked_subtitle_parse.return_value.get_lyrics.return_value = "lyri lyri"
 
         # create the config
@@ -189,6 +191,7 @@ class DakaraFeederTestCase(TestCase):
                     "filename": "song_2.mp4",
                     "directory": "directory_2",
                     "duration": 1,
+                    "has_instrumental": False,
                     "artists": [],
                     "works": [],
                     "tags": [],
@@ -247,6 +250,7 @@ class DakaraFeederTestCase(TestCase):
         mocked_metadata_parse.return_value.get_duration.return_value = timedelta(
             seconds=1
         )
+        mocked_metadata_parse.return_value.get_audio_tracks_count.return_value = 1
 
         # create the config
         config = {"server": {}, "kara_folder": "basepath"}
@@ -269,6 +273,7 @@ class DakaraFeederTestCase(TestCase):
                 "filename": "musics.mp4",
                 "directory": "directory_1",
                 "duration": 1,
+                "has_instrumental": False,
                 "artists": [],
                 "works": [],
                 "tags": [],
@@ -307,11 +312,12 @@ class DakaraFeederTestCase(TestCase):
             {"id": 1, "path": Path("music_1.mp4")}
         ]
         mocked_list_directory.return_value = [
-            SongPaths(Path("music_1.mp4"), Path("music_1.ass"))
+            SongPaths(Path("music_1.mp4"), subtitle=Path("music_1.ass"))
         ]
         mocked_metadata_parse.return_value.get_duration.return_value = timedelta(
             seconds=1
         )
+        mocked_metadata_parse.return_value.get_audio_tracks_count.return_value = 1
         mocked_subtitle_parse.return_value.get_lyrics.return_value = "lyri lyri"
 
         # create the config
@@ -335,6 +341,7 @@ class DakaraFeederTestCase(TestCase):
                 "filename": "music_1.mp4",
                 "directory": "",
                 "duration": 1,
+                "has_instrumental": False,
                 "artists": [],
                 "works": [],
                 "tags": [],
@@ -378,6 +385,7 @@ class DakaraFeederTestCase(TestCase):
         mocked_metadata_parse.return_value.get_duration.return_value = timedelta(
             seconds=1
         )
+        mocked_metadata_parse.return_value.get_audio_tracks_count.return_value = 1
 
         # create the config
         config = {"server": {}, "kara_folder": "basepath"}
@@ -399,6 +407,7 @@ class DakaraFeederTestCase(TestCase):
                 "filename": "song_0.mp4",
                 "directory": "directory_0",
                 "duration": 1,
+                "has_instrumental": False,
                 "artists": [],
                 "works": [],
                 "tags": [],
@@ -412,6 +421,7 @@ class DakaraFeederTestCase(TestCase):
                 "filename": "song_1.mp4",
                 "directory": "directory_1",
                 "duration": 1,
+                "has_instrumental": False,
                 "artists": [],
                 "works": [],
                 "tags": [],
@@ -462,6 +472,7 @@ class DakaraFeederTestCase(TestCase):
         mocked_metadata_parse.return_value.get_duration.return_value = timedelta(
             seconds=1
         )
+        mocked_metadata_parse.return_value.get_audio_tracks_count.return_value = 2
 
         class Song(BaseSong):
             def get_artists(self):
@@ -491,6 +502,7 @@ class DakaraFeederTestCase(TestCase):
                     "filename": "song_0.mp4",
                     "directory": "directory_0",
                     "duration": 1,
+                    "has_instrumental": True,
                     "artists": ["artist1", "artist2"],
                     "works": [],
                     "tags": [],
@@ -498,6 +510,67 @@ class DakaraFeederTestCase(TestCase):
                     "detail": "",
                     "detail_video": "",
                     "lyrics": "",
+                }
+            ]
+        )
+
+    @patch.object(Pysubs2SubtitleParser, "parse", autoset=True)
+    @patch.object(FFProbeMetadataParser, "parse", autoset=True)
+    @patch("dakara_feeder.dakara_feeder.list_directory", autoset=True)
+    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
+    def test_feed_extra_audio_file(
+        self,
+        mocked_dakara_server_class,
+        mocked_list_directory,
+        mocked_metadata_parse,
+        mocked_subtitle_parse,
+    ):
+        """Test to feed
+        """
+        # create the mocks
+        mocked_dakara_server_class.return_value.get_songs.return_value = []
+        mocked_list_directory.return_value = [
+            SongPaths(
+                Path("music_1.mp4"),
+                audio=Path("music_1.flac"),
+                subtitle=Path("music_1.ass"),
+            )
+        ]
+        mocked_metadata_parse.return_value.get_duration.return_value = timedelta(
+            seconds=1
+        )
+        mocked_metadata_parse.return_value.get_audio_tracks_count.return_value = 1
+        mocked_subtitle_parse.return_value.get_lyrics.return_value = "lyri lyri"
+
+        # create the config
+        config = {"server": {}, "kara_folder": "basepath"}
+
+        # create the object
+        feeder = DakaraFeeder(config, progress=False)
+
+        # call the method
+        with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG"):
+            with self.assertLogs("dakara_base.progress_bar"):
+                feeder.feed()
+
+        # assert the mocked calls
+        mocked_dakara_server_class.return_value.get_songs.assert_called_with()
+        mocked_list_directory.assert_called_with("basepath")
+        mocked_dakara_server_class.return_value.post_song.assert_called_with(
+            [
+                {
+                    "title": "music_1",
+                    "filename": "music_1.mp4",
+                    "directory": "",
+                    "duration": 1,
+                    "has_instrumental": True,
+                    "artists": [],
+                    "works": [],
+                    "tags": [],
+                    "version": "",
+                    "detail": "",
+                    "detail_video": "",
+                    "lyrics": "lyri lyri",
                 }
             ]
         )
@@ -531,7 +604,8 @@ class DakaraFeederIntegrationTestCase(TestCase):
                     "title": "dummy",
                     "filename": "dummy.mkv",
                     "directory": "",
-                    "duration": 2,
+                    "duration": 2.023,
+                    "has_instrumental": True,
                     "artists": [],
                     "works": [],
                     "tags": [],

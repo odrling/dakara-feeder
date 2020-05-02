@@ -46,6 +46,7 @@ def group_by_type(files):
     """
     # sort files by their extension
     videos = []
+    audios = []
     subtitles = []
     others = []
     for file in files:
@@ -58,6 +59,10 @@ def group_by_type(files):
             videos.append(file)
             continue
 
+        if maintype == "audio":
+            audios.append(file)
+            continue
+
         if file.ext.lower() in SUBTITLE_EXTENSIONS:
             subtitles.append(file)
             continue
@@ -68,6 +73,11 @@ def group_by_type(files):
     if len(videos) == 0:
         return []
 
+    # check there if there are only one audio file
+    if len(audios) > 1:
+        logger.warning("More than one audio file for video %s", videos[0])
+        return []
+
     # check there if there are only one subtitle
     if len(subtitles) > 1:
         logger.warning("More than one subtitle for video %s", videos[0])
@@ -75,7 +85,12 @@ def group_by_type(files):
 
     # recombine the files
     return [
-        SongPaths(video, subtitles[0] if subtitles else None, others)
+        SongPaths(
+            video,
+            audios[0] if audios else None,
+            subtitles[0] if subtitles else None,
+            others,
+        )
         for video in videos
     ]
 
@@ -85,12 +100,14 @@ class SongPaths:
 
     Attributes:
         video (path.Path): Path to the video file.
+        audio (path.Path): Path to the audio file.
         subtitle (path.Path): Path to the subtitle file.
         others (list of path.Path): Paths of other files.
     """
 
-    def __init__(self, video, subtitle=None, others=[]):
+    def __init__(self, video, audio=None, subtitle=None, others=[]):
         self.video = video
+        self.audio = audio
         self.subtitle = subtitle
         self.others = others
 
@@ -101,6 +118,6 @@ class SongPaths:
         return hash(str(self))
 
     def __repr__(self):
-        return "video: {}, subtitle: {}, others: {}".format(
-            self.video, self.subtitle, self.others
+        return "video: {}, audio: {}, subtitle: {}, others: {}".format(
+            self.video, self.audio, self.subtitle, self.others
         )

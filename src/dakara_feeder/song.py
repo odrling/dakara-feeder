@@ -1,6 +1,10 @@
 import logging
 
-from dakara_feeder.metadata_parser import FFProbeMetadataParser, MediaParseError
+from dakara_feeder.metadata_parser import (
+    FFProbeMetadataParser,
+    MediaParseError,
+    NullMetadataParser,
+)
 from dakara_feeder.subtitle_parser import Pysubs2SubtitleParser, SubtitleParseError
 
 
@@ -54,11 +58,15 @@ class BaseSong:
             relative to the base directory.
     """
 
+    metadata_parser_class = FFProbeMetadataParser
+
     def __init__(self, base_directory, paths):
         self.base_directory = base_directory
         self.video_path = paths.video
+        self.audio_path = paths.audio
         self.subtitle_path = paths.subtitle
         self.others_path = paths.others
+        self.metadata = NullMetadataParser.parse(self.video_path)
 
     def pre_process(self):
         """Process preparative actions
@@ -95,6 +103,15 @@ class BaseSong:
         """
         return self.video_path.stem
 
+    def parse_metadata(self):
+        try:
+            self.metadata = self.metadata_parser_class.parse(
+                self.base_directory / self.video_path
+            )
+
+        except MediaParseError as error:
+            logger.error("Cannot parse metadata: {}".format(error))
+
     def get_duration(self):
         """Get the duration
 
@@ -113,14 +130,7 @@ class BaseSong:
         Returns:
             float: Duration of the song in seconds.
         """
-        try:
-            parser = FFProbeMetadataParser.parse(self.base_directory / self.video_path)
-            return parser.get_duration().total_seconds()
-
-        except MediaParseError as error:
-            logger.error("Duration not parsed: {}".format(error))
-            # Set duration to zero when duration can't be extracted
-            return 0
+        return self.metadata.get_duration().total_seconds()
 
     def get_artists(self):
         """Get the list of artists
@@ -247,18 +257,29 @@ class BaseSong:
             logger.error("Lyrics not parsed: {}".format(error))
             return ""
 
+    def get_has_instrumental(self):
+        if self.audio_path:
+            return True
+
+        if self.metadata.get_audio_tracks_count() >= 2:
+            return True
+
+        return False
+
     def get_representation(self):
         """Get the simple representation of the song
 
         Returns:
             dict: JSON-compiliant structure representing the song.
         """
+        self.parse_metadata()
         self.pre_process()
         representation = {
             "title": self.get_title(),
             "filename": str(self.video_path.basename()),
             "directory": str(self.video_path.dirname()),
             "duration": self.get_duration(),
+            "has_instrumental": self.get_has_instrumental(),
             "version": self.get_version(),
             "detail": self.get_detail(),
             "detail_video": self.get_detail_video(),

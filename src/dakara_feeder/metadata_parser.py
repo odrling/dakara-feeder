@@ -40,6 +40,14 @@ class MetadataParser(ABC):
         Returns timedelta 0 if unable to get duration.
         """
 
+    @abstractmethod
+    def get_audio_tracks_count(self):
+        """Get number of audio tracks
+
+        Returns:
+            int: Number of audio tracks.
+        """
+
 
 class NullMetadataParser(MetadataParser):
     """Dummy metedata parser
@@ -65,6 +73,9 @@ class NullMetadataParser(MetadataParser):
 
     def get_duration(self):
         return timedelta(0)
+
+    def get_audio_tracks_count(self):
+        return 0
 
 
 class MediainfoMetadataParser(MetadataParser):
@@ -120,6 +131,11 @@ class MediainfoMetadataParser(MetadataParser):
         general_track = self.metadata.tracks[0]
         duration = getattr(general_track, "duration", 0) or 0
         return timedelta(milliseconds=int(duration))
+
+    def get_audio_tracks_count(self):
+        return len(
+            list(filter(lambda e: e.track_type == "Audio", self.metadata.tracks))
+        )
 
 
 class FFProbeMetadataParser(MetadataParser):
@@ -214,6 +230,14 @@ class FFProbeMetadataParser(MetadataParser):
 
         # if nothing is found
         return timedelta(0)
+
+    def get_audio_tracks_count(self):
+        if "streams" not in self.metadata:
+            return 0
+
+        return len(
+            list(filter(lambda e: e["codec_type"] == "audio", self.metadata["streams"]))
+        )
 
 
 class MediaParseError(DakaraError):

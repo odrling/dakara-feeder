@@ -76,7 +76,15 @@ class MediainfoMetadataParserTestCase(TestCase):
         """Test to get duration
         """
         parser = MediainfoMetadataParser.parse(get_file("tests.resources", "dummy.mkv"))
-        self.assertEqual(parser.get_duration(), timedelta(seconds=2))
+        self.assertEqual(
+            parser.get_duration(), timedelta(seconds=2, microseconds=23000)
+        )
+
+    def test_get_number_audio_tracks(self):
+        """Test to get number of audio tracks
+        """
+        parser = MediainfoMetadataParser.parse(get_file("tests.resources", "dummy.mkv"))
+        self.assertEqual(parser.get_audio_tracks_count(), 2)
 
 
 class FFProbeMetadataParserTestCase(TestCase):
@@ -146,4 +154,12 @@ class FFProbeMetadataParserTestCase(TestCase):
         """Test to get duration
         """
         parser = FFProbeMetadataParser.parse(get_file("tests.resources", "dummy.mkv"))
-        self.assertEqual(parser.get_duration(), timedelta(seconds=2))
+        self.assertEqual(
+            parser.get_duration(), timedelta(seconds=2, microseconds=23000)
+        )
+
+    def test_get_number_audio_tracks(self):
+        """Test to get number of audio tracks
+        """
+        parser = FFProbeMetadataParser.parse(get_file("tests.resources", "dummy.mkv"))
+        self.assertEqual(parser.get_audio_tracks_count(), 2)
