@@ -1,11 +1,11 @@
 import logging
+import mimetypes
 from itertools import groupby
 
 
 logger = logging.getLogger(__name__)
 
 
-VIDEO_EXTENSIONS = [".avi", ".mkv", ".mp4", ".mpeg", ".mpg", ".vob", ".webm"]
 SUBTITLE_EXTENSIONS = [".ass", ".ssa"]
 
 
@@ -49,7 +49,12 @@ def group_by_type(files):
     subtitles = []
     others = []
     for file in files:
-        if file.ext.lower() in VIDEO_EXTENSIONS:
+        mimetype, _ = mimetypes.guess_type(file)
+        maintype = None
+        if mimetype:
+            maintype, _ = mimetype.split("/")
+
+        if maintype == "video":
             videos.append(file)
             continue
 

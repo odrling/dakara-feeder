@@ -142,7 +142,7 @@ class GroupByTypeTestCase(TestCase):
                 Path("video.mp4"),
                 Path("video.ass"),
                 Path("video.other"),
-                Path("video.dat"),
+                Path("video.json"),
             ]
         )
 
@@ -152,7 +152,7 @@ class GroupByTypeTestCase(TestCase):
             SongPaths(
                 Path("video.mp4"),
                 Path("video.ass"),
-                [Path("video.other"), Path("video.dat")],
+                [Path("video.other"), Path("video.json")],
             ),
         )
 
@@ -177,7 +177,7 @@ class GroupByTypeTestCase(TestCase):
     def test_no_video_no_subtitle_other(self):
         """Test to group no video, no subtitle and one other file
         """
-        results = group_by_type([Path("other.dat")])
+        results = group_by_type([Path("other.json")])
 
         self.assertEqual(len(results), 0)
 
