@@ -41,6 +41,23 @@ class Pysubs2SubtitleParserTestCase(TestCase):
         """
         self.generic_test_subtitle("simple.ass")
 
+    def test_simple_string(self):
+        """Test simple ass file from string
+        """
+        file_path = get_file("tests.resources.subtitles", "simple.ass")
+
+        # open and parse given file
+        content = file_path.text()
+        parser = Pysubs2SubtitleParser.parse_string(content)
+        lyrics = parser.get_lyrics()
+        lines = lyrics.splitlines()
+
+        # open expected result
+        expected_lines = (file_path + "_expected").lines(retain=False)
+
+        # check against expected file
+        self.assertListEqual(lines, expected_lines)
+
     def test_duplicate_lines(self):
         """Test ass with duplicate lines
         """
@@ -64,7 +81,7 @@ class Pysubs2SubtitleParserTestCase(TestCase):
             Pysubs2SubtitleParser.parse(Path("nowhere"))
 
         # assert the error
-        self.assertEqual(str(error.exception), "Subtitle file nowhere not found")
+        self.assertEqual(str(error.exception), "Subtitle file 'nowhere' not found")
 
     @patch("dakara_feeder.subtitle_parser.pysubs2.load")
     def test_parse_error(self, mocked_load):
@@ -79,5 +96,5 @@ class Pysubs2SubtitleParserTestCase(TestCase):
 
         # assert the error
         self.assertEqual(
-            str(error.exception), "Error when parsing subtitle file nowhere: invalid"
+            str(error.exception), "Error when parsing subtitle file 'nowhere': invalid"
         )

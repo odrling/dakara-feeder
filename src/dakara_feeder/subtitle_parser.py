@@ -39,6 +39,18 @@ class SubtitleParser(ABC):
             SubtitleParser: instance of the class for the given file.
         """
 
+    @classmethod
+    @abstractmethod
+    def parse_string(cls, filecontent):
+        """Read a subtitle file and store the lyrics
+
+        Args:
+            filecontent (str): content of the file to extract lyrics from.
+
+        Returns:
+            SubtitleParser: instance of the class for the given content.
+        """
+
     @abstractmethod
     def get_lyrics(self):
         """Extract lyrics
@@ -72,6 +84,18 @@ class TXTSubtitleParser(SubtitleParser):
             TXTSubtitleParser: instance of the class for the given file.
         """
         return cls(filepath.text())
+
+    @classmethod
+    def parse_string(cls, filecontent):
+        """Read a subtitle file and store the lyrics
+
+        Args:
+            filecontent (str): content of the file to extract lyrics from.
+
+        Returns:
+            SubtitleParser: instance of the class for the given content.
+        """
+        return cls(filecontent)
 
     def get_lyrics(self):
         """Extract lyrics
@@ -132,19 +156,35 @@ class Pysubs2SubtitleParser(SubtitleParser):
             Pysubs2SubtitleParser: instance of the class for the given file.
         """
         try:
-            instance = cls(pysubs2.load(filepath))
+            return cls(pysubs2.load(filepath))
 
         except FileNotFoundError as error:
             raise SubtitleNotFoundError(
-                "Subtitle file {} not found".format(filepath)
+                "Subtitle file '{}' not found".format(filepath)
             ) from error
 
-        except BaseException as error:
+        except Exception as error:
             raise SubtitleParseError(
-                "Error when parsing subtitle file {}: {}".format(filepath, error)
+                "Error when parsing subtitle file '{}': {}".format(filepath, error)
             ) from error
 
-        return instance
+    @classmethod
+    def parse_string(cls, filecontent):
+        """Read a subtitle file and store the lyrics
+
+        Args:
+            filecontent (str): content of the file to extract lyrics from.
+
+        Returns:
+            SubtitleParser: instance of the class for the given content.
+        """
+        try:
+            return cls(pysubs2.SSAFile.from_string(filecontent))
+
+        except Exception as error:
+            raise SubtitleParseError(
+                "Error when parsing subtitle content: {}".format(error)
+            ) from error
 
     def get_lyrics(self):
         """Gives the cleaned text of the Event block
