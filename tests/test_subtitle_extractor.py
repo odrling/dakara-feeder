@@ -12,7 +12,7 @@ class FFmpegSubtitleExtractorTestCase(TestCase):
     def test_extract(self):
         """Test to extract subtitle from file
         """
-        file_path = get_file("tests.resources", "dummy.mkv")
+        file_path = get_file("tests.resources.media", "dummy.mkv")
         extractor = FFmpegSubtitleExtractor.extract(file_path)
         subtitle = extractor.get_subtitle()
 

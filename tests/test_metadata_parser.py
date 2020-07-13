@@ -75,7 +75,9 @@ class MediainfoMetadataParserTestCase(TestCase):
     def test_get_duration(self):
         """Test to get duration
         """
-        parser = MediainfoMetadataParser.parse(get_file("tests.resources", "dummy.mkv"))
+        parser = MediainfoMetadataParser.parse(
+            get_file("tests.resources.media", "dummy.mkv")
+        )
         self.assertEqual(
             parser.get_duration(), timedelta(seconds=2, microseconds=23000)
         )
@@ -83,13 +85,17 @@ class MediainfoMetadataParserTestCase(TestCase):
     def test_get_number_audio_tracks(self):
         """Test to get number of audio tracks
         """
-        parser = MediainfoMetadataParser.parse(get_file("tests.resources", "dummy.mkv"))
+        parser = MediainfoMetadataParser.parse(
+            get_file("tests.resources.media", "dummy.mkv")
+        )
         self.assertEqual(parser.get_audio_tracks_count(), 2)
 
     def test_get_number_subtitle_tracks(self):
         """Test to get number of subtitle tracks
         """
-        parser = MediainfoMetadataParser.parse(get_file("tests.resources", "dummy.mkv"))
+        parser = MediainfoMetadataParser.parse(
+            get_file("tests.resources.media", "dummy.mkv")
+        )
         self.assertEqual(parser.get_subtitle_tracks_count(), 1)
 
 
@@ -159,7 +165,9 @@ class FFProbeMetadataParserTestCase(TestCase):
     def test_get_duration(self):
         """Test to get duration
         """
-        parser = FFProbeMetadataParser.parse(get_file("tests.resources", "dummy.mkv"))
+        parser = FFProbeMetadataParser.parse(
+            get_file("tests.resources.media", "dummy.mkv")
+        )
         self.assertEqual(
             parser.get_duration(), timedelta(seconds=2, microseconds=23000)
         )
@@ -167,11 +175,15 @@ class FFProbeMetadataParserTestCase(TestCase):
     def test_get_number_audio_tracks(self):
         """Test to get number of audio tracks
         """
-        parser = FFProbeMetadataParser.parse(get_file("tests.resources", "dummy.mkv"))
+        parser = FFProbeMetadataParser.parse(
+            get_file("tests.resources.media", "dummy.mkv")
+        )
         self.assertEqual(parser.get_audio_tracks_count(), 2)
 
     def test_get_number_subtitle_tracks(self):
         """Test to get number of subtitle tracks
         """
-        parser = FFProbeMetadataParser.parse(get_file("tests.resources", "dummy.mkv"))
+        parser = FFProbeMetadataParser.parse(
+            get_file("tests.resources.media", "dummy.mkv")
+        )
         self.assertEqual(parser.get_subtitle_tracks_count(), 1)
