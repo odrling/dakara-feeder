@@ -149,9 +149,7 @@ class MediainfoMetadataParser(MetadataParser):
         Returns:
             int: Number of audio tracks.
         """
-        return len(
-            list(filter(lambda e: e.track_type == "Audio", self.metadata.tracks))
-        )
+        return len([t for t in self.metadata.tracks if t.track_type == "Audio"])
 
     def get_subtitle_tracks_count(self):
         """Get number of subtitle tracks
@@ -159,7 +157,7 @@ class MediainfoMetadataParser(MetadataParser):
         Returns:
             int: Number of subtitle tracks.
         """
-        return len(list(filter(lambda e: e.track_type == "Text", self.metadata.tracks)))
+        return len([t for t in self.metadata.tracks if t.track_type == "Text"])
 
 
 class FFProbeMetadataParser(MetadataParser):
@@ -265,11 +263,7 @@ class FFProbeMetadataParser(MetadataParser):
             return 0
 
         return len(
-            list(
-                filter(
-                    lambda e: e.get("codec_type") == "audio", self.metadata["streams"]
-                )
-            )
+            [s for s in self.metadata["streams"] if s.get("codec_type") == "audio"]
         )
 
     def get_subtitle_tracks_count(self):
@@ -282,12 +276,7 @@ class FFProbeMetadataParser(MetadataParser):
             return 0
 
         return len(
-            list(
-                filter(
-                    lambda e: e.get("codec_type") == "subtitle",
-                    self.metadata["streams"],
-                )
-            )
+            [s for s in self.metadata["streams"] if s.get("codec_type") == "subtitle"]
         )
 
 
