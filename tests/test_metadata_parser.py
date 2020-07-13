@@ -12,7 +12,36 @@ from dakara_feeder.metadata_parser import (
     MediaParseError,
     MediaNotFoundError,
     MediainfoMetadataParser,
+    NullMetadataParser,
 )
+
+
+class NullMetadataParserTestCase(TestCase):
+    """Test the dummy metadata parser
+    """
+
+    def test_available(self):
+        """Test if the dummy parser is available
+        """
+        self.assertTrue(NullMetadataParser.is_available())
+
+    def test_get_duration(self):
+        """Test to get a dummy duration
+        """
+        parser = NullMetadataParser(Path("path/to/file"))
+        self.assertEqual(parser.get_duration(), timedelta(0))
+
+    def test_get_audio_tracks_count(self):
+        """Test to get a dummy audio tracks count
+        """
+        parser = NullMetadataParser(Path("path/to/file"))
+        self.assertEqual(parser.get_audio_tracks_count(), 0)
+
+    def test_get_subtitle_tracks_count(self):
+        """Test to get a dummy subtitle tracks count
+        """
+        parser = NullMetadataParser(Path("path/to/file"))
+        self.assertEqual(parser.get_subtitle_tracks_count(), 0)
 
 
 @skipUnless(MediaInfo.can_parse(), "MediaInfo not installed")

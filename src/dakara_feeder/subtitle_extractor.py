@@ -29,7 +29,11 @@ class SubtitleExtractor(ABC):
     @classmethod
     @abstractmethod
     def extract(cls, filepath):
-        pass
+        """Extract lyrics form a file
+
+        Args:
+            input_file_path (str): path to the input file.
+        """
 
     def get_subtitle(self):
         return self.content
