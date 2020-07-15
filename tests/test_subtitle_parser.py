@@ -8,7 +8,26 @@ from dakara_feeder.subtitle_parser import (
     Pysubs2SubtitleParser,
     SubtitleParseError,
     SubtitleNotFoundError,
+    TXTSubtitleParser,
 )
+
+
+class TXTSubtitleParserTestCase(TestCase):
+    """Test the subtitle parser based on plain txt files
+    """
+
+    def test_parse(self):
+        """Parse text file
+        """
+        file_path = get_file("tests.resources.subtitles", "plain.txt")
+        parser = TXTSubtitleParser.parse(file_path)
+        self.assertEqual(parser.get_lyrics(), file_path.text())
+
+    def test_parse_string(self):
+        """Parse text
+        """
+        parser = TXTSubtitleParser.parse_string("Piyo!")
+        self.assertEqual(parser.get_lyrics(), "Piyo!")
 
 
 class Pysubs2SubtitleParserTestCase(TestCase):
@@ -97,4 +116,20 @@ class Pysubs2SubtitleParserTestCase(TestCase):
         # assert the error
         self.assertEqual(
             str(error.exception), "Error when parsing subtitle file 'nowhere': invalid"
+        )
+
+    @patch("dakara_feeder.subtitle_parser.pysubs2.SSAFile.from_string")
+    def test_parse_string_error(self, mocked_from_string):
+        """Test when the ass stream to parse is invalid
+        """
+        # prepare the mock
+        mocked_from_string.side_effect = Exception("invalid")
+
+        # call the method
+        with self.assertRaises(SubtitleParseError) as error:
+            Pysubs2SubtitleParser.parse_string("data")
+
+        # assert the error
+        self.assertEqual(
+            str(error.exception), "Error when parsing subtitle content: invalid"
         )

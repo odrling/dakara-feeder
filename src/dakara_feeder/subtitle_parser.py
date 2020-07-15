@@ -42,7 +42,7 @@ class SubtitleParser(ABC):
     @classmethod
     @abstractmethod
     def parse_string(cls, filecontent):
-        """Read a subtitle file and store the lyrics
+        """Read a subtitle stream and store the lyrics
 
         Args:
             filecontent (str): content of the file to extract lyrics from.
