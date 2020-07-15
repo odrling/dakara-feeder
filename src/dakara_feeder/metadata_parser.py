@@ -124,12 +124,12 @@ class MediainfoMetadataParser(MetadataParser):
 
         except FileNotFoundError as error:
             raise MediaNotFoundError(
-                "Media file {} not found".format(filename)
+                "Media file '{}' not found".format(filename)
             ) from error
 
         except BaseException as error:
             raise MediaParseError(
-                "Error when processing media file {}: {}".format(filename, error)
+                "Error when processing media file '{}': {}".format(filename, error)
             ) from error
 
         return cls(metadata)
@@ -222,11 +222,11 @@ class FFProbeMetadataParser(MetadataParser):
         if process.returncode:
             # check the file exists
             if not filename.exists():
-                raise MediaNotFoundError("Media file {} not found".format(filename))
+                raise MediaNotFoundError("Media file '{}' not found".format(filename))
 
             # otherwise
             raise MediaParseError(
-                "Error when processing media file {}".format(filename)
+                "Error when processing media file '{}'".format(filename)
             )
 
         return cls(json.loads(process.stdout.decode(sys.stdout.encoding)))
