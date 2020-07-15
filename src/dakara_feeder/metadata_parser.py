@@ -1,5 +1,4 @@
 import json
-import os
 import subprocess
 import sys
 from abc import ABC, abstractmethod
@@ -188,12 +187,14 @@ class FFProbeMetadataParser(MetadataParser):
         """Check if the parser is callable
         """
         try:
-            with open(os.devnull, "w") as tempf:
-                subprocess.check_call(["ffprobe", "-h"], stdout=tempf, stderr=tempf)
+            subprocess.run(
+                ["ffprobe", "-version"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            return True
 
-                return True
-
-        except subprocess.CalledProcessError:
+        except FileNotFoundError:
             return False
 
     @classmethod

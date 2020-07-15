@@ -1,7 +1,6 @@
 from unittest import TestCase, skipUnless
 from unittest.mock import ANY, patch
 from datetime import timedelta
-from subprocess import CalledProcessError
 
 from dakara_base.resources_manager import get_file
 from path import Path
@@ -128,8 +127,8 @@ class FFProbeMetadataParserTestCase(TestCase):
     """Test the FFProbe metadata parser
     """
 
-    @patch("dakara_feeder.metadata_parser.subprocess.check_call", autoset=True)
-    def test_available(self, mocked_check_call):
+    @patch("dakara_feeder.metadata_parser.subprocess.run", autoset=True)
+    def test_available(self, mocked_run):
         """Test when the parser is available
         """
         # call the method
@@ -139,14 +138,14 @@ class FFProbeMetadataParserTestCase(TestCase):
         self.assertTrue(result)
 
         # assert the call
-        mocked_check_call.assert_called_with(ANY, stdout=ANY, stderr=ANY)
+        mocked_run.assert_called_with(["ffprobe", "-version"], stdout=ANY, stderr=ANY)
 
-    @patch("dakara_feeder.metadata_parser.subprocess.check_call", autoset=True)
-    def test_not_available(self, mocked_check_call):
+    @patch("dakara_feeder.metadata_parser.subprocess.run", autoset=True)
+    def test_not_available(self, mocked_run):
         """Test when the parser is not available
         """
         # prepare the mock
-        mocked_check_call.side_effect = CalledProcessError(255, "none")
+        mocked_run.side_effect = FileNotFoundError()
 
         # call the method
         result = FFProbeMetadataParser.is_available()
