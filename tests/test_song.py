@@ -23,10 +23,11 @@ class BaseSongTestCase(TestCase):
         mocked_metadata_parse.return_value.get_duration.return_value = timedelta(
             seconds=1
         )
+        mocked_metadata_parse.return_value.get_audio_tracks_count.return_value = 1
         mocked_subtitle_parse.side_effect = SubtitleParseError("invalid")
 
         # create paths
-        paths = SongPaths(Path("file.mp4"), Path("file.ass"))
+        paths = SongPaths(Path("file.mp4"), subtitle=Path("file.ass"))
 
         # create BaseSong instance
         song = BaseSong(Path("/base-dir"), paths)
@@ -54,7 +55,7 @@ class BaseSongTestCase(TestCase):
         mocked_subtitle_parse.return_value.get_lyrics.return_value = ""
 
         # create paths
-        paths = SongPaths(Path("file.mp4"), Path("file.ass"))
+        paths = SongPaths(Path("file.mp4"), subtitle=Path("file.ass"))
 
         # create BaseSong instance
         song = BaseSong(Path("/base-dir"), paths)
@@ -69,5 +70,5 @@ class BaseSongTestCase(TestCase):
         # assert logs
 
         self.assertListEqual(
-            logger.output, ["ERROR:dakara_feeder.song:Duration not parsed: invalid"]
+            logger.output, ["ERROR:dakara_feeder.song:Cannot parse metadata: invalid"]
         )

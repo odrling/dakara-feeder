@@ -65,13 +65,11 @@ class GetCustomSongTestCase(TestCase):
         mocked_import_custom_object.return_value = my_module
 
         # call the method
-        with self.assertRaises(customization.InvalidObjectModuleNameError) as error:
+        with self.assertRaisesRegex(
+            customization.InvalidObjectModuleNameError,
+            "Cannot find default class Song in module my_module",
+        ):
             customization.get_custom_song("song")
-
-        # assert error
-        self.assertEqual(
-            str(error.exception), "Cannot find default class Song in module my_module"
-        )
 
     @patch("dakara_feeder.customization.import_custom_object", autospec=True)
     def test_get_from_class_error_not_class(self, mocked_import_custom_object):
@@ -81,11 +79,10 @@ class GetCustomSongTestCase(TestCase):
         mocked_import_custom_object.return_value = "str"
 
         # call the method
-        with self.assertRaises(customization.InvalidObjectTypeError) as error:
+        with self.assertRaisesRegex(
+            customization.InvalidObjectTypeError, "song.MySong is not a class"
+        ):
             customization.get_custom_song("song.MySong")
-
-        # assert error
-        self.assertEqual(str(error.exception), "song.MySong is not a class")
 
     @patch("dakara_feeder.customization.import_custom_object", autospec=True)
     def test_get_from_module_error_not_class(self, mocked_import_custom_object):
@@ -97,11 +94,10 @@ class GetCustomSongTestCase(TestCase):
         mocked_import_custom_object.return_value = my_module
 
         # call the method
-        with self.assertRaises(customization.InvalidObjectTypeError) as error:
+        with self.assertRaisesRegex(
+            customization.InvalidObjectTypeError, "song.Song is not a class"
+        ):
             customization.get_custom_song("song")
-
-        # assert error
-        self.assertEqual(str(error.exception), "song.Song is not a class")
 
     @patch("dakara_feeder.customization.import_custom_object", autospec=True)
     def test_get_from_class_error_not_song_subclass(self, mocked_import_custom_object):
@@ -114,11 +110,10 @@ class GetCustomSongTestCase(TestCase):
         mocked_import_custom_object.return_value = MySong
 
         # call the method
-        with self.assertRaises(customization.InvalidObjectTypeError) as error:
+        with self.assertRaisesRegex(
+            customization.InvalidObjectTypeError, "song.MySong is not a Song subclass"
+        ):
             customization.get_custom_song("song.MySong")
-
-        # assert error
-        self.assertEqual(str(error.exception), "song.MySong is not a Song subclass")
 
 
 class CurrentDirInPathTestCase(TestCase):
@@ -196,50 +191,41 @@ class ImportCustomObjectTestCase(TestCase):
     def test_error_parent_module(self):
         """Test to import a non-existing parent module
         """
-        with self.assertRaises(customization.InvalidObjectModuleNameError) as error:
+        with self.assertRaisesRegex(
+            customization.InvalidObjectModuleNameError,
+            "No module notexistingmodule found",
+        ):
             customization.import_custom_object("notexistingmodule.sub")
-
-        # assert error
-        self.assertEqual(str(error.exception), "No module notexistingmodule found")
 
     def test_error_module(self):
         """Test to import a non-existing module
         """
-        with self.assertRaises(customization.InvalidObjectModuleNameError) as error:
+        with self.assertRaisesRegex(
+            customization.InvalidObjectModuleNameError,
+            "No module or object notexistingmodule found in tests.resources",
+        ):
             customization.import_custom_object("tests.resources.notexistingmodule")
-
-        # assert error
-        self.assertEqual(
-            str(error.exception),
-            "No module or object notexistingmodule found in " "tests.resources",
-        )
 
     def test_error_object(self):
         """Test to import a non-existing object
         """
-        with self.assertRaises(customization.InvalidObjectModuleNameError) as error:
+        with self.assertRaisesRegex(
+            customization.InvalidObjectModuleNameError,
+            "No module or object notexistingattribute found in "
+            "tests.resources.my_module",
+        ):
             customization.import_custom_object(
                 "tests.resources.my_module.notexistingattribute"
             )
 
-        # assert error
-        self.assertEqual(
-            str(error.exception),
-            "No module or object notexistingattribute found in "
-            "tests.resources.my_module",
-        )
-
     def test_error_sub_object(self):
         """Test to import a non-existing sub object
         """
-        with self.assertRaises(customization.InvalidObjectModuleNameError) as error:
+        with self.assertRaisesRegex(
+            customization.InvalidObjectModuleNameError,
+            "No module or object notexistingattribute found in "
+            "tests.resources.my_module.MyClass",
+        ):
             customization.import_custom_object(
                 "tests.resources.my_module.MyClass.notexistingattribute"
             )
-
-        # assert error
-        self.assertEqual(
-            str(error.exception),
-            "No module or object notexistingattribute found in "
-            "tests.resources.my_module.MyClass",
-        )
