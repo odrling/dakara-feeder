@@ -30,6 +30,8 @@
 
 ## Unreleased
 
+- Detect instrumental tracks.
+
 ## 1.5.1 - 2019-12-06
 
 ### Fixed
