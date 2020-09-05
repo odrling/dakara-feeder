@@ -32,6 +32,8 @@
 
 ## 1.6.0 - 2020-09-05
 
+### Added
+
 - Detect instrumental tracks.
 
 ## 1.5.1 - 2019-12-06
