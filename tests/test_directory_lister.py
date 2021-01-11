@@ -125,6 +125,44 @@ class ListDirectoryTestCase(TestCase):
             ],
         )
 
+    @patch("dakara_feeder.directory_lister.get_main_type", autoset=True)
+    @patch.object(Path, "walkfiles", autoset=True)
+    def test_list_dot_in_filename(self, mocked_walkfiles, mocked_get_main_type):
+        """Test case with a dot in filename
+        """
+        # mock directory structure
+        mocked_walkfiles.return_value = (
+            item.normpath()
+            for item in [
+                Path("directory/file0.ass"),
+                Path("directory/file0.extra.ass"),
+                Path("directory/file0.mkv"),
+            ]
+        )
+        mocked_get_main_type.side_effect = (
+            lambda f: "video" if f.ext == ".mkv" else None
+        )
+
+        # call the function
+        with self.assertLogs("dakara_feeder.directory_lister", "DEBUG") as logger:
+            listing = list_directory(Path("directory"))
+
+        # check the structure
+        self.assertEqual(len(listing), 1)
+        self.assertCountEqual(
+            [SongPaths(Path("file0.mkv"), subtitle=Path("file0.ass"))], listing,
+        )
+
+        # check the logger was called
+        self.assertListEqual(
+            logger.output,
+            [
+                "DEBUG:dakara_feeder.directory_lister:Listing 'directory'",
+                "DEBUG:dakara_feeder.directory_lister:Listed 3 files",
+                "DEBUG:dakara_feeder.directory_lister:Found 1 different videos",
+            ],
+        )
+
     def test_list_directory_dummy(self):
         """Test to list a directory using test ressource dummy files
         """
