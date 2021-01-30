@@ -21,18 +21,31 @@ def list_directory(path):
     """
     logger.debug("Listing '%s'", path)
     files_list = [p.relpath(path) for p in path.walkfiles()]
-    files_list.sort()
+    files_list.sort(key=lambda f: (get_path_without_extension(f), f))
     logger.debug("Listed %i files", len(files_list))
 
     listing = [
         item
-        for _, files in groupby(files_list, lambda f: f.dirname() / f.stem)
+        for _, files in groupby(files_list, get_path_without_extension)
         for item in group_by_type(files, path)
     ]
 
     logger.debug("Found %i different videos", len(listing))
 
     return listing
+
+
+def get_path_without_extension(path):
+    """Remove extension from file path.
+
+    Args:
+        path (path.Path): Path to a file.
+
+    Returns:
+        path.Path: path to the file without the extension.
+        'directory/file0.mkv' will return 'directory/file0'.
+    """
+    return path.dirname() / path.stem
 
 
 def get_main_type(file):
