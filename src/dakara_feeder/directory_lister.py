@@ -36,6 +36,15 @@ def list_directory(path):
 
 
 def get_path_without_extension(f):
+    """Remove extension from file path
+
+    Args:
+        path (path.Path): Path to a file.
+
+    Returns:
+        path to the file without the extension.
+        'directory/file0.mkv' will return 'directory/file0'
+    """
     return f.dirname() / f.stem
 
 
