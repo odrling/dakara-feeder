@@ -337,23 +337,24 @@ class GroupByTypeTestCase(TestCase):
         )
 
 
-def get_main_type_mock(filePath):
-    """ Detect audio or video type from file extension.
+def get_main_type_mock(path):
+    """Detect audio or video type from file extension.
+
     Used to mock real method which needs actual files to be present.
 
     Args:
         path (path.Path): Path to a file.
 
     Returns:
-        "video" if file extension is "mp4" or "mkv",
+        str: "video" if file extension is "mp4" or "mkv",
         "audio" if file extension is "ogg" or "flac",
         None otherwise.
     """
-    ext = filePath.ext
+    ext = path.ext
 
     if ext in [".mp4", ".mkv"]:
         return "video"
-    elif ext in [".ogg", ".flac"]:
+    if ext in [".ogg", ".flac"]:
         return "audio"
 
     return None
