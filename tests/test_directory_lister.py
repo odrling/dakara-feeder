@@ -41,18 +41,7 @@ class ListDirectoryTestCase(TestCase):
                 Path("directory/file0.ass"),
             ]
         )
-        mocked_get_main_type.side_effect = [
-            None,
-            "video",
-            None,
-            "video",
-            "audio",
-            None,
-            "video",
-            None,
-            "video",
-        ]
-
+        mocked_get_main_type.side_effect = get_main_type_mock
         # call the function
         with self.assertLogs("dakara_feeder.directory_lister", "DEBUG") as logger:
             listing = list_directory(Path("directory"))
@@ -101,7 +90,7 @@ class ListDirectoryTestCase(TestCase):
                 Path("directory/subdirectory/file0.ass"),
             ]
         )
-        mocked_get_main_type.side_effect = [None, "video", None, "video"]
+        mocked_get_main_type.side_effect = get_main_type_mock
 
         # call the function
         with self.assertLogs("dakara_feeder.directory_lister", "DEBUG") as logger:
@@ -127,6 +116,42 @@ class ListDirectoryTestCase(TestCase):
                 "DEBUG:dakara_feeder.directory_lister:Listing 'directory'",
                 "DEBUG:dakara_feeder.directory_lister:Listed 4 files",
                 "DEBUG:dakara_feeder.directory_lister:Found 2 different videos",
+            ],
+        )
+
+    @patch("dakara_feeder.directory_lister.get_main_type", autoset=True)
+    @patch.object(Path, "walkfiles", autoset=True)
+    def test_list_dot_in_filename(self, mocked_walkfiles, mocked_get_main_type):
+        """Test case with a dot in filename
+        """
+        # mock directory structure
+        mocked_walkfiles.return_value = (
+            item.normpath()
+            for item in [
+                Path("directory/file0.ass"),
+                Path("directory/file0.extra.ass"),
+                Path("directory/file0.mkv"),
+            ]
+        )
+        mocked_get_main_type.side_effect = get_main_type_mock
+
+        # call the function
+        with self.assertLogs("dakara_feeder.directory_lister", "DEBUG") as logger:
+            listing = list_directory(Path("directory"))
+
+        # check the structure
+        self.assertEqual(len(listing), 1)
+        self.assertCountEqual(
+            [SongPaths(Path("file0.mkv"), subtitle=Path("file0.ass"))], listing,
+        )
+
+        # check the logger was called
+        self.assertListEqual(
+            logger.output,
+            [
+                "DEBUG:dakara_feeder.directory_lister:Listing 'directory'",
+                "DEBUG:dakara_feeder.directory_lister:Listed 3 files",
+                "DEBUG:dakara_feeder.directory_lister:Found 1 different videos",
             ],
         )
 
@@ -198,7 +223,7 @@ class GroupByTypeTestCase(TestCase):
     def test_one_video_one_audio_one_subtitle(self, mocked_get_main_type):
         """Test to group one video, one audio and one subtitle
         """
-        mocked_get_main_type.side_effect = ["video", None, "audio"]
+        mocked_get_main_type.side_effect = get_main_type_mock
         results = group_by_type(
             [Path("video.mp4"), Path("subtitle.ass"), Path("audio.ogg")],
             Path("directory"),
@@ -217,7 +242,7 @@ class GroupByTypeTestCase(TestCase):
     def test_one_video_no_subtitle(self, mocked_get_main_type):
         """Test to group one video and no subtitle
         """
-        mocked_get_main_type.side_effect = ["video"]
+        mocked_get_main_type.side_effect = get_main_type_mock
         results = group_by_type([Path("video.mp4")], Path("directory"))
 
         self.assertEqual(len(results), 1)
@@ -226,7 +251,7 @@ class GroupByTypeTestCase(TestCase):
     def test_one_video_one_subtitle_plus_others(self, mocked_get_main_type):
         """Test to group one video, one subtitle and other files
         """
-        mocked_get_main_type.side_effect = ["video", None, None, None]
+        mocked_get_main_type.side_effect = get_main_type_mock
         results = group_by_type(
             [
                 Path("video.mp4"),
@@ -250,7 +275,7 @@ class GroupByTypeTestCase(TestCase):
     def test_one_video_two_subtitles(self, mocked_get_main_type):
         """Test to group one video and two subtitles
         """
-        mocked_get_main_type.side_effect = ["video", None, None]
+        mocked_get_main_type.side_effect = get_main_type_mock
         with self.assertLogs("dakara_feeder.directory_lister") as logger:
             results = group_by_type(
                 [Path("video.mp4"), Path("subtitles.ass"), Path("subtitles.ssa")],
@@ -270,7 +295,7 @@ class GroupByTypeTestCase(TestCase):
     def test_one_video_two_audios(self, mocked_get_main_type):
         """Test to group one video and two audio files
         """
-        mocked_get_main_type.side_effect = ["video", "audio", "audio"]
+        mocked_get_main_type.side_effect = get_main_type_mock
         with self.assertLogs("dakara_feeder.directory_lister") as logger:
             results = group_by_type(
                 [Path("video.mp4"), Path("audio.ogg"), Path("audio.flac")],
@@ -290,7 +315,7 @@ class GroupByTypeTestCase(TestCase):
     def test_no_video_no_subtitle_other(self, mocked_get_main_type):
         """Test to group no video, no subtitle and one other file
         """
-        mocked_get_main_type.side_effect = [None]
+        mocked_get_main_type.side_effect = get_main_type_mock
         results = group_by_type([Path("other.kara")], Path("directory"))
 
         self.assertEqual(len(results), 0)
@@ -298,7 +323,7 @@ class GroupByTypeTestCase(TestCase):
     def test_two_videos_one_subtitle(self, mocked_get_main_type):
         """Test to group two videos and one subtitle
         """
-        mocked_get_main_type.side_effect = ["video", "video", None]
+        mocked_get_main_type.side_effect = get_main_type_mock
         results = group_by_type(
             [Path("video.mp4"), Path("video.mkv"), Path("subtitle.ass")],
             Path("directory"),
@@ -312,3 +337,26 @@ class GroupByTypeTestCase(TestCase):
                 SongPaths(Path("video.mkv"), subtitle=Path("subtitle.ass")),
             ],
         )
+
+
+def get_main_type_mock(path):
+    """Detect audio or video type from file extension.
+
+    Used to mock real method which needs actual files to be present.
+
+    Args:
+        path (path.Path): Path to a file.
+
+    Returns:
+        str: "video" if file extension is "mp4" or "mkv",
+        "audio" if file extension is "ogg" or "flac",
+        None otherwise.
+    """
+    ext = path.ext
+
+    if ext in [".mp4", ".mkv"]:
+        return "video"
+    if ext in [".ogg", ".flac"]:
+        return "audio"
+
+    return None
