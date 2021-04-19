@@ -2,7 +2,7 @@ from datetime import timedelta
 from unittest import TestCase
 from unittest.mock import patch
 
-from path import Path
+from path import Path, TempDir
 
 try:
     from importlib.resources import path
@@ -590,8 +590,15 @@ class DakaraFeederIntegrationTestCase(TestCase):
         mocked_dakara_server_class.return_value.get_songs.return_value = []
 
         # create the object
-        with path("tests.resources.media", "") as media:
-            config = {"server": {}, "kara_folder": str(media)}
+        with TempDir() as temp:
+            # copy required files
+            with path("tests.resources.media", "dummy.ass") as file:
+                Path(file).copy(temp)
+
+            with path("tests.resources.media", "dummy.mkv") as file:
+                Path(file).copy(temp)
+
+            config = {"server": {}, "kara_folder": str(temp)}
             feeder = DakaraFeeder(config, progress=False)
 
             # call the method

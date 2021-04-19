@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from path import Path
+from path import Path, TempDir
 
 try:
     from importlib.resources import path
@@ -155,14 +155,25 @@ class ListDirectoryTestCase(TestCase):
             ],
         )
 
-    def test_list_directory_dummy(self):
+
+class ListDirectoryIntegrationTestCase(TestCase):
+    """Integration test for the directory lister
+    """
+
+    def test_list_directory(self):
         """Test to list a directory using test ressource dummy files
         """
         # call the function
-        with path("tests.resources.media", "") as media:
+        with TempDir() as temp:
+            # copy required files
+            with path("tests.resources.media", "dummy.ass") as file:
+                Path(file).copy(temp)
+
+            with path("tests.resources.media", "dummy.mkv") as file:
+                Path(file).copy(temp)
+
             with self.assertLogs("dakara_feeder.directory_lister", "DEBUG"):
-                directory = Path(media)
-                listing = list_directory(directory)
+                listing = list_directory(Path(temp))
 
         # check the structure
         self.assertEqual(len(listing), 1)
