@@ -50,7 +50,6 @@ test_script:
 
   # run commands
   - "py -%PYTHON% -m dakara_feeder --version"
-  - "%PYTHON%\\Scripts\\dakara-feed.exe --version"
 
   # run code formatting tests
   - "if NOT %PYTHON% == 3.5 (py -%PYTHON% -m  black . --check)"
