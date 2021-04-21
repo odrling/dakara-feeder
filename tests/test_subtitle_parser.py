@@ -1,8 +1,13 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from dakara_base.resources_manager import get_file
 from path import Path
+
+try:
+    from importlib.resources import path
+
+except ImportError:
+    from importlib_resources import path
 
 from dakara_feeder.subtitle_parser import (
     Pysubs2SubtitleParser,
@@ -19,9 +24,9 @@ class TXTSubtitleParserTestCase(TestCase):
     def test_parse(self):
         """Parse text file
         """
-        file_path = get_file("tests.resources.subtitles", "plain.txt")
-        parser = TXTSubtitleParser.parse(file_path)
-        self.assertEqual(parser.get_lyrics(), file_path.text())
+        with path("tests.resources.subtitles", "plain.txt") as file:
+            parser = TXTSubtitleParser.parse(Path(file))
+            self.assertEqual(parser.get_lyrics(), file.read_text())
 
     def test_parse_string(self):
         """Parse text
@@ -42,15 +47,15 @@ class Pysubs2SubtitleParserTestCase(TestCase):
 
         This method is called from other tests methods.
         """
-        file_path = get_file("tests.resources.subtitles", file_name)
-
         # open and parse given file
-        parser = Pysubs2SubtitleParser.parse(file_path)
-        lyrics = parser.get_lyrics()
-        lines = lyrics.splitlines()
+        with path("tests.resources.subtitles", file_name) as file:
+            parser = Pysubs2SubtitleParser.parse(Path(file))
+            lyrics = parser.get_lyrics()
+            lines = lyrics.splitlines()
 
         # open expected result
-        expected_lines = (file_path + "_expected").lines(retain=False)
+        with path("tests.resources.subtitles", file_name + "_expected") as file:
+            expected_lines = Path(file).lines(retain=False)
 
         # check against expected file
         self.assertListEqual(lines, expected_lines)
@@ -63,16 +68,16 @@ class Pysubs2SubtitleParserTestCase(TestCase):
     def test_simple_string(self):
         """Test simple ass file from string
         """
-        file_path = get_file("tests.resources.subtitles", "simple.ass")
-
         # open and parse given file
-        content = file_path.text()
-        parser = Pysubs2SubtitleParser.parse_string(content)
-        lyrics = parser.get_lyrics()
-        lines = lyrics.splitlines()
+        with path("tests.resources.subtitles", "simple.ass") as file:
+            content = file.read_text()
+            parser = Pysubs2SubtitleParser.parse_string(content)
+            lyrics = parser.get_lyrics()
+            lines = lyrics.splitlines()
 
         # open expected result
-        expected_lines = (file_path + "_expected").lines(retain=False)
+        with path("tests.resources.subtitles", "simple.ass_expected") as file:
+            expected_lines = Path(file).lines(retain=False)
 
         # check against expected file
         self.assertListEqual(lines, expected_lines)

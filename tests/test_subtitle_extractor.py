@@ -1,8 +1,13 @@
 from unittest import TestCase
 from unittest.mock import ANY, patch
 
-from dakara_base.resources_manager import get_file
 from path import Path
+
+try:
+    from importlib.resources import path
+
+except ImportError:
+    from importlib_resources import path
 
 from dakara_feeder.subtitle_extractor import FFmpegSubtitleExtractor
 
@@ -28,12 +33,12 @@ class FFmpegSubtitleExtractorTestCase(TestCase):
     def test_extract(self):
         """Test to extract subtitle from file
         """
-        file_path = get_file("tests.resources.media", "dummy.mkv")
-        extractor = FFmpegSubtitleExtractor.extract(file_path)
-        subtitle = extractor.get_subtitle()
+        with path("tests.resources.media", "dummy.mkv") as file:
+            extractor = FFmpegSubtitleExtractor.extract(Path(file))
+            subtitle = extractor.get_subtitle()
 
-        subtitle_path = get_file("tests.resources.subtitles", "dummy.ass")
-        subtitle_expected = subtitle_path.text()
+        with path("tests.resources.subtitles", "dummy.ass") as file:
+            subtitle_expected = file.read_text()
 
         self.assertEqual(subtitle, subtitle_expected)
 

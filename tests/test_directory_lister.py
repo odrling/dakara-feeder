@@ -1,8 +1,13 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from path import Path
-from dakara_base.resources_manager import get_file
+from path import Path, TempDir
+
+try:
+    from importlib.resources import path
+
+except ImportError:
+    from importlib_resources import path
 
 from dakara_feeder.directory_lister import (
     get_main_type,
@@ -150,13 +155,25 @@ class ListDirectoryTestCase(TestCase):
             ],
         )
 
-    def test_list_directory_dummy(self):
+
+class ListDirectoryIntegrationTestCase(TestCase):
+    """Integration test for the directory lister
+    """
+
+    def test_list_directory(self):
         """Test to list a directory using test ressource dummy files
         """
         # call the function
-        with self.assertLogs("dakara_feeder.directory_lister", "DEBUG"):
-            directory = get_file("tests.resources.media", "")
-            listing = list_directory(directory)
+        with TempDir() as temp:
+            # copy required files
+            with path("tests.resources.media", "dummy.ass") as file:
+                Path(file).copy(temp)
+
+            with path("tests.resources.media", "dummy.mkv") as file:
+                Path(file).copy(temp)
+
+            with self.assertLogs("dakara_feeder.directory_lister", "DEBUG"):
+                listing = list_directory(Path(temp))
 
         # check the structure
         self.assertEqual(len(listing), 1)
@@ -172,45 +189,41 @@ class GetMainTypeTestCase(TestCase):
     def test_video(self):
         """Test the common video files
         """
-        self.assertEqual(
-            get_main_type(get_file("tests.resources.filetype", "file.avi")), "video"
-        )
-        self.assertEqual(
-            get_main_type(get_file("tests.resources.filetype", "file.mkv")), "video"
-        )
-        self.assertEqual(
-            get_main_type(get_file("tests.resources.filetype", "file_upper.MKV")),
-            "video",
-        )
-        self.assertEqual(
-            get_main_type(get_file("tests.resources.filetype", "file.mp4")), "video"
-        )
+        with path("tests.resources.filetype", "file.avi") as file:
+            self.assertEqual(get_main_type(Path(file)), "video")
+
+        with path("tests.resources.filetype", "file.mkv") as file:
+            self.assertEqual(get_main_type(Path(file)), "video")
+
+        with path("tests.resources.filetype", "file_upper.MKV") as file:
+            self.assertEqual(get_main_type(Path(file)), "video")
+
+        with path("tests.resources.filetype", "file.mp4") as file:
+            self.assertEqual(get_main_type(Path(file)), "video")
 
     def test_audio(self):
         """Test the common audio files
         """
-        self.assertEqual(
-            get_main_type(get_file("tests.resources.filetype", "file.flac")), "audio"
-        )
-        self.assertEqual(
-            get_main_type(get_file("tests.resources.filetype", "file.mp3")), "audio"
-        )
-        self.assertEqual(
-            get_main_type(get_file("tests.resources.filetype", "file.ogg")), "audio"
-        )
+        with path("tests.resources.filetype", "file.flac") as file:
+            self.assertEqual(get_main_type(Path(file)), "audio")
+
+        with path("tests.resources.filetype", "file.mp3") as file:
+            self.assertEqual(get_main_type(Path(file)), "audio")
+
+        with path("tests.resources.filetype", "file.ogg") as file:
+            self.assertEqual(get_main_type(Path(file)), "audio")
 
     def test_subtitle(self):
         """Test the common subtitles files
         """
-        self.assertIsNone(
-            get_main_type(get_file("tests.resources.filetype", "file.ass"))
-        )
-        self.assertIsNone(
-            get_main_type(get_file("tests.resources.filetype", "file.ssa"))
-        )
-        self.assertIsNone(
-            get_main_type(get_file("tests.resources.filetype", "file.srt"))
-        )
+        with path("tests.resources.filetype", "file.ass") as file:
+            self.assertIsNone(get_main_type(Path(file)))
+
+        with path("tests.resources.filetype", "file.ssa") as file:
+            self.assertIsNone(get_main_type(Path(file)))
+
+        with path("tests.resources.filetype", "file.srt") as file:
+            self.assertIsNone(get_main_type(Path(file)))
 
 
 @patch("dakara_feeder.directory_lister.get_main_type", autoset=True)

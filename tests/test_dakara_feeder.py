@@ -2,8 +2,13 @@ from datetime import timedelta
 from unittest import TestCase
 from unittest.mock import patch
 
-from dakara_base.resources_manager import get_file
-from path import Path
+from path import Path, TempDir
+
+try:
+    from importlib.resources import path
+
+except ImportError:
+    from importlib_resources import path
 
 from dakara_feeder.dakara_feeder import DakaraFeeder, KaraFolderNotFound
 from dakara_feeder.directory_lister import SongPaths
@@ -585,13 +590,21 @@ class DakaraFeederIntegrationTestCase(TestCase):
         mocked_dakara_server_class.return_value.get_songs.return_value = []
 
         # create the object
-        config = {"server": {}, "kara_folder": get_file("tests.resources.media", "")}
-        feeder = DakaraFeeder(config, progress=False)
+        with TempDir() as temp:
+            # copy required files
+            with path("tests.resources.media", "dummy.ass") as file:
+                Path(file).copy(temp)
 
-        # call the method
-        with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG"):
-            with self.assertLogs("dakara_base.progress_bar"):
-                feeder.feed()
+            with path("tests.resources.media", "dummy.mkv") as file:
+                Path(file).copy(temp)
+
+            config = {"server": {}, "kara_folder": str(temp)}
+            feeder = DakaraFeeder(config, progress=False)
+
+            # call the method
+            with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG"):
+                with self.assertLogs("dakara_base.progress_bar"):
+                    feeder.feed()
 
         # assert the mocked calls
         mocked_dakara_server_class.return_value.get_songs.assert_called_with()

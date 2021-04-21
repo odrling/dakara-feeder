@@ -1,9 +1,8 @@
 import logging
 import subprocess
 from abc import ABC, abstractmethod
-from tempfile import TemporaryDirectory
 
-from path import Path
+from path import TempDir
 
 
 logger = logging.getLogger(__name__)
@@ -68,8 +67,7 @@ class FFmpegSubtitleExtractor(SubtitleExtractor):
         Args:
             input_file_path (str): path to the input file.
         """
-        with TemporaryDirectory() as tempdir:
-            directory_path = Path(tempdir)
+        with TempDir() as directory_path:
             output_file_path = directory_path / "output.ass"
 
             process = subprocess.run(
