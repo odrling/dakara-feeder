@@ -32,7 +32,7 @@
 
 ### Removed
 
-- Dropped support of Python 3.5.
+- Dropped support of Python 3.5 and 3.6.
 
 ## 1.6.0 - 2020-09-05
 
