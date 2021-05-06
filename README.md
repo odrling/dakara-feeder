@@ -1,6 +1,7 @@
 # Dakara Feeder
 
-[![Appveyor CI Build status](https://ci.appveyor.com/api/projects/status/8qpr1lk1kye7fkf0?svg=true)](https://ci.appveyor.com/project/neraste/dakara-feeder)
+<!-- Badges are displayed for the develop branch -->
+[![Appveyor CI Build status](https://ci.appveyor.com/api/projects/status/8qpr1lk1kye7fkf0/branch/develop?svg=true)](https://ci.appveyor.com/project/neraste/dakara-feeder/branch/develop)
 [![Codecov coverage analysis](https://codecov.io/gh/DakaraProject/dakara-feeder/branch/develop/graph/badge.svg)](https://codecov.io/gh/DakaraProject/dakara-feeder)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 [![PyPI version](https://badge.fury.io/py/dakarafeeder.svg)](https://pypi.python.org/pypi/dakarafeeder/)
