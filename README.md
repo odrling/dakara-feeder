@@ -1,6 +1,5 @@
 # Dakara Feeder
 
-[![Travis CI Build Status](https://travis-ci.com/DakaraProject/dakara-feeder.svg?branch=develop)](https://travis-ci.com/DakaraProject/dakara-feeder)
 [![Appveyor CI Build status](https://ci.appveyor.com/api/projects/status/8qpr1lk1kye7fkf0?svg=true)](https://ci.appveyor.com/project/neraste/dakara-feeder)
 [![Codecov coverage analysis](https://codecov.io/gh/DakaraProject/dakara-feeder/branch/develop/graph/badge.svg)](https://codecov.io/gh/DakaraProject/dakara-feeder)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
@@ -21,7 +20,7 @@ Other important parts of the project include:
 
 ### System requirements
 
-* Python3, to make everything up and running (supported versions: 3.5, 3.6, 3.7, 3.8 and 3.9);
+* Python3, to make everything up and running (supported versions: 3.6, 3.7, 3.8 and 3.9);
 * [ffmpeg](https://www.ffmpeg.org/), to extract lyrics and extract metadata from files (preferred way);
 * [MediaInfo](https://mediaarea.net/fr/MediaInfo/), to extract metadata from files (slower, alternative way, may not work on Windows).
 
