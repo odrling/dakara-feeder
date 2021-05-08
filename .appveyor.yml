@@ -16,8 +16,11 @@ environment:
   # setup tests matrix
   matrix:
     - PYTHON: "3.7"
+      INTEGRATION_TEST: false
     - PYTHON: "3.8"
+      INTEGRATION_TEST: false
     - PYTHON: "3.9"
+      INTEGRATION_TEST: true
 
 # check current python version
 init:
@@ -40,9 +43,9 @@ for:
       - "python --version"
 
     install:
-      # install system dependencies
-      - "sudo apt-get -qq update"
-      - "sudo apt-get install -y ffmpeg mediainfo"
+      # install system dependencies if requested
+      - "if $INTEGRATION_TEST; then sudo apt-get -qq update; fi"
+      - "if $INTEGRATION_TEST; then sudo apt-get install -y ffmpeg mediainfo; fi"
 
       # the features used in setup.cfg require a recent enough version of setuptools
       - "python -m pip install --upgrade \"setuptools>=40.0\""
@@ -50,13 +53,13 @@ for:
       # install dependencies for test
       - "python -m pip install -e \".[tests]\""
 
-      # check version of dependencies
-      - "ffprobe -version"
-      - "mediainfo --version"
+      # check version of dependencies if requested
+      - "if $INTEGRATION_TEST; then ffprobe -version; fi"
+      - "if $INTEGRATION_TEST; then mediainfo --version; fi"
 
     test_script:
       # run tests
-      - "python -m coverage run -m pytest -v"
+      - "if $INTEGRATION_TEST; then python -m coverage run -m pytest -v; else python -m coverage run -m pytest -v tests/unit; fi"
 
       # run commands
       - "python -m dakara_feeder --version"
@@ -88,8 +91,8 @@ for:
       - "py -%PYTHON% --version"
 
     install:
-      # install system dependencies
-      - "cinst ffmpeg mediainfo"
+      # install system dependencies if requested
+      - "if %INTEGRATION_TEST% == true (cinst ffmpeg mediainfo)"
 
       # the features used in setup.cfg require a recent enough version of setuptools
       - "py -%PYTHON% -m pip install --upgrade \"setuptools>=40.0\""
@@ -97,9 +100,12 @@ for:
       # install dependencies for test
       - "py -%PYTHON% -m pip install -e \".[tests]\""
 
+      # refresh console
+      - "refreshenv"
+
     test_script:
       # run tests
-      - "py -%PYTHON% -m coverage run -m pytest -v"
+      - "if %INTEGRATION_TEST% == true (py -%PYTHON% -m coverage run -m pytest -v) else (py -%PYTHON% -m coverage run -m pytest -v tests/unit)"
 
       # run commands
       - "py -%PYTHON% -m dakara_feeder --version"

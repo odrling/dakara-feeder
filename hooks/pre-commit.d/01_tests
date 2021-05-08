@@ -2,4 +2,4 @@
 
 echo "Running tests for Dakara feeder"
 
-pytest
+pytest tests/unit
