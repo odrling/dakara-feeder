@@ -1,5 +1,4 @@
-from unittest import TestCase
-from unittest.mock import ANY, patch
+from unittest import TestCase, skipUnless
 
 from path import Path
 
@@ -12,23 +11,10 @@ except ImportError:
 from dakara_feeder.subtitle_extractor import FFmpegSubtitleExtractor
 
 
+@skipUnless(FFmpegSubtitleExtractor.is_available(), "FFmpeg not installed")
 class FFmpegSubtitleExtractorTestCase(TestCase):
-    """Test the subtitle extractor based on FFmpeg
+    """Test the subtitle extractor based on FFmpeg in an integrated way
     """
-
-    @patch("dakara_feeder.subtitle_extractor.subprocess.run")
-    def test_is_available(self, mocked_run):
-        """Test if the FFmpeg subtitle extractor is available
-        """
-        self.assertTrue(FFmpegSubtitleExtractor.is_available())
-        mocked_run.assert_called_with(["ffmpeg", "-version"], stdout=ANY, stderr=ANY)
-
-    @patch("dakara_feeder.subtitle_extractor.subprocess.run")
-    def test_is_available_not_available(self, mocked_run):
-        """Test if the FFmpeg subtitle extractor is not available
-        """
-        mocked_run.side_effect = FileNotFoundError()
-        self.assertFalse(FFmpegSubtitleExtractor.is_available())
 
     def test_extract(self):
         """Test to extract subtitle from file
