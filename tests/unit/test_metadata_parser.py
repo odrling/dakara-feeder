@@ -7,8 +7,10 @@ from pymediainfo import MediaInfo
 
 from dakara_feeder.metadata_parser import (
     FFProbeMetadataParser,
+    FFProbeNotInstalledError,
     MediaParseError,
     MediainfoMetadataParser,
+    MediainfoNotInstalledError,
     NullMetadataParser,
 )
 
@@ -71,6 +73,17 @@ class MediainfoMetadataParserTestCase(TestCase):
         # assert the result
         self.assertFalse(result)
 
+    @patch.object(MediainfoMetadataParser, "is_available")
+    def test_parse_not_available(self, mocked_is_available):
+        """Test to parse whene mediainfo is not installed
+        """
+        mocked_is_available.return_value = False
+
+        with self.assertRaisesRegex(
+            MediainfoNotInstalledError, "Mediainfo not installed"
+        ):
+            MediainfoMetadataParser.parse(Path("nowhere"))
+
     @patch.object(MediaInfo, "parse", autoset=True)
     def test_parse_invalid_error(self, mocked_parse):
         """Test to extract metadata from a file that cannot be parsed
@@ -114,3 +127,70 @@ class FFProbeMetadataParserTestCase(TestCase):
 
         # assert the result
         self.assertFalse(result)
+
+    @patch.object(FFProbeMetadataParser, "is_available")
+    def test_parse_not_available(self, mocked_is_available):
+        """Test to parse whene mediainfo is not installed
+        """
+        mocked_is_available.return_value = False
+
+        with self.assertRaisesRegex(FFProbeNotInstalledError, "FFProbe not installed"):
+            FFProbeMetadataParser.parse(Path("nowhere"))
+
+    def test_get_duration_format(self):
+        """Test to get duration stored in format key
+        """
+        parser = FFProbeMetadataParser({"format": {"duration": "42.42"}})
+        self.assertEqual(parser.get_duration(), timedelta(seconds=42.42))
+
+    def test_get_duration_streams(self):
+        """Test to get duration stored in streams key
+        """
+        parser = FFProbeMetadataParser({"streams": [{"duration": "42.42"}]})
+        self.assertEqual(parser.get_duration(), timedelta(seconds=42.42))
+
+    def test_get_duration_default(self):
+        """Test to get default null duration
+        """
+        parser = FFProbeMetadataParser({})
+        self.assertEqual(parser.get_duration(), timedelta(0))
+
+    def test_get_audio_tracks_count_no_streams(self):
+        """Test to get default null number of audio tracks
+        """
+        parser = FFProbeMetadataParser({})
+        self.assertEqual(parser.get_audio_tracks_count(), 0)
+
+    def test_get_audio_tracks_count(self):
+        """Test to get number of audio tracks
+        """
+        parser = FFProbeMetadataParser(
+            {
+                "streams": [
+                    {"codec_type": "audio"},
+                    {"codec_type": "video"},
+                    {"codec_type": "subtitle"},
+                ]
+            }
+        )
+        self.assertEqual(parser.get_audio_tracks_count(), 1)
+
+    def test_get_subtitle_tracks_count_no_streams(self):
+        """Test to get default null number of subtitle tracks
+        """
+        parser = FFProbeMetadataParser({})
+        self.assertEqual(parser.get_subtitle_tracks_count(), 0)
+
+    def test_get_subtitle_tracks_count(self):
+        """Test to get number of subtitle tracks
+        """
+        parser = FFProbeMetadataParser(
+            {
+                "streams": [
+                    {"codec_type": "audio"},
+                    {"codec_type": "video"},
+                    {"codec_type": "subtitle"},
+                ]
+            }
+        )
+        self.assertEqual(parser.get_subtitle_tracks_count(), 1)
