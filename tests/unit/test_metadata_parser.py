@@ -85,10 +85,12 @@ class MediainfoMetadataParserTestCase(TestCase):
             MediainfoMetadataParser.parse(Path("nowhere"))
 
     @patch.object(MediaInfo, "parse", autoset=True)
-    def test_parse_invalid_error(self, mocked_parse):
+    @patch.object(MediainfoMetadataParser, "is_available")
+    def test_parse_invalid_error(self, mocked_is_available, mocked_parse):
         """Test to extract metadata from a file that cannot be parsed
         """
         # prepare the mock
+        mocked_is_available.return_value = True
         mocked_parse.side_effect = Exception("invalid")
 
         # call the method
