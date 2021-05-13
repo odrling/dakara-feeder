@@ -118,6 +118,9 @@ class MediainfoMetadataParser(MetadataParser):
         Args:
             filename (str): path of the file to parse.
         """
+        if not cls.is_available():
+            raise MediainfoNotInstalledError("Mediainfo not installed")
+
         try:
             metadata = MediaInfo.parse(filename)
 
@@ -204,6 +207,9 @@ class FFProbeMetadataParser(MetadataParser):
         Args:
             filename (path.Path): path of the file to parse.
         """
+        if not cls.is_available():
+            raise FFProbeNotInstalledError("FFProbe not installed")
+
         command = [
             "ffprobe",
             "-loglevel",
@@ -288,4 +294,14 @@ class MediaParseError(DakaraError):
 
 class MediaNotFoundError(DakaraError, FileNotFoundError):
     """Error if the metadata file does not exist
+    """
+
+
+class MediainfoNotInstalledError(DakaraError):
+    """Error if MediainfoMetadataParser is used when mediainfo is not installed
+    """
+
+
+class FFProbeNotInstalledError(DakaraError):
+    """Error if FFProbeMetadataParser is used when FFProbe is not installed
     """

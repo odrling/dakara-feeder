@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 
 from path import TempDir
 
+from dakara_base.exceptions import DakaraError
+
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +69,9 @@ class FFmpegSubtitleExtractor(SubtitleExtractor):
         Args:
             input_file_path (str): path to the input file.
         """
+        if not cls.is_available():
+            raise FFmpegNotInstalledError("FFmpeg not installed")
+
         with TempDir() as directory_path:
             output_file_path = directory_path / "output.ass"
 
@@ -82,3 +87,8 @@ class FFmpegSubtitleExtractor(SubtitleExtractor):
 
             # otherwise extract content
             return cls(output_file_path.text())
+
+
+class FFmpegNotInstalledError(DakaraError):
+    """Error when FFmpegSubtitleExtractor is used if FFmpeg is not installed
+    """

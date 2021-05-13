@@ -1,21 +1,16 @@
-from unittest import TestCase, skipUnless
+from unittest import TestCase
 from unittest.mock import ANY, patch
 from datetime import timedelta
 
 from path import Path
 from pymediainfo import MediaInfo
 
-try:
-    from importlib.resources import path
-
-except ImportError:
-    from importlib_resources import path
-
 from dakara_feeder.metadata_parser import (
     FFProbeMetadataParser,
+    FFProbeNotInstalledError,
     MediaParseError,
-    MediaNotFoundError,
     MediainfoMetadataParser,
+    MediainfoNotInstalledError,
     NullMetadataParser,
 )
 
@@ -48,7 +43,6 @@ class NullMetadataParserTestCase(TestCase):
         self.assertEqual(parser.get_subtitle_tracks_count(), 0)
 
 
-@skipUnless(MediaInfo.can_parse(), "MediaInfo not installed")
 class MediainfoMetadataParserTestCase(TestCase):
     """Test the Mediainfo metadata parser
     """
@@ -79,20 +73,24 @@ class MediainfoMetadataParserTestCase(TestCase):
         # assert the result
         self.assertFalse(result)
 
-    def test_parse_not_found_error(self):
-        """Test to extract metadata from a file that does not exist
+    @patch.object(MediainfoMetadataParser, "is_available")
+    def test_parse_not_available(self, mocked_is_available):
+        """Test to parse whene mediainfo is not installed
         """
-        # call the method
+        mocked_is_available.return_value = False
+
         with self.assertRaisesRegex(
-            MediaNotFoundError, "Media file 'nowhere' not found"
+            MediainfoNotInstalledError, "Mediainfo not installed"
         ):
             MediainfoMetadataParser.parse(Path("nowhere"))
 
     @patch.object(MediaInfo, "parse", autoset=True)
-    def test_parse_invalid_error(self, mocked_parse):
+    @patch.object(MediainfoMetadataParser, "is_available")
+    def test_parse_invalid_error(self, mocked_is_available, mocked_parse):
         """Test to extract metadata from a file that cannot be parsed
         """
         # prepare the mock
+        mocked_is_available.return_value = True
         mocked_parse.side_effect = Exception("invalid")
 
         # call the method
@@ -100,32 +98,6 @@ class MediainfoMetadataParserTestCase(TestCase):
             MediaParseError, "Error when processing media file 'nowhere': invalid"
         ):
             MediainfoMetadataParser.parse(Path("nowhere"))
-
-    def test_get_duration(self):
-        """Test to get duration
-        """
-        with path("tests.resources.media", "dummy.mkv") as file:
-            parser = MediainfoMetadataParser.parse(Path(file))
-
-        self.assertEqual(
-            parser.get_duration(), timedelta(seconds=2, microseconds=23000)
-        )
-
-    def test_get_number_audio_tracks(self):
-        """Test to get number of audio tracks
-        """
-        with path("tests.resources.media", "dummy.mkv") as file:
-            parser = MediainfoMetadataParser.parse(Path(file))
-
-        self.assertEqual(parser.get_audio_tracks_count(), 2)
-
-    def test_get_number_subtitle_tracks(self):
-        """Test to get number of subtitle tracks
-        """
-        with path("tests.resources.media", "dummy.mkv") as file:
-            parser = MediainfoMetadataParser.parse(Path(file))
-
-        self.assertEqual(parser.get_subtitle_tracks_count(), 1)
 
 
 class FFProbeMetadataParserTestCase(TestCase):
@@ -158,57 +130,69 @@ class FFProbeMetadataParserTestCase(TestCase):
         # assert the result
         self.assertFalse(result)
 
-    @patch.object(Path, "exists", autoset=True)
-    def test_parse_not_found_error(self, mocked_exists):
-        """Test to extract metadata from a file that does not exist
+    @patch.object(FFProbeMetadataParser, "is_available")
+    def test_parse_not_available(self, mocked_is_available):
+        """Test to parse whene mediainfo is not installed
         """
-        # prepare the mock
-        mocked_exists.return_value = False
+        mocked_is_available.return_value = False
 
-        # call the method
-        with self.assertRaisesRegex(
-            MediaNotFoundError, "Media file 'nowhere' not found"
-        ):
+        with self.assertRaisesRegex(FFProbeNotInstalledError, "FFProbe not installed"):
             FFProbeMetadataParser.parse(Path("nowhere"))
 
-        # assert the call
-        mocked_exists.assert_called_with()
-
-    @patch.object(Path, "exists", autoset=True)
-    def test_parse_invalid_error(self, mocked_exists):
-        """Test to extract metadata from a file that cannot be parsed
+    def test_get_duration_format(self):
+        """Test to get duration stored in format key
         """
-        # prepare the mock
-        mocked_exists.return_value = True
+        parser = FFProbeMetadataParser({"format": {"duration": "42.42"}})
+        self.assertEqual(parser.get_duration(), timedelta(seconds=42.42))
 
-        # call the method
-        with self.assertRaisesRegex(
-            MediaParseError, "Error when processing media file 'nowhere'"
-        ):
-            FFProbeMetadataParser.parse(Path("nowhere"))
-
-    def test_get_duration(self):
-        """Test to get duration
+    def test_get_duration_streams(self):
+        """Test to get duration stored in streams key
         """
-        with path("tests.resources.media", "dummy.mkv") as file:
-            parser = FFProbeMetadataParser.parse(Path(file))
+        parser = FFProbeMetadataParser({"streams": [{"duration": "42.42"}]})
+        self.assertEqual(parser.get_duration(), timedelta(seconds=42.42))
 
-        self.assertEqual(
-            parser.get_duration(), timedelta(seconds=2, microseconds=23000)
-        )
+    def test_get_duration_default(self):
+        """Test to get default null duration
+        """
+        parser = FFProbeMetadataParser({})
+        self.assertEqual(parser.get_duration(), timedelta(0))
 
-    def test_get_number_audio_tracks(self):
+    def test_get_audio_tracks_count_no_streams(self):
+        """Test to get default null number of audio tracks
+        """
+        parser = FFProbeMetadataParser({})
+        self.assertEqual(parser.get_audio_tracks_count(), 0)
+
+    def test_get_audio_tracks_count(self):
         """Test to get number of audio tracks
         """
-        with path("tests.resources.media", "dummy.mkv") as file:
-            parser = FFProbeMetadataParser.parse(Path(file))
+        parser = FFProbeMetadataParser(
+            {
+                "streams": [
+                    {"codec_type": "audio"},
+                    {"codec_type": "video"},
+                    {"codec_type": "subtitle"},
+                ]
+            }
+        )
+        self.assertEqual(parser.get_audio_tracks_count(), 1)
 
-        self.assertEqual(parser.get_audio_tracks_count(), 2)
+    def test_get_subtitle_tracks_count_no_streams(self):
+        """Test to get default null number of subtitle tracks
+        """
+        parser = FFProbeMetadataParser({})
+        self.assertEqual(parser.get_subtitle_tracks_count(), 0)
 
-    def test_get_number_subtitle_tracks(self):
+    def test_get_subtitle_tracks_count(self):
         """Test to get number of subtitle tracks
         """
-        with path("tests.resources.media", "dummy.mkv") as file:
-            parser = FFProbeMetadataParser.parse(Path(file))
-
+        parser = FFProbeMetadataParser(
+            {
+                "streams": [
+                    {"codec_type": "audio"},
+                    {"codec_type": "video"},
+                    {"codec_type": "subtitle"},
+                ]
+            }
+        )
         self.assertEqual(parser.get_subtitle_tracks_count(), 1)
