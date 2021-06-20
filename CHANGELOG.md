@@ -30,6 +30,8 @@
 
 ## Unreleased
 
+## 1.7.0 - 2021-06-20
+
 ### Removed
 
 - Dropped support of Python 3.5 and 3.6.
