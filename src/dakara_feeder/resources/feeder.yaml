@@ -3,9 +3,13 @@ server:
   # Server address
   address: 127.0.0.1:8000
 
-  # Credentials for server authentication
-  login: login
-  password: pass
+  # Token for server authentication
+  # You can find your token in "Settings > Token" on the dakara web client
+  token: tokenValue
+
+  # If you cannot use a token, you can use login and password instead
+  # login: login
+  # password: pass
 
   # Use a secured connection
   # ssl: false
