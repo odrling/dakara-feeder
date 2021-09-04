@@ -1,6 +1,6 @@
+from subprocess import DEVNULL
 from unittest import TestCase
 from unittest.mock import patch
-from subprocess import DEVNULL
 
 from path import Path
 

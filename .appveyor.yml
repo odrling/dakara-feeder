@@ -66,6 +66,7 @@ for:
       - "dakara-feed --version"
 
       # run code formatting tests
+      - "python -m isort . --check"
       - "python -m black . --check"
       - "python -m flake8"
 
@@ -107,6 +108,7 @@ for:
       - "py -%PYTHON% -m dakara_feeder --version"
 
       # run code formatting tests
+      - "py -%PYTHON% -m isort . --check"
       - "py -%PYTHON% -m black . --check"
       - "py -%PYTHON% -m flake8"
 

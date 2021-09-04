@@ -5,7 +5,6 @@ import filetype
 
 from dakara_feeder.subtitle_parser import is_subtitle
 
-
 logger = logging.getLogger(__name__)
 
 

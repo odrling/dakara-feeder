@@ -2,10 +2,8 @@ import logging
 import subprocess
 from abc import ABC, abstractmethod
 
-from path import TempDir
-
 from dakara_base.exceptions import DakaraError
-
+from path import TempDir
 
 logger = logging.getLogger(__name__)
 

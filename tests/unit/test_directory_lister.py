@@ -10,10 +10,10 @@ except ImportError:
     from importlib_resources import path
 
 from dakara_feeder.directory_lister import (
+    SongPaths,
     get_main_type,
     group_by_type,
     list_directory,
-    SongPaths,
 )
 
 

@@ -9,7 +9,6 @@ from dakara_base.exceptions import DakaraError
 
 from dakara_feeder.song import BaseSong
 
-
 logger = logging.getLogger(__name__)
 
 

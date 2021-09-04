@@ -7,7 +7,6 @@ from dakara_feeder.metadata_parser import (
 )
 from dakara_feeder.subtitle_parser import Pysubs2SubtitleParser, SubtitleParseError
 
-
 logger = logging.getLogger(__name__)
 
 

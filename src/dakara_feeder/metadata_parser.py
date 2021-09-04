@@ -4,8 +4,8 @@ import sys
 from abc import ABC, abstractmethod
 from datetime import timedelta
 
-from pymediainfo import MediaInfo
 from dakara_base.exceptions import DakaraError
+from pymediainfo import MediaInfo
 
 
 class MetadataParser(ABC):

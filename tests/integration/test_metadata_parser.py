@@ -11,9 +11,9 @@ except ImportError:
 
 from dakara_feeder.metadata_parser import (
     FFProbeMetadataParser,
-    MediaParseError,
-    MediaNotFoundError,
     MediainfoMetadataParser,
+    MediaNotFoundError,
+    MediaParseError,
 )
 
 

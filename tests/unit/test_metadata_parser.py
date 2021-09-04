@@ -1,6 +1,6 @@
+from datetime import timedelta
 from unittest import TestCase
 from unittest.mock import ANY, patch
-from datetime import timedelta
 
 from path import Path
 from pymediainfo import MediaInfo
@@ -8,9 +8,9 @@ from pymediainfo import MediaInfo
 from dakara_feeder.metadata_parser import (
     FFProbeMetadataParser,
     FFProbeNotInstalledError,
-    MediaParseError,
     MediainfoMetadataParser,
     MediainfoNotInstalledError,
+    MediaParseError,
     NullMetadataParser,
 )
 

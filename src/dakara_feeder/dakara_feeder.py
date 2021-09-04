@@ -1,8 +1,8 @@
 import logging
 
-from path import Path
-from dakara_base.progress_bar import progress_bar, null_bar
 from dakara_base.exceptions import DakaraError
+from dakara_base.progress_bar import null_bar, progress_bar
+from path import Path
 
 from dakara_feeder.customization import get_custom_song
 from dakara_feeder.dakara_server import DakaraServer
@@ -12,7 +12,6 @@ from dakara_feeder.similarity_calculator import calculate_file_path_similarity
 from dakara_feeder.song import BaseSong
 from dakara_feeder.utils import divide_chunks
 from dakara_feeder.version import check_version
-
 
 logger = logging.getLogger(__name__)
 

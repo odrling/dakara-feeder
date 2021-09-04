@@ -11,8 +11,8 @@ except ImportError:
 
 from dakara_feeder.subtitle_parser import (
     Pysubs2SubtitleParser,
-    SubtitleParseError,
     SubtitleNotFoundError,
+    SubtitleParseError,
     TXTSubtitleParser,
 )
 
