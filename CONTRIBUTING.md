@@ -33,6 +33,7 @@ pytest tests/unit
 pytest tests/integration
 ```
 
+Both Pytest style and standard Unittest style tests can be used.
 Coverage is checked automatically with [Pytest-cov](https://pypi.org/project/pytest-cov/).
 
 ### Imports
