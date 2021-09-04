@@ -1,3 +1,5 @@
+"""Feeder."""
+
 import logging
 
 from dakara_base.exceptions import DakaraError
@@ -20,24 +22,24 @@ SONGS_PER_CHUNK = 100
 
 
 class DakaraFeeder:
-    """Class for the Dakara feeder
+    """Class for the Dakara feeder.
 
     Args:
-        config (dict): dictionary of config.
-        force_update (bool): if True, the feeder will re-parse and re-upload
+        config (dict): Dictionary of config.
+        force_update (bool): If True, the feeder will re-parse and re-upload
             songs that do not seem to have changed.
-        progress (bool): if True, a progress bar is displayed during long tasks.
+        progress (bool): If True, a progress bar is displayed during long tasks.
 
     Attributes:
-        dakara_server (dakara_server.DakaraServer): client for the Dakara server.
-        kara_folder_path (path.Path): path to the scanned folder containing karaoke
+        dakara_server (dakara_server.DakaraServer): Client for the Dakara server.
+        kara_folder_path (path.Path): Path to the scanned folder containing karaoke
             files.
-        songs_per_chunk (int): number of songs per chunk to send to server when
+        songs_per_chunk (int): Number of songs per chunk to send to server when
             creating songs.
-        bar (function): progress bar to use.
-        song_class_module_name (str): module name of the custom song class to
+        bar (function): Progress bar to use.
+        song_class_module_name (str): Module name of the custom song class to
             use.
-        Song (class): custom song class to use. Must be a subclass of
+        Song (class): Custom song class to use. Must be a subclass of
             `dakara_feeder.song.BaseSong`.
     """
 
@@ -52,8 +54,7 @@ class DakaraFeeder:
         self.song_class = BaseSong
 
     def load(self):
-        """Execute side-effect initialization tasks
-        """
+        """Execute side-effect initialization tasks."""
         # check version
         check_version()
 
@@ -68,16 +69,14 @@ class DakaraFeeder:
         self.dakara_server.authenticate()
 
     def check_kara_folder_path(self):
-        """Check the kara folder is valid
-        """
+        """Check the kara folder is valid."""
         if not self.kara_folder_path.isdir():
             raise KaraFolderNotFound(
                 "Karaoke folder '{}' does not exist".format(self.kara_folder_path)
             )
 
     def feed(self):
-        """Execute the feeding action
-        """
+        """Execute the feeding action."""
         # get list of songs on the server
         old_songs = self.dakara_server.get_songs()
         logger.info("Found %i songs in server", len(old_songs))
@@ -163,5 +162,4 @@ class DakaraFeeder:
 
 
 class KaraFolderNotFound(DakaraError):
-    """Error raised when the kara folder cannot be found
-    """
+    """Error raised when the kara folder cannot be found."""

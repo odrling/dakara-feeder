@@ -1,7 +1,4 @@
-#!/usr/bin/env python3
-"""Entry point for the dakara-feed command
-"""
-
+"""Entry point for the dakara-feed command."""
 
 import logging
 from argparse import ArgumentParser
@@ -26,10 +23,10 @@ logger = logging.getLogger(__name__)
 
 
 def get_parser():
-    """Get a parser
+    """Get a parser.
 
     Returns:
-        argparse.ArgumentParser: parser.
+        argparse.ArgumentParser: Parser.
     """
     # main parser
     parser = ArgumentParser(prog="feed", description="Feeder for the Dakara project")
@@ -81,10 +78,10 @@ def get_parser():
 
 
 def feed(args):
-    """Execute the feed action
+    """Execute the feed action.
 
     Args:
-        args (argparse.Namespace): arguments from command line.
+        args (argparse.Namespace): Arguments from command line.
     """
     create_logger(wrap=True)
 
@@ -121,10 +118,10 @@ def feed(args):
 
 
 def create_config(args):
-    """Create the config
+    """Create the config.
 
     Args:
-        args (argparse.Namespace): arguments from command line.
+        args (argparse.Namespace): Arguments from command line.
     """
     create_logger(custom_log_format="%(message)s", custom_log_level="INFO")
     create_config_file("dakara_feeder.resources", CONFIG_FILE, args.force)
@@ -132,8 +129,7 @@ def create_config(args):
 
 
 def main():
-    """Main command
-    """
+    """Main command."""
     parser = get_parser()
     args = parser.parse_args()
 
@@ -164,7 +160,3 @@ def main():
         value = 128
 
     exit(value)
-
-
-if __name__ == "__main__":
-    main()

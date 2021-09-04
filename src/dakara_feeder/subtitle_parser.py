@@ -1,3 +1,5 @@
+"""Parse subtitle file to extract lyrics."""
+
 import re
 from abc import ABC, abstractmethod
 
@@ -6,7 +8,7 @@ from dakara_base.exceptions import DakaraError
 
 
 def is_subtitle(filename):
-    """Check if the provided file is a subtitle
+    """Check if the provided file is a subtitle.
 
     Check the admissible file extensions for pysubs2.
 
@@ -17,10 +19,10 @@ def is_subtitle(filename):
 
 
 class SubtitleParser(ABC):
-    """Abstract class for subtitle parser
+    """Abstract class for subtitle parser.
 
     Args:
-        content (anything): object containing the lyrics. Can be a complete
+        content (anything): Object containing the lyrics. Can be a complete
             object or the full text of the lyrics.
     """
 
@@ -30,38 +32,38 @@ class SubtitleParser(ABC):
     @classmethod
     @abstractmethod
     def parse(cls, filepath):
-        """Read a subtitle file and store the lyrics
+        """Read a subtitle file and store the lyrics.
 
         Args:
-            filepath (path.Path): path of the file to extract lyrics from.
+            filepath (path.Path): Path of the file to extract lyrics from.
 
         Returns:
-            SubtitleParser: instance of the class for the given file.
+            SubtitleParser: Instance of the class for the given file.
         """
 
     @classmethod
     @abstractmethod
     def parse_string(cls, filecontent):
-        """Read a subtitle stream and store the lyrics
+        """Read a subtitle stream and store the lyrics.
 
         Args:
-            filecontent (str): content of the file to extract lyrics from.
+            filecontent (str): Content of the file to extract lyrics from.
 
         Returns:
-            SubtitleParser: instance of the class for the given content.
+            SubtitleParser: Instance of the class for the given content.
         """
 
     @abstractmethod
     def get_lyrics(self):
-        """Extract lyrics
+        """Extract lyrics.
 
         Returns:
-            str: text of the lyrics.
+            str: Text of the lyrics.
         """
 
 
 class TXTSubtitleParser(SubtitleParser):
-    """Subtitle parser for plain txt files
+    """Subtitle parser for plain txt files.
 
     >>> from Path import path
     >>> file_path = Path("path/to/file")
@@ -75,39 +77,39 @@ class TXTSubtitleParser(SubtitleParser):
 
     @classmethod
     def parse(cls, filepath):
-        """Read a subtitle file and store the lyrics
+        """Read a subtitle file and store the lyrics.
 
         Args:
-            filepath (path.Path): path of the file to extract lyrics from.
+            filepath (path.Path): Path of the file to extract lyrics from.
 
         Returns:
-            TXTSubtitleParser: instance of the class for the given file.
+            TXTSubtitleParser: Instance of the class for the given file.
         """
         return cls(filepath.text())
 
     @classmethod
     def parse_string(cls, filecontent):
-        """Read a subtitle file and store the lyrics
+        """Read a subtitle stream and store the lyrics.
 
         Args:
-            filecontent (str): content of the file to extract lyrics from.
+            filecontent (str): Content of the file to extract lyrics from.
 
         Returns:
-            SubtitleParser: instance of the class for the given content.
+            SubtitleParser: Instance of the class for the given content.
         """
         return cls(filecontent)
 
     def get_lyrics(self):
-        """Extract lyrics
+        """Extract lyrics.
 
         Returns:
-            str: text of the lyrics.
+            str: Text of the lyrics.
         """
         return self.content
 
 
 class Pysubs2SubtitleParser(SubtitleParser):
-    """Subtitle parser for ass, ssa and srt files
+    """Subtitle parser for ASS, SSA and SRT files.
 
     This parser extracts cleaned lyrics from the provided subtitle file.
 
@@ -122,12 +124,12 @@ class Pysubs2SubtitleParser(SubtitleParser):
     "Mary had a little lamb…"
 
     Attributes:
-        content (pysubs2.SSAFile): parsed subtitle.
-        override_sequence (re.Pattern): regex that matches any tag and any
+        content (pysubs2.SSAFile): Parsed subtitle.
+        override_sequence (re.Pattern): Regex that matches any tag and any
             drawing area.
 
     Args:
-        content (pysubs2.SSAFile): parsed subtitle.
+        content (pysubs2.SSAFile): Parsed subtitle.
     """
 
     override_sequence = re.compile(
@@ -147,13 +149,17 @@ class Pysubs2SubtitleParser(SubtitleParser):
 
     @classmethod
     def parse(cls, filepath):
-        """Read a subtitle file and store the lyrics
+        """Read a subtitle file and store the lyrics.
 
         Args:
-            filepath (path.Path): path of the file to extract lyrics from.
+            filepath (path.Path): Path of the file to extract lyrics from.
 
         Returns:
-            Pysubs2SubtitleParser: instance of the class for the given file.
+            Pysubs2SubtitleParser: Instance of the class for the given file.
+
+        Raises:
+            SubtitleNotFoundError: If the subtitle file does not exist.
+            SubtitleParseError: If the subtitle file cannot be parsed.
         """
         try:
             return cls(pysubs2.load(filepath))
@@ -170,13 +176,16 @@ class Pysubs2SubtitleParser(SubtitleParser):
 
     @classmethod
     def parse_string(cls, filecontent):
-        """Read a subtitle file and store the lyrics
+        """Read a subtitle stream and store the lyrics.
 
         Args:
-            filecontent (str): content of the file to extract lyrics from.
+            filecontent (str): Content of the file to extract lyrics from.
 
         Returns:
-            SubtitleParser: instance of the class for the given content.
+            SubtitleParser: Instance of the class for the given content.
+
+        Raises:
+            SubtitleParseError: If the subtitle stream cannot be parsed.
         """
         try:
             return cls(pysubs2.SSAFile.from_string(filecontent))
@@ -187,7 +196,7 @@ class Pysubs2SubtitleParser(SubtitleParser):
             ) from error
 
     def get_lyrics(self):
-        """Gives the cleaned text of the Event block
+        """Gives the cleaned text of the Event block.
 
         The text is cleaned in two ways:
             - All tags are removed;
@@ -237,10 +246,8 @@ class Pysubs2SubtitleParser(SubtitleParser):
 
 
 class SubtitleParseError(DakaraError):
-    """Error when the subtitle file cannot be parsed
-    """
+    """Error when the subtitle file cannot be parsed."""
 
 
 class SubtitleNotFoundError(DakaraError):
-    """Error when the subtitle file cannot be found
-    """
+    """Error when the subtitle file cannot be found."""

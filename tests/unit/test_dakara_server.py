@@ -7,8 +7,7 @@ from dakara_feeder import dakara_server
 
 
 class DakaraServerTestCase(TestCase):
-    """Test the Dakara client
-    """
+    """Test the Dakara client."""
 
     def setUp(self):
         # create a server address
@@ -33,8 +32,7 @@ class DakaraServerTestCase(TestCase):
 
     @patch.object(dakara_server.DakaraServer, "get", autoset=True)
     def test_get_songs(self, mocked_get):
-        """Test to obtain the list of song paths
-        """
+        """Test to obtain the list of song paths."""
         # create the mock
         mocked_get.return_value = [
             {"filename": "song_0.mp4", "directory": "directory_0", "id": 0},
@@ -63,8 +61,7 @@ class DakaraServerTestCase(TestCase):
 
     @patch.object(dakara_server.DakaraServer, "post", autoset=True)
     def test_post_song(self, mocked_post):
-        """Test to create one song on the server
-        """
+        """Test to create one song on the server."""
         # create song
         song = {
             "title": "title_0",
@@ -86,8 +83,7 @@ class DakaraServerTestCase(TestCase):
 
     @patch.object(dakara_server.DakaraServer, "delete", autoset=True)
     def test_delete_song(self, mocked_delete):
-        """Test to delete one song on the server
-        """
+        """Test to delete one song on the server."""
         # create song ID
         song_id = 42
 
@@ -104,8 +100,7 @@ class DakaraServerTestCase(TestCase):
 
     @patch.object(dakara_server.DakaraServer, "put", autoset=True)
     def test_put_song(self, mocked_put):
-        """Test to update one song on the server
-        """
+        """Test to update one song on the server."""
         # create song ID
         song_id = 42
 

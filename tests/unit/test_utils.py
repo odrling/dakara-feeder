@@ -4,12 +4,10 @@ from dakara_feeder import utils
 
 
 class DivideChuncksTestCase(TestCase):
-    """Test the function to divide in chuncks
-    """
+    """Test the function to divide in chuncks."""
 
     def test(self):
-        """Test a simple case
-        """
+        """Test a simple case."""
         items = [34, 58, 98, 35, 45]
         chuncks = list(utils.divide_chunks(items, 2))
 

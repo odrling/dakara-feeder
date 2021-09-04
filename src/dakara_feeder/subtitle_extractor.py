@@ -1,3 +1,5 @@
+"""Extrac subtitle from media file."""
+
 import logging
 import subprocess
 from abc import ABC, abstractmethod
@@ -9,10 +11,10 @@ logger = logging.getLogger(__name__)
 
 
 class SubtitleExtractor(ABC):
-    """Abstract class for subtitle extractor
+    """Abstract class for subtitle extractor.
 
     Arg:
-        content (anything): object containing the lyrics. Can be a complete
+        content (anything): Object containing the lyrics. Can be a complete
             object or the full text of the lyrics.
     """
 
@@ -22,16 +24,15 @@ class SubtitleExtractor(ABC):
     @staticmethod
     @abstractmethod
     def is_available():
-        """Check if the parser is callable
-        """
+        """Check if the parser is callable."""
 
     @classmethod
     @abstractmethod
     def extract(cls, filepath):
-        """Extract lyrics form a file
+        """Extract lyrics form a file.
 
         Args:
-            input_file_path (str): path to the input file.
+            input_file_path (str): Path to the input file.
         """
 
     def get_subtitle(self):
@@ -39,13 +40,11 @@ class SubtitleExtractor(ABC):
 
 
 class FFmpegSubtitleExtractor(SubtitleExtractor):
-    """Subtitle extractor using FFmpeg
-    """
+    """Subtitle extractor using FFmpeg."""
 
     @staticmethod
     def is_available():
-        """Check if the parser is callable
-        """
+        """Check if the parser is callable"""
         try:
             subprocess.run(
                 ["ffmpeg", "-version"],
@@ -59,13 +58,16 @@ class FFmpegSubtitleExtractor(SubtitleExtractor):
 
     @classmethod
     def extract(cls, input_file_path):
-        """Extract lyrics form a file
+        """Extract lyrics form a file.
 
         Try to extract the first subtitle of the given input file into the
         output file given.
 
         Args:
-            input_file_path (str): path to the input file.
+            input_file_path (str): Path to the input file.
+
+        Raises:
+            FFmpegNotInstalledError: If FFmpeg is not installed.
         """
         if not cls.is_available():
             raise FFmpegNotInstalledError("FFmpeg not installed")
@@ -88,5 +90,4 @@ class FFmpegSubtitleExtractor(SubtitleExtractor):
 
 
 class FFmpegNotInstalledError(DakaraError):
-    """Error when FFmpegSubtitleExtractor is used if FFmpeg is not installed
-    """
+    """Error when FFmpegSubtitleExtractor is used if FFmpeg is not installed."""

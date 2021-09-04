@@ -1,3 +1,5 @@
+"""Customize the Song class."""
+
 import importlib
 import inspect
 import logging
@@ -13,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_custom_song(class_module_name):
-    """Get the customized Song class
+    """Get the customized Song class.
 
     Args:
         class_module_name (str): Python name of the custom Song class to import. It
@@ -22,6 +24,10 @@ def get_custom_song(class_module_name):
 
     Returns:
         class: Customized Song class.
+
+    Raises:
+        InvalidObjectTypeError: If the designated object is not a class, or if
+            it does not inherit from Song.
     """
     custom_object = import_custom_object(class_module_name)
 
@@ -61,7 +67,7 @@ def get_custom_song(class_module_name):
 
 @contextmanager
 def current_dir_in_path():
-    """Temporarily add current directory to top of the Python path
+    """Temporarily add current directory to top of the Python path.
 
     Python path is reseted to its initial state when leaving the context
     manager.
@@ -80,7 +86,7 @@ def current_dir_in_path():
 
 
 def import_custom_object(object_module_name):
-    """Import a custom object from a given module name
+    """Import a custom object from a given module name.
 
     Args:
         object_module_name (str): Python name of the custom object to import.
@@ -88,6 +94,9 @@ def import_custom_object(object_module_name):
 
     Returns:
         type: Imported object.
+
+    Raises:
+        InvalidObjectModuleNameError: If the given module name cannot be found.
     """
     object_module_name_list = object_module_name.split(".")
 
@@ -127,10 +136,8 @@ def import_custom_object(object_module_name):
 
 
 class InvalidObjectModuleNameError(DakaraError, ImportError, AttributeError):
-    """Error when the object requested does not exist
-    """
+    """Error when the object requested does not exist."""
 
 
 class InvalidObjectTypeError(DakaraError):
-    """Error when the object type is unexpected
-    """
+    """Error when the object type is unexpected."""

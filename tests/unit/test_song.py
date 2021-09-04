@@ -11,14 +11,12 @@ from dakara_feeder.subtitle_parser import Pysubs2SubtitleParser, SubtitleParseEr
 
 
 class BaseSongTestCase(TestCase):
-    """Test the BaseSong class
-    """
+    """Test the BaseSong class."""
 
     @patch.object(Pysubs2SubtitleParser, "parse", autoset=True)
     @patch.object(FFProbeMetadataParser, "parse", autoset=True)
     def test_subtitle_parser_error(self, mocked_metadata_parse, mocked_subtitle_parse):
-        """Test an invalid subtitle file raises no exception but logs error
-        """
+        """Test an invalid subtitle file raises no exception but logs error."""
         # setup mocks
         mocked_metadata_parse.return_value.get_duration.return_value = timedelta(
             seconds=1
@@ -48,8 +46,7 @@ class BaseSongTestCase(TestCase):
     @patch.object(Pysubs2SubtitleParser, "parse", autoset=True)
     @patch.object(FFProbeMetadataParser, "parse", autoset=True)
     def test_metadata_parser_error(self, mocked_metadata_parse, mocked_subtitle_parse):
-        """Test an invalid video file raises no exception but logs error
-        """
+        """Test an invalid video file raises no exception but logs error."""
         # setup mocks
         mocked_metadata_parse.side_effect = MediaParseError("invalid")
         mocked_subtitle_parse.return_value.get_lyrics.return_value = ""

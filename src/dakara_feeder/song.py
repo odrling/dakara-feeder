@@ -1,3 +1,5 @@
+"""Song class to extract data from media file."""
+
 import logging
 
 from dakara_feeder.metadata_parser import (
@@ -11,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class BaseSong:
-    """Class describing a song
+    """Class describing a song.
 
     This class is supposed to be overloaded for getting more data from song
     files.
@@ -63,20 +65,20 @@ class BaseSong:
     values (e.g. 0 seconds duration).
 
     Args.
-        base_directory (path.Path): path to the scanned directory.
-        paths (directory_lister.SongPaths): paths of the song file.
+        base_directory (path.Path): Path to the scanned directory.
+        paths (directory_lister.SongPaths): Paths of the song file.
 
     Attributes:
         metadata_parser_class (type): Class of the metadata parser to use.
             Default to `dakara_feeder.metadata_parser.FFProbeMetadataParser`.
-        base_directory (path.Path): path to the scanned directory.
-        video_path (path.Path): path to the song file, relative to the base
+        base_directory (path.Path): Path to the scanned directory.
+        video_path (path.Path): Path to the song file, relative to the base
             directory.
-        audio_path (path.Path): path to the audio file, relative to the base
+        audio_path (path.Path): Path to the audio file, relative to the base
             directory.
-        sublitle_path (path.Path): path to the subtitle file, relative to the
+        sublitle_path (path.Path): Path to the subtitle file, relative to the
             base directory.
-        others_path (list of path.Path): list of paths to the other files,
+        others_path (list of path.Path): List of paths to the other files,
             relative to the base directory.
         metadata (dakara_feeder.metadata_parser.MetadataParser): Object for
             containing metadata of the video file.
@@ -93,8 +95,7 @@ class BaseSong:
         self.metadata = NullMetadataParser.parse(self.video_path)
 
     def parse_metadata(self):
-        """Use the requested metadata parser to parse video file
-        """
+        """Use the requested metadata parser to parse video file."""
         try:
             self.metadata = self.metadata_parser_class.parse(
                 self.base_directory / self.video_path
@@ -104,7 +105,7 @@ class BaseSong:
             logger.error("Cannot parse metadata: {}".format(error))
 
     def pre_process(self):
-        """Process preparative actions
+        """Process preparative actions.
 
         This method should be overriden. By default, it does not do anything.
 
@@ -114,7 +115,7 @@ class BaseSong:
         pass
 
     def post_process(self, representation):
-        """Process final actions
+        """Process final actions.
 
         This method should be overriden. By default, it does not do anything.
 
@@ -128,7 +129,7 @@ class BaseSong:
         pass
 
     def get_title(self):
-        """Get the title
+        """Get the title.
 
         This method should be overriden. By default it returns the video file
         name without extension.
@@ -139,7 +140,7 @@ class BaseSong:
         return self.video_path.stem
 
     def get_duration(self):
-        """Get the duration
+        """Get the duration.
 
         This method may be overriden. By default it returns the duration of the
         video file using FFProbe.
@@ -151,7 +152,7 @@ class BaseSong:
         return self.metadata.get_duration().total_seconds()
 
     def get_has_instrumental(self):
-        """Get the flag if the song has an instrumental track
+        """Get the flag if the song has an instrumental track.
 
         Returns:
             bool: True either if there is an extra audio file siding with the
@@ -166,7 +167,7 @@ class BaseSong:
         return False
 
     def get_artists(self):
-        """Get the list of artists
+        """Get the list of artists.
 
         This method should be overriden. By default it returns an empty list.
 
@@ -178,7 +179,7 @@ class BaseSong:
         return []
 
     def get_works(self):
-        """Get the list of work links
+        """Get the list of work links.
 
         This method should be overriden. By default it returns an empty list.
 
@@ -220,7 +221,7 @@ class BaseSong:
         return []
 
     def get_tags(self):
-        """Get the list of tags
+        """Get the list of tags.
 
         This method should be overriden. By default it returns an empty list.
 
@@ -234,7 +235,7 @@ class BaseSong:
         return []
 
     def get_version(self):
-        """Get the version
+        """Get the version.
 
         This method should be overriden. By default it returns an empty string.
 
@@ -244,7 +245,7 @@ class BaseSong:
         return ""
 
     def get_detail(self):
-        """Get the datail
+        """Get the datail.
 
         This method should be overriden. By default it returns an empty string.
 
@@ -254,7 +255,7 @@ class BaseSong:
         return ""
 
     def get_detail_video(self):
-        """Get the datail of the video
+        """Get the datail of the video.
 
         This method should be overriden. By default it returns an empty string.
 
@@ -264,7 +265,7 @@ class BaseSong:
         return ""
 
     def get_lyrics(self):
-        """Get the lyrics
+        """Get the lyrics.
 
         This method may be overriden. By default it returns a string containing
         the lyrics of the song extracted from the subtitle file using Pysubs2.
@@ -291,7 +292,7 @@ class BaseSong:
             return ""
 
     def get_representation(self):
-        """Get the simple representation of the song
+        """Get the simple representation of the song.
 
         Returns:
             dict: JSON-compiliant structure representing the song.
