@@ -1,14 +1,16 @@
+"""Compute similarities."""
+
 from difflib import SequenceMatcher
 
 
 def calculate_file_path_similarity(path1, path2):
-    """Calculate file path similarity, according more value to file name
+    """Calculate file path similarity, according more value to file name.
 
     Use a simple weighted sum formula.
 
     Args:
-        path1 (path.Path): path to compare.
-        path2 (path.Path): path to compare.
+        path1 (path.Path): Path to compare.
+        path2 (path.Path): Path to compare.
 
     Returns:
         float: Similarity index beetween path1 and path2. Value is between 0
@@ -25,17 +27,17 @@ def calculate_file_path_similarity(path1, path2):
 
 
 def compute_symmetric_gestalt_pattern_matching(val1, val2):
-    """Compute a symmetric ratio using SequenceMatcher
+    """Compute a symmetric ratio using SequenceMatcher.
 
     Use two SequenceMatcher instances with reversed arguments position. Compute
     the mean ratio of the two.
 
     Args:
-        val1 (str): value to compare.
-        val2 (str): value to compare.
+        val1 (str): Value to compare.
+        val2 (str): Value to compare.
 
     Returns:
-        float: symmetric ratio of similarity.
+        float: Symmetric ratio of similarity.
     """
     return 0.5 * (
         SequenceMatcher(None, val1, val2).ratio()

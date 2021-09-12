@@ -15,13 +15,11 @@ from dakara_feeder.metadata_parser import FFProbeMetadataParser
 
 @skipUnless(FFProbeMetadataParser.is_available(), "FFProbe not installed")
 class DakaraFeederIntegrationTestCase(TestCase):
-    """Integration test for the Feeder class
-    """
+    """Integration test for the Feeder class."""
 
     @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
     def test_feed(self, mocked_dakara_server_class):
-        """Test to feed
-        """
+        """Test to feed."""
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = []
 

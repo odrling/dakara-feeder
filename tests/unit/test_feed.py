@@ -11,18 +11,15 @@ from dakara_feeder.commands import feed
 
 
 class GetParserTestCase(TestCase):
-    """Test the parser creator
-    """
+    """Test the parser creator."""
 
     def test(self):
-        """Test a parser is created
-        """
+        """Test a parser is created."""
         parser = feed.get_parser()
         self.assertIsNotNone(parser)
 
     def test_main_function(self):
-        """Test the parser calls feed by default
-        """
+        """Test the parser calls feed by default."""
         # call the function
         parser = feed.get_parser()
         args = parser.parse_args([])
@@ -31,8 +28,7 @@ class GetParserTestCase(TestCase):
         self.assertIs(args.function, feed.feed)
 
     def test_create_config_function(self):
-        """Test the parser calls create_config when prompted
-        """
+        """Test the parser calls create_config when prompted."""
         # call the function
         parser = feed.get_parser()
         args = parser.parse_args(["create-config"])
@@ -42,8 +38,7 @@ class GetParserTestCase(TestCase):
 
 
 class FeedTestCase(TestCase):
-    """Test the feed action
-    """
+    """Test the feed action."""
 
     @patch.object(DakaraFeeder, "feed")
     @patch.object(DakaraFeeder, "load")
@@ -58,8 +53,7 @@ class FeedTestCase(TestCase):
         mocked_load,
         mocked_feed,
     ):
-        """Test when config file is not found
-        """
+        """Test when config file is not found."""
         # create the mocks
         mocked_get_config_file.return_value = Path("path") / "to" / "config"
         mocked_load_config.side_effect = ConfigNotFoundError("Config file not found")
@@ -90,8 +84,7 @@ class FeedTestCase(TestCase):
         mocked_load,
         mocked_feed,
     ):
-        """Test when config file is incomplete
-        """
+        """Test when config file is incomplete."""
         # create the mocks
         mocked_get_config_file.return_value = Path("path") / "to" / "config"
         mocked_load.side_effect = DakaraError("Config-related error")
@@ -138,8 +131,7 @@ class FeedTestCase(TestCase):
         mocked_load,
         mocked_feed,
     ):
-        """Test a simple feed action
-        """
+        """Test a simple feed action."""
         # setup the mocks
         mocked_get_config_file.return_value = Path("path") / "to" / "config"
         config = {
@@ -168,14 +160,12 @@ class FeedTestCase(TestCase):
 
 
 class CreateConfigTestCase(TestCase):
-    """Test the create-config action
-    """
+    """Test the create-config action."""
 
     @patch("dakara_feeder.commands.feed.create_logger")
     @patch("dakara_feeder.commands.feed.create_config_file")
     def test_create_config(self, mocked_create_config_file, mocked_create_logger):
-        """Test a normall config creation
-        """
+        """Test a normall config creation."""
         # call the function
         with self.assertLogs("dakara_feeder.commands.feed") as logger:
             feed.create_config(Namespace(force=False))
@@ -197,12 +187,10 @@ class CreateConfigTestCase(TestCase):
 @patch("dakara_feeder.commands.feed.exit")
 @patch.object(ArgumentParser, "parse_args")
 class MainTestCase(TestCase):
-    """Test the main action
-    """
+    """Test the main action."""
 
     def test_normal_exit(self, mocked_parse_args, mocked_exit):
-        """Test a normal exit
-        """
+        """Test a normal exit."""
         # create mocks
         function = MagicMock()
         mocked_parse_args.return_value = Namespace(function=function, debug=False)
@@ -215,8 +203,7 @@ class MainTestCase(TestCase):
         mocked_exit.assert_called_with(0)
 
     def test_keyboard_interrupt(self, mocked_parse_args, mocked_exit):
-        """Test a Ctrl+C exit
-        """
+        """Test a Ctrl+C exit."""
         # create mocks
         def function(args):
             raise KeyboardInterrupt()
@@ -236,8 +223,7 @@ class MainTestCase(TestCase):
         )
 
     def test_known_error(self, mocked_parse_args, mocked_exit):
-        """Test a known error exit
-        """
+        """Test a known error exit."""
         # create mocks
         def function(args):
             raise DakaraError("error")
@@ -257,8 +243,7 @@ class MainTestCase(TestCase):
         )
 
     def test_known_error_debug(self, mocked_parse_args, mocked_exit):
-        """Test a known error exit in debug mode
-        """
+        """Test a known error exit in debug mode."""
         # create mocks
         def function(args):
             raise DakaraError("error")
@@ -273,8 +258,7 @@ class MainTestCase(TestCase):
         mocked_exit.assert_not_called()
 
     def test_unknown_error(self, mocked_parse_args, mocked_exit):
-        """Test an unknown error exit
-        """
+        """Test an unknown error exit."""
         # create mocks
         def function(args):
             raise Exception("error")
@@ -299,8 +283,7 @@ class MainTestCase(TestCase):
         )
 
     def test_unknown_error_debug(self, mocked_parse_args, mocked_exit):
-        """Test an unknown error exit in debug mode
-        """
+        """Test an unknown error exit in debug mode."""
         # create mocks
         def function(args):
             raise Exception("error")

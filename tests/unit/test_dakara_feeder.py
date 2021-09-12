@@ -12,8 +12,7 @@ from dakara_feeder.subtitle_parser import Pysubs2SubtitleParser
 
 
 class DakaraFeederTestCase(TestCase):
-    """Test the feeder class
-    """
+    """Test the feeder class."""
 
     @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
     @patch.object(DakaraFeeder, "check_kara_folder_path", autoset=True)
@@ -26,8 +25,7 @@ class DakaraFeederTestCase(TestCase):
         mocked_check_kara_folder_path,
         mocked_dakara_server_class,
     ):
-        """Test to run side-effect tasks
-        """
+        """Test to run side-effect tasks."""
         # create the config
         config = {"server": {}, "kara_folder": "basepath"}
 
@@ -60,8 +58,7 @@ class DakaraFeederTestCase(TestCase):
         mocked_check_kara_folder_path,
         mocked_dakara_server_class,
     ):
-        """Test to run side-effect tasks
-        """
+        """Test to run side-effect tasks."""
 
         class MySong(BaseSong):
             pass
@@ -96,8 +93,7 @@ class DakaraFeederTestCase(TestCase):
     def test_check_kara_folder_path_exists(
         self, mocked_isdir, mocked_dakara_server_class
     ):
-        """Test to check when the kara folder exists
-        """
+        """Test to check when the kara folder exists."""
         # setup the mock
         mocked_isdir.return_value = True
 
@@ -118,8 +114,7 @@ class DakaraFeederTestCase(TestCase):
     def test_check_kara_folder_path_not_exists(
         self, mocked_isdir, mocked_dakara_server_class
     ):
-        """Test to check when the kara folder does not exists
-        """
+        """Test to check when the kara folder does not exists."""
         # setup the mock
         mocked_isdir.return_value = False
 
@@ -146,8 +141,7 @@ class DakaraFeederTestCase(TestCase):
         mocked_metadata_parse,
         mocked_subtitle_parse,
     ):
-        """Test to feed
-        """
+        """Test to feed."""
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = [
             {"id": 0, "path": Path("directory_0") / "song_0.mp4"},
@@ -229,8 +223,7 @@ class DakaraFeederTestCase(TestCase):
     def test_renamed_file(
         self, mocked_dakara_server_class, mocked_list_directory, mocked_metadata_parse
     ):
-        """Test feed when a file has been renamed
-        """
+        """Test feed when a file has been renamed."""
         # mock content of server (old files)
         mocked_dakara_server_class.return_value.get_songs.return_value = [
             {"id": 0, "path": Path("directory_0") / "song.mp4"},
@@ -301,8 +294,7 @@ class DakaraFeederTestCase(TestCase):
         mocked_metadata_parse,
         mocked_subtitle_parse,
     ):
-        """Test to feed
-        """
+        """Test to feed."""
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = [
             {"id": 1, "path": Path("music_1.mp4")}
@@ -370,8 +362,7 @@ class DakaraFeederTestCase(TestCase):
         mocked_metadata_parse,
         mocked_subtitle_parse,
     ):
-        """Test to create two songs
-        """
+        """Test to create two songs."""
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = []
         mocked_list_directory.return_value = [
@@ -433,7 +424,11 @@ class DakaraFeederTestCase(TestCase):
         self.assertEqual(len(post_calls), 1)
 
         # check one positional argument
-        _, args, kwargs, = post_calls[0]
+        (
+            _,
+            args,
+            kwargs,
+        ) = post_calls[0]
         self.assertEqual(len(args), 1)
         self.assertEqual(len(kwargs), 0)
 
@@ -458,8 +453,7 @@ class DakaraFeederTestCase(TestCase):
     def test_feed_custom_song_class(
         self, mocked_dakara_server_class, mocked_list_directory, mocked_metadata_parse
     ):
-        """Test to feed using a custom song class
-        """
+        """Test to feed using a custom song class."""
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = []
         mocked_list_directory.return_value = [
@@ -521,8 +515,7 @@ class DakaraFeederTestCase(TestCase):
         mocked_metadata_parse,
         mocked_subtitle_parse,
     ):
-        """Test to feed
-        """
+        """Test to feed."""
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = []
         mocked_list_directory.return_value = [

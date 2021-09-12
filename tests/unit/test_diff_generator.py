@@ -7,12 +7,10 @@ from dakara_feeder.similarity_calculator import calculate_file_path_similarity
 
 
 class GenerateDiffTestCase(TestCase):
-    """Test the generate_diff method
-    """
+    """Test the generate_diff method."""
 
     def test_generate_diff_all_added(self):
-        """Test to generate diff when all files are added
-        """
+        """Test to generate diff when all files are added."""
         added, deleted, unchanged = diff_generator.generate_diff([], ["a", "b", "c"])
 
         self.assertCountEqual(["a", "b", "c"], added)
@@ -20,8 +18,7 @@ class GenerateDiffTestCase(TestCase):
         self.assertCountEqual([], unchanged)
 
     def test_generate_diff_all_deleted(self):
-        """Test to generate diff when all files are deleted
-        """
+        """Test to generate diff when all files are deleted."""
         added, deleted, unchanged = diff_generator.generate_diff(["a", "b", "c"], [])
 
         self.assertCountEqual([], added)
@@ -29,8 +26,7 @@ class GenerateDiffTestCase(TestCase):
         self.assertCountEqual([], unchanged)
 
     def test_generate_diff_no_diff(self):
-        """Test to generate diff when nothing has changed
-        """
+        """Test to generate diff when nothing has changed."""
         added, deleted, unchanged = diff_generator.generate_diff(
             ["a", "b", "c"], ["a", "b", "c"]
         )
@@ -40,8 +36,7 @@ class GenerateDiffTestCase(TestCase):
         self.assertCountEqual(["a", "b", "c"], unchanged)
 
     def test_generate_diff(self):
-        """Test to generate diff when some filse are added and some others deleted
-        """
+        """Test to generate diff when some filse are added and some others deleted."""
         added, deleted, unchanged = diff_generator.generate_diff(
             ["a", "b", "c"], ["d", "b", "a"]
         )
@@ -52,12 +47,10 @@ class GenerateDiffTestCase(TestCase):
 
 
 class MatchSimilarTestCase(TestCase):
-    """Test match_similar method
-    """
+    """Test match_similar method."""
 
     def test_simple(self):
-        """Test basic similar name matching
-        """
+        """Test basic similar name matching."""
 
         list1 = [
             Path("directory/file.mp4"),

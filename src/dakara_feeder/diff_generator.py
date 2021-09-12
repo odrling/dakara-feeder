@@ -1,8 +1,10 @@
+"""Manage differences."""
+
 import itertools
 
 
 def generate_diff(old_list, new_list):
-    """Returns 2 lists of added, deleted and unchanged elements
+    """Returns 2 lists of added, deleted and unchanged elements.
 
     Added elements are elements presents in new_list but not in old_list.
     Deleted elements are elements presents in old_list but not in new_list.
@@ -12,7 +14,7 @@ def generate_diff(old_list, new_list):
         new_list (list): New list.
 
     Returns:
-        tuple: contains 2 elements:
+        tuple: Contains 2 elements:
             - A list of added elements;
             - A list of deleted elements.
             - A list of unchanged elements.
@@ -28,7 +30,7 @@ def generate_diff(old_list, new_list):
 
 
 def match_similar(list1, list2, compute_similarity, threshold=0.8):
-    """Match similar strings between list1 and list2 using the compute_similarity method
+    """Match similar strings between list1 and list2 using the compute_similarity method.
 
     Args:
         list1 (list): Elements to match.
@@ -41,11 +43,11 @@ def match_similar(list1, list2, compute_similarity, threshold=0.8):
             value. Default is 0.8.
 
     Returns:
-        tuple of list: contains 3 values.
-            first value: list of tuple with matching elements from list1 and
+        tuple of list: Contains 3 values.
+            first value: List of tuple with matching elements from list1 and
                 list2.
-            second value: list of unmatched elements from list1.
-            third value: list of unmatched elements from list2.
+            second value: List of unmatched elements from list1.
+            third value: List of unmatched elements from list2.
     """
     items1 = list1.copy()
     items2 = list2.copy()

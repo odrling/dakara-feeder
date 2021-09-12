@@ -8,13 +8,11 @@ from dakara_feeder.song import BaseSong
 
 
 class GetCustomSongTestCase(TestCase):
-    """Test the getter of customized song class
-    """
+    """Test the getter of customized song class."""
 
     @patch("dakara_feeder.customization.import_custom_object", autospec=True)
     def test_get_from_class(self, mocked_import_custom_object):
-        """Test to get a valid song class from class module name
-        """
+        """Test to get a valid song class from class module name."""
         # mock the returned class
         class MySong(BaseSong):
             pass
@@ -39,8 +37,7 @@ class GetCustomSongTestCase(TestCase):
 
     @patch("dakara_feeder.customization.import_custom_object", autospec=True)
     def test_get_from_module(self, mocked_import_custom_object):
-        """Test to get a valid default song class from module name
-        """
+        """Test to get a valid default song class from module name."""
         # mock the returned class
         my_module = ModuleType("my_module")
 
@@ -58,8 +55,7 @@ class GetCustomSongTestCase(TestCase):
 
     @patch("dakara_feeder.customization.import_custom_object", autospec=True)
     def test_get_from_module_error_no_default(self, mocked_import_custom_object):
-        """Test to get a default song class that does not exist
-        """
+        """Test to get a default song class that does not exist."""
         # mock the returned class
         my_module = ModuleType("my_module")
         mocked_import_custom_object.return_value = my_module
@@ -73,8 +69,7 @@ class GetCustomSongTestCase(TestCase):
 
     @patch("dakara_feeder.customization.import_custom_object", autospec=True)
     def test_get_from_class_error_not_class(self, mocked_import_custom_object):
-        """Test to get a song class that is not a class
-        """
+        """Test to get a song class that is not a class."""
         # mock the returned class
         mocked_import_custom_object.return_value = "str"
 
@@ -86,8 +81,7 @@ class GetCustomSongTestCase(TestCase):
 
     @patch("dakara_feeder.customization.import_custom_object", autospec=True)
     def test_get_from_module_error_not_class(self, mocked_import_custom_object):
-        """Test to get a default song class that is not a class
-        """
+        """Test to get a default song class that is not a class."""
         # mock the returned class
         my_module = ModuleType("my_module")
         my_module.Song = 42
@@ -101,8 +95,7 @@ class GetCustomSongTestCase(TestCase):
 
     @patch("dakara_feeder.customization.import_custom_object", autospec=True)
     def test_get_from_class_error_not_song_subclass(self, mocked_import_custom_object):
-        """Test to get a song class that is not a subclass of Song
-        """
+        """Test to get a song class that is not a subclass of Song."""
         # mock the returned class
         class MySong:
             pass
@@ -117,14 +110,12 @@ class GetCustomSongTestCase(TestCase):
 
 
 class CurrentDirInPathTestCase(TestCase):
-    """Test the helper to put current directory in Python path
-    """
+    """Test the helper to put current directory in Python path."""
 
     @patch("dakara_feeder.customization.os.getcwd")
     @patch("dakara_feeder.customization.sys")
     def test_normal(self, mocked_sys, mocked_getcwd):
-        """Test the helper with no alteration of the path
-        """
+        """Test the helper with no alteration of the path."""
         # setup mocks
         mocked_getcwd.return_value = "current/directory"
         mocked_sys.path = ["some/directory"]
@@ -141,8 +132,7 @@ class CurrentDirInPathTestCase(TestCase):
     @patch("dakara_feeder.customization.os.getcwd")
     @patch("dakara_feeder.customization.sys")
     def test_alteration(self, mocked_sys, mocked_getcwd):
-        """Test the helper with alteration of the path
-        """
+        """Test the helper with alteration of the path."""
         # setup mocks
         mocked_getcwd.return_value = "current/directory"
         mocked_sys.path = []
@@ -159,38 +149,32 @@ class CurrentDirInPathTestCase(TestCase):
 
 
 class ImportCustomObjectTestCase(TestCase):
-    """Test the importer for custom objects
-    """
+    """Test the importer for custom objects."""
 
     def test_import_module(self):
-        """Test to import a module
-        """
+        """Test to import a module."""
         module = customization.import_custom_object("tests.resources.my_module")
         self.assertTrue(inspect.ismodule(module))
 
     def test_import_parent_module(self):
-        """Test to import a parent module
-        """
+        """Test to import a parent module."""
         module = customization.import_custom_object("tests.resources")
         self.assertTrue(inspect.ismodule(module))
 
     def test_import_class(self):
-        """Test to import a class
-        """
+        """Test to import a class."""
         klass = customization.import_custom_object("tests.resources.my_module.MyClass")
         self.assertTrue(inspect.isclass(klass))
 
     def test_import_static_attribute(self):
-        """Test to import a class static attribute
-        """
+        """Test to import a class static attribute."""
         attribute = customization.import_custom_object(
             "tests.resources.my_module.MyClass.my_attribute"
         )
         self.assertEqual(attribute, 42)
 
     def test_error_parent_module(self):
-        """Test to import a non-existing parent module
-        """
+        """Test to import a non-existing parent module."""
         with self.assertRaisesRegex(
             customization.InvalidObjectModuleNameError,
             "No module notexistingmodule found",
@@ -198,8 +182,7 @@ class ImportCustomObjectTestCase(TestCase):
             customization.import_custom_object("notexistingmodule.sub")
 
     def test_error_module(self):
-        """Test to import a non-existing module
-        """
+        """Test to import a non-existing module."""
         with self.assertRaisesRegex(
             customization.InvalidObjectModuleNameError,
             "No module or object notexistingmodule found in tests.resources",
@@ -207,8 +190,7 @@ class ImportCustomObjectTestCase(TestCase):
             customization.import_custom_object("tests.resources.notexistingmodule")
 
     def test_error_object(self):
-        """Test to import a non-existing object
-        """
+        """Test to import a non-existing object."""
         with self.assertRaisesRegex(
             customization.InvalidObjectModuleNameError,
             "No module or object notexistingattribute found in "
@@ -219,8 +201,7 @@ class ImportCustomObjectTestCase(TestCase):
             )
 
     def test_error_sub_object(self):
-        """Test to import a non-existing sub object
-        """
+        """Test to import a non-existing sub object."""
         with self.assertRaisesRegex(
             customization.InvalidObjectModuleNameError,
             "No module or object notexistingattribute found in "
