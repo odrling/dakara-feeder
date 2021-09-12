@@ -3,13 +3,13 @@ from unittest import TestCase
 from unittest.mock import ANY, MagicMock, patch
 
 from dakara_base.exceptions import DakaraError
+
 from dakara_feeder.commands import feed
 from dakara_feeder.commands.create_config import CreateConfigSubcommand
 
 
 class GetSubcommandsTestCase(TestCase):
-    """Test the get_subcommands function
-    """
+    """Test the get_subcommands function"""
 
     def test_get(self):
         """Test to get subcommands
@@ -21,12 +21,10 @@ class GetSubcommandsTestCase(TestCase):
 
 
 class GetParserTestCase(TestCase):
-    """Test the get_parser function
-    """
+    """Test the get_parser function"""
 
     def test(self):
-        """Test a parser is created
-        """
+        """Test a parser is created"""
         parser = feed.get_parser()
         self.assertIsNotNone(parser)
 
@@ -34,12 +32,10 @@ class GetParserTestCase(TestCase):
 @patch("dakara_feeder.commands.feed.exit")
 @patch.object(ArgumentParser, "parse_args")
 class MainTestCase(TestCase):
-    """Test the main action
-    """
+    """Test the main action"""
 
     def test_normal_exit(self, mocked_parse_args, mocked_exit):
-        """Test a normal exit
-        """
+        """Test a normal exit"""
         # create mocks
         function = MagicMock()
         mocked_parse_args.return_value = Namespace(function=function, debug=False)
@@ -52,8 +48,7 @@ class MainTestCase(TestCase):
         mocked_exit.assert_called_with(0)
 
     def test_keyboard_interrupt(self, mocked_parse_args, mocked_exit):
-        """Test a Ctrl+C exit
-        """
+        """Test a Ctrl+C exit"""
         # create mocks
         def function(args):
             raise KeyboardInterrupt()
@@ -73,8 +68,7 @@ class MainTestCase(TestCase):
         )
 
     def test_known_error(self, mocked_parse_args, mocked_exit):
-        """Test a known error exit
-        """
+        """Test a known error exit"""
         # create mocks
         def function(args):
             raise DakaraError("error")
@@ -94,8 +88,7 @@ class MainTestCase(TestCase):
         )
 
     def test_known_error_debug(self, mocked_parse_args, mocked_exit):
-        """Test a known error exit in debug mode
-        """
+        """Test a known error exit in debug mode"""
         # create mocks
         def function(args):
             raise DakaraError("error message")
@@ -110,8 +103,7 @@ class MainTestCase(TestCase):
         mocked_exit.assert_not_called()
 
     def test_unknown_error(self, mocked_parse_args, mocked_exit):
-        """Test an unknown error exit
-        """
+        """Test an unknown error exit"""
         # create mocks
         def function(args):
             raise Exception("error")
@@ -136,8 +128,7 @@ class MainTestCase(TestCase):
         )
 
     def test_unknown_error_debug(self, mocked_parse_args, mocked_exit):
-        """Test an unknown error exit in debug mode
-        """
+        """Test an unknown error exit in debug mode"""
         # create mocks
         def function(args):
             raise Exception("error message")

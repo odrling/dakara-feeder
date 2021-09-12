@@ -8,7 +8,8 @@ class TagsSubcommand(Subcommand):
 
     def set_subparser(self, subparser):
         subparser.add_argument(
-            "file", help="path to the tags configuration file",
+            "file",
+            help="path to the tags configuration file",
         )
 
     def handle(self, args):

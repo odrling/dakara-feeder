@@ -9,17 +9,18 @@ from dakara_feeder.commands.songs import SongsSubcommand
 
 
 class SongsTestCase(TestCase):
-    """Test the songs subcommand
-    """
+    """Test the songs subcommand"""
 
     @patch.object(SongsFeeder, "feed")
     @patch.object(SongsSubcommand, "load_feeder")
     @patch.object(SongsSubcommand, "load_config")
     def test_feed(
-        self, mocked_load_config, mocked_load_feeder, mocked_feed,
+        self,
+        mocked_load_config,
+        mocked_load_feeder,
+        mocked_feed,
     ):
-        """Test to feed songs
-        """
+        """Test to feed songs"""
         subcommand = SongsSubcommand()
 
         # setup the mocks

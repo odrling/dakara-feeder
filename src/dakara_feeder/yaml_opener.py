@@ -1,5 +1,4 @@
 import yaml
-
 from dakara_base.exceptions import DakaraError
 
 
@@ -46,15 +45,12 @@ def get_yaml_file_content(file_path, key=None):
 
 
 class YamlFileNotFoundError(DakaraError, FileNotFoundError):
-    """Exception raised if the YAML file does not exist
-    """
+    """Exception raised if the YAML file does not exist"""
 
 
 class YamlFileInvalidError(DakaraError):
-    """Exception raised if the YAML file is invalid
-    """
+    """Exception raised if the YAML file is invalid"""
 
 
 class YamlContentInvalidError(DakaraError):
-    """Exception raised if the content of the YAML file is unexpected
-    """
+    """Exception raised if the content of the YAML file is unexpected"""

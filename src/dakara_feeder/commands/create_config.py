@@ -1,11 +1,8 @@
 import logging
 
-from dakara_base.config import (
-    create_config_file,
-    create_logger,
-)
-from dakara_feeder.commands.base import Subcommand, CONFIG_FILE
+from dakara_base.config import create_config_file, create_logger
 
+from dakara_feeder.commands.base import CONFIG_FILE, Subcommand
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,8 @@
+"""Various utilities."""
+
+
 def divide_chunks(listing, size):
-    """Yield successive chunks from given listing
+    """Yield successive chunks from given listing.
 
     Args:
         listing (list): List of objects to slice.

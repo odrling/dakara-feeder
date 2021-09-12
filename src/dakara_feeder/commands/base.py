@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-from dakara_base.exceptions import DakaraError
 from dakara_base.config import (
     ConfigNotFoundError,
     create_logger,
@@ -8,7 +7,7 @@ from dakara_base.config import (
     load_config,
     set_loglevel,
 )
-
+from dakara_base.exceptions import DakaraError
 
 CONFIG_FILE = "feeder.yaml"
 

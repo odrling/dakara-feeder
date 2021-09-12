@@ -2,16 +2,15 @@ from argparse import ArgumentParser
 from unittest import TestCase
 from unittest.mock import ANY, MagicMock, patch
 
+from dakara_base.config import ConfigNotFoundError
+from dakara_base.exceptions import DakaraError
 from path import Path
 
-from dakara_base.exceptions import DakaraError
-from dakara_base.config import ConfigNotFoundError
 from dakara_feeder.commands.base import Subcommand
 
 
 class SubcommandTestCase(TestCase):
-    """Test the Subcommand class
-    """
+    """Test the Subcommand class"""
 
     class TestSubcommand(Subcommand):
         name = "name"
@@ -24,19 +23,16 @@ class SubcommandTestCase(TestCase):
             pass
 
     def test_init_base(self):
-        """Test to instanciate the base abstract class
-        """
+        """Test to instanciate the base abstract class"""
         with self.assertRaises(TypeError):
             Subcommand()
 
     def test_init(self):
-        """Test to instanciate a child class
-        """
+        """Test to instanciate a child class"""
         self.TestSubcommand()
 
     def test_create_subparser(self):
-        """Test to create a subparser
-        """
+        """Test to create a subparser"""
         subcommand = self.TestSubcommand()
         parser = ArgumentParser()
         subparsers = parser.add_subparsers()
@@ -78,8 +74,7 @@ class SubcommandTestCase(TestCase):
         mocked_load_config,
         mocked_set_loglevel,
     ):
-        """Test to load config
-        """
+        """Test to load config"""
         # create the mocks
         config = {"key": "value"}
         mocked_get_config_file.return_value = Path("path") / "to" / "config"
@@ -108,8 +103,7 @@ class SubcommandTestCase(TestCase):
         mocked_load_config,
         mocked_set_loglevel,
     ):
-        """Test to load config when the file is not found
-        """
+        """Test to load config when the file is not found"""
         # create the mocks
         mocked_get_config_file.return_value = Path("path") / "to" / "config"
         mocked_load_config.side_effect = ConfigNotFoundError("Config file not found")
@@ -129,10 +123,10 @@ class SubcommandTestCase(TestCase):
 
     @patch("dakara_feeder.commands.base.get_config_file")
     def test_load_feeder(
-        self, mocked_get_config_file,
+        self,
+        mocked_get_config_file,
     ):
-        """Test to load feeder
-        """
+        """Test to load feeder"""
         # create the mocks
         feeder = MagicMock()
         mocked_get_config_file.return_value = Path("path") / "to" / "config"
@@ -146,10 +140,10 @@ class SubcommandTestCase(TestCase):
 
     @patch("dakara_feeder.commands.base.get_config_file")
     def test_load_feeder_error(
-        self, mocked_get_config_file,
+        self,
+        mocked_get_config_file,
     ):
-        """Test to load feeder when config file is incomplete
-        """
+        """Test to load feeder when config file is incomplete"""
         # create the mocks
         feeder = MagicMock()
         feeder.load.side_effect = DakaraError("Any error message")

@@ -4,17 +4,16 @@ from unittest.mock import patch
 
 from path import Path
 
-from dakara_feeder.songs_feeder import SongsFeeder, KaraFolderNotFound
 from dakara_feeder.directory_lister import SongPaths
 from dakara_feeder.metadata_parser import FFProbeMetadataParser
 from dakara_feeder.song import BaseSong
+from dakara_feeder.songs_feeder import KaraFolderNotFound, SongsFeeder
 from dakara_feeder.subtitle_parser import Pysubs2SubtitleParser
 
 
 @patch("dakara_feeder.songs_feeder.DakaraServer", autoset=True)
 class SongsFeederTestCase(TestCase):
-    """Test the feeder class
-    """
+    """Test the feeder class."""
 
     def setUp(self):
         # create base config
@@ -30,8 +29,7 @@ class SongsFeederTestCase(TestCase):
         mocked_check_kara_folder_path,
         mocked_dakara_server_class,
     ):
-        """Test to run side-effect tasks
-        """
+        """Test to run side-effect tasks."""
         # create the object
         feeder = SongsFeeder(self.config, progress=False)
 
@@ -60,8 +58,7 @@ class SongsFeederTestCase(TestCase):
         mocked_check_kara_folder_path,
         mocked_dakara_server_class,
     ):
-        """Test to run side-effect tasks
-        """
+        """Test to run side-effect tasks."""
 
         class MySong(BaseSong):
             pass
@@ -95,8 +92,7 @@ class SongsFeederTestCase(TestCase):
     def test_check_kara_folder_path_exists(
         self, mocked_isdir, mocked_dakara_server_class
     ):
-        """Test to check when the kara folder exists
-        """
+        """Test to check when the kara folder exists."""
         # setup the mock
         mocked_isdir.return_value = True
 
@@ -113,8 +109,7 @@ class SongsFeederTestCase(TestCase):
     def test_check_kara_folder_path_not_exists(
         self, mocked_isdir, mocked_dakara_server_class
     ):
-        """Test to check when the kara folder does not exists
-        """
+        """Test to check when the kara folder does not exists."""
         # setup the mock
         mocked_isdir.return_value = False
 
@@ -137,8 +132,7 @@ class SongsFeederTestCase(TestCase):
         mocked_subtitle_parse,
         mocked_dakara_server_class,
     ):
-        """Test to feed
-        """
+        """Test to feed."""
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = [
             {"id": 0, "path": Path("directory_0") / "song_0.mp4"},
@@ -222,8 +216,7 @@ class SongsFeederTestCase(TestCase):
     def test_renamed_file(
         self, mocked_list_directory, mocked_metadata_parse, mocked_dakara_server_class
     ):
-        """Test feed when a file has been renamed
-        """
+        """Test feed when a file has been renamed."""
         # mock content of server (old files)
         mocked_dakara_server_class.return_value.get_songs.return_value = [
             {"id": 0, "path": Path("directory_0") / "song.mp4"},
@@ -294,8 +287,7 @@ class SongsFeederTestCase(TestCase):
         mocked_subtitle_parse,
         mocked_dakara_server_class,
     ):
-        """Test to feed
-        """
+        """Test to feed."""
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = [
             {"id": 1, "path": Path("music_1.mp4")}
@@ -363,8 +355,7 @@ class SongsFeederTestCase(TestCase):
         mocked_subtitle_parse,
         mocked_dakara_server_class,
     ):
-        """Test to feed without prune artists and works without songs
-        """
+        """Test to feed without prune artists and works without songs"""
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = [
             {"id": 0, "path": Path("directory_0") / "song_0.mp4"}
@@ -414,8 +405,7 @@ class SongsFeederTestCase(TestCase):
         mocked_subtitle_parse,
         mocked_dakara_server_class,
     ):
-        """Test to create two songs
-        """
+        """Test to create two songs."""
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = []
         mocked_dakara_server_class.return_value.prune_artists.return_value = 0
@@ -476,7 +466,11 @@ class SongsFeederTestCase(TestCase):
         self.assertEqual(len(post_calls), 1)
 
         # check one positional argument
-        _, args, kwargs, = post_calls[0]
+        (
+            _,
+            args,
+            kwargs,
+        ) = post_calls[0]
         self.assertEqual(len(args), 1)
         self.assertEqual(len(kwargs), 0)
 
@@ -502,8 +496,7 @@ class SongsFeederTestCase(TestCase):
     def test_feed_custom_song_class(
         self, mocked_list_directory, mocked_metadata_parse, mocked_dakara_server_class
     ):
-        """Test to feed using a custom song class
-        """
+        """Test to feed using a custom song class."""
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = []
         mocked_dakara_server_class.return_value.prune_artists.return_value = 0
@@ -566,8 +559,7 @@ class SongsFeederTestCase(TestCase):
         mocked_subtitle_parse,
         mocked_dakara_server_class,
     ):
-        """Test to feed a song with an extra audio file
-        """
+        """Test to feed a song with an extra audio file."""
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = []
         mocked_list_directory.return_value = [
@@ -592,7 +584,7 @@ class SongsFeederTestCase(TestCase):
         # call the method
         with self.assertLogs("dakara_feeder.songs_feeder", "DEBUG"):
             # with self.assertLogs("dakara_base.progress_bar"):
-                feeder.feed()
+            feeder.feed()
 
         # assert the mocked calls
         mocked_dakara_server_class.return_value.get_songs.assert_called_with()

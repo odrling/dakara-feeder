@@ -6,15 +6,13 @@ from dakara_feeder.commands.create_config import CreateConfigSubcommand
 
 
 class CreateConfigTestCase(TestCase):
-    """Test the create-config subcommand
-    """
+    """Test the create-config subcommand"""
 
     @patch("dakara_feeder.commands.create_config.CONFIG_FILE", "feeder.yaml")
     @patch("dakara_feeder.commands.create_config.create_logger")
     @patch("dakara_feeder.commands.create_config.create_config_file")
     def test_create_config(self, mocked_create_config_file, mocked_create_logger):
-        """Test a normall config creation
-        """
+        """Test a normall config creation"""
         subcommand = CreateConfigSubcommand()
 
         # call the function

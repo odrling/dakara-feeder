@@ -9,17 +9,18 @@ from dakara_feeder.commands.work_types import WorkTypesSubcommand
 
 
 class WorkTypesTestCase(TestCase):
-    """Test the work types subcommand
-    """
+    """Test the work types subcommand"""
 
     @patch.object(WorkTypesFeeder, "feed")
     @patch.object(WorkTypesSubcommand, "load_feeder")
     @patch.object(WorkTypesSubcommand, "load_config")
     def test_feed(
-        self, mocked_load_config, mocked_load_feeder, mocked_feed,
+        self,
+        mocked_load_config,
+        mocked_load_feeder,
+        mocked_feed,
     ):
-        """Test to feed work types
-        """
+        """Test to feed work types"""
         subcommand = WorkTypesSubcommand()
 
         # setup the mocks

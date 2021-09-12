@@ -9,17 +9,18 @@ from dakara_feeder.commands.tags import TagsSubcommand
 
 
 class TagsTestCase(TestCase):
-    """Test the tags subcommand
-    """
+    """Test the tags subcommand"""
 
     @patch.object(TagsFeeder, "feed")
     @patch.object(TagsSubcommand, "load_feeder")
     @patch.object(TagsSubcommand, "load_config")
     def test_feed(
-        self, mocked_load_config, mocked_load_feeder, mocked_feed,
+        self,
+        mocked_load_config,
+        mocked_load_feeder,
+        mocked_feed,
     ):
-        """Test to feed tags
-        """
+        """Test to feed tags"""
         subcommand = TagsSubcommand()
 
         # setup the mocks

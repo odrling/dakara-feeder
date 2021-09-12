@@ -1,14 +1,13 @@
 import logging
 
+from dakara_base.exceptions import DakaraError
+from dakara_base.progress_bar import null_bar, progress_bar
 from path import Path
 
-from dakara_base.exceptions import DakaraError
-from dakara_base.progress_bar import progress_bar, null_bar
 from dakara_feeder.dakara_server import DakaraServer, TagAlreadyExistsError
 from dakara_feeder.utils import clean_dict
 from dakara_feeder.version import check_version
 from dakara_feeder.yaml_opener import get_yaml_file_content
-
 
 logger = logging.getLogger(__name__)
 
@@ -34,8 +33,7 @@ class TagsFeeder:
         self.bar = progress_bar if progress else null_bar
 
     def load(self):
-        """Execute side-effect initialization tasks
-        """
+        """Execute side-effect initialization tasks"""
         # check version
         check_version()
 
@@ -43,8 +41,7 @@ class TagsFeeder:
         self.dakara_server.authenticate()
 
     def feed(self):
-        """Execute the feeding action
-        """
+        """Execute the feeding action"""
         # load file and get the key
         tags = get_yaml_file_content(self.tags_file_path, "tags")
 
@@ -71,5 +68,4 @@ class TagsFeeder:
 
 
 class InvalidTag(DakaraError):
-    """Exception raised if a tag is invalid
-    """
+    """Exception raised if a tag is invalid"""

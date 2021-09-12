@@ -1,16 +1,21 @@
-#!/usr/bin/env python3
-"""Entry point for the dakara-feed command
-"""
-
+"""Entry point for the dakara-feed command."""
 
 import logging
 from argparse import ArgumentParser
 
+from dakara_base.config import (
+    ConfigNotFoundError,
+    create_config_file,
+    create_logger,
+    get_config_file,
+    load_config,
+    set_loglevel,
+)
 from dakara_base.exceptions import DakaraError
-from dakara_feeder import commands
-from dakara_feeder.commands.base import Subcommand
-from dakara_feeder.version import __version__, __date__
 
+from dakara_feeder import SongsFeeder, commands
+from dakara_feeder.commands.base import CONFIG_FILE, Subcommand
+from dakara_feeder.version import __date__, __version__
 
 logger = logging.getLogger(__name__)
 
@@ -33,10 +38,10 @@ def get_subcommands():
 
 
 def get_parser():
-    """Get the parser
+    """Get the parser.
 
     Returns:
-        argparse.ArgumentParser: parser.
+        argparse.ArgumentParser: Parser.
     """
     # main parser
     parser = ArgumentParser(
@@ -76,9 +81,59 @@ def get_parser():
     return parser
 
 
-def main():
-    """Main command
+def feed(args):
+    """Execute the feed action.
+
+    Args:
+        args (argparse.Namespace): Arguments from command line.
     """
+    create_logger(wrap=True)
+
+    # load the config, display help to create config if it fails
+    try:
+        config = load_config(
+            get_config_file(CONFIG_FILE),
+            args.debug,
+            mandatory_keys=["kara_folder", "server"],
+        )
+
+    except ConfigNotFoundError as error:
+        raise ConfigNotFoundError(
+            "{}, please run 'dakara-feed create-config'".format(error)
+        ) from error
+
+    set_loglevel(config)
+    feeder = SongsFeeder(config, force_update=args.force, progress=args.progress)
+
+    # load the feeder, consider that the config is incomplete if it fails
+    try:
+        feeder.load()
+
+    except DakaraError:
+        logger.warning(
+            "Config may be incomplete, please check '{}'".format(
+                get_config_file(CONFIG_FILE)
+            )
+        )
+        raise
+
+    # do the actual feeding
+    feeder.feed()
+
+
+def create_config(args):
+    """Create the config.
+
+    Args:
+        args (argparse.Namespace): Arguments from command line.
+    """
+    create_logger(custom_log_format="%(message)s", custom_log_level="INFO")
+    create_config_file("dakara_feeder.resources", CONFIG_FILE, args.force)
+    logger.info("Please edit this file")
+
+
+def main():
+    """Main command."""
     parser = get_parser()
     args = parser.parse_args()
 
@@ -109,7 +164,3 @@ def main():
         value = 128
 
     exit(value)
-
-
-if __name__ == "__main__":
-    main()

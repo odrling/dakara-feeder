@@ -8,7 +8,8 @@ class WorkTypesSubcommand(Subcommand):
 
     def set_subparser(self, subparser):
         subparser.add_argument(
-            "file", help="path to the work types configuration file",
+            "file",
+            help="path to the work types configuration file",
         )
 
     def handle(self, args):
