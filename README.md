@@ -1,7 +1,7 @@
 # Dakara Feeder
 
-[![Travis CI Build Status](https://travis-ci.com/DakaraProject/dakara-feeder.svg?branch=develop)](https://travis-ci.com/DakaraProject/dakara-feeder)
-[![Appveyor CI Build status](https://ci.appveyor.com/api/projects/status/7vxx2dyu8y25v6of?svg=true)](https://ci.appveyor.com/project/neraste/dakara-feeder/branch/develop)
+<!-- Badges are displayed for the develop branch -->
+[![Appveyor CI Build status](https://ci.appveyor.com/api/projects/status/8qpr1lk1kye7fkf0/branch/develop?svg=true)](https://ci.appveyor.com/project/neraste/dakara-feeder/branch/develop)
 [![Codecov coverage analysis](https://codecov.io/gh/DakaraProject/dakara-feeder/branch/develop/graph/badge.svg)](https://codecov.io/gh/DakaraProject/dakara-feeder)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 [![PyPI version](https://badge.fury.io/py/dakarafeeder.svg)](https://pypi.python.org/pypi/dakarafeeder/)
@@ -21,7 +21,7 @@ Other important parts of the project include:
 
 ### System requirements
 
-* Python3, to make everything up and running (supported versions: 3.5 and 3.6);
+* Python3, to make everything up and running (supported versions: 3.7, 3.8 and 3.9);
 * [ffmpeg](https://www.ffmpeg.org/), to extract lyrics and extract metadata from files (preferred way);
 * [MediaInfo](https://mediaarea.net/fr/MediaInfo/), to extract metadata from files (slower, alternative way, may not work on Windows).
 
@@ -135,14 +135,29 @@ This installs the normal dependencies of the package plus the dependencies for t
 Run tests simply with:
 
 ```sh
-python setup.py test
+pytest
+# or
+python -m pytest
+```
+
+Tests are split between unit tests, which are ligthweight and do not require mediainfo or FFmpeg to be installed, and integration tests, which are heavier:
+
+```sh
+pytest tests/unit
+pytest tests/integration
+# or
+python -m pytest tests/unit
+python -m pytest tests/integration
 ```
 
 To check coverage, use the `coverage` command:
 
 ```sh
-coverage run setup.py test
+coverage run -m pytest
 coverage report -m
+# or
+python -m coverage run -m pytest
+python -m coverage report -m
 ```
 
 ### Hooks

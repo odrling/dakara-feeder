@@ -1,5 +1,4 @@
 import json
-import os
 import subprocess
 import sys
 from abc import ABC, abstractmethod
@@ -40,6 +39,22 @@ class MetadataParser(ABC):
         Returns timedelta 0 if unable to get duration.
         """
 
+    @abstractmethod
+    def get_audio_tracks_count(self):
+        """Get number of audio tracks
+
+        Returns:
+            int: Number of audio tracks.
+        """
+
+    @abstractmethod
+    def get_subtitle_tracks_count(self):
+        """Get number of subtitle tracks
+
+        Returns:
+            int: Number of subtitle tracks.
+        """
+
 
 class NullMetadataParser(MetadataParser):
     """Dummy metedata parser
@@ -65,6 +80,12 @@ class NullMetadataParser(MetadataParser):
 
     def get_duration(self):
         return timedelta(0)
+
+    def get_audio_tracks_count(self):
+        return 0
+
+    def get_subtitle_tracks_count(self):
+        return 0
 
 
 class MediainfoMetadataParser(MetadataParser):
@@ -97,17 +118,20 @@ class MediainfoMetadataParser(MetadataParser):
         Args:
             filename (str): path of the file to parse.
         """
+        if not cls.is_available():
+            raise MediainfoNotInstalledError("Mediainfo not installed")
+
         try:
             metadata = MediaInfo.parse(filename)
 
         except FileNotFoundError as error:
             raise MediaNotFoundError(
-                "Media file {} not found".format(filename)
+                "Media file '{}' not found".format(filename)
             ) from error
 
         except BaseException as error:
             raise MediaParseError(
-                "Error when processing media file {}: {}".format(filename, error)
+                "Error when processing media file '{}': {}".format(filename, error)
             ) from error
 
         return cls(metadata)
@@ -120,6 +144,22 @@ class MediainfoMetadataParser(MetadataParser):
         general_track = self.metadata.tracks[0]
         duration = getattr(general_track, "duration", 0) or 0
         return timedelta(milliseconds=int(duration))
+
+    def get_audio_tracks_count(self):
+        """Get number of audio tracks
+
+        Returns:
+            int: Number of audio tracks.
+        """
+        return len([t for t in self.metadata.tracks if t.track_type == "Audio"])
+
+    def get_subtitle_tracks_count(self):
+        """Get number of subtitle tracks
+
+        Returns:
+            int: Number of subtitle tracks.
+        """
+        return len([t for t in self.metadata.tracks if t.track_type == "Text"])
 
 
 class FFProbeMetadataParser(MetadataParser):
@@ -150,12 +190,14 @@ class FFProbeMetadataParser(MetadataParser):
         """Check if the parser is callable
         """
         try:
-            with open(os.devnull, "w") as tempf:
-                subprocess.check_call(["ffprobe", "-h"], stdout=tempf, stderr=tempf)
+            subprocess.run(
+                ["ffprobe", "-version"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            return True
 
-                return True
-
-        except subprocess.CalledProcessError:
+        except FileNotFoundError:
             return False
 
     @classmethod
@@ -165,6 +207,9 @@ class FFProbeMetadataParser(MetadataParser):
         Args:
             filename (path.Path): path of the file to parse.
         """
+        if not cls.is_available():
+            raise FFProbeNotInstalledError("FFProbe not installed")
+
         command = [
             "ffprobe",
             "-loglevel",
@@ -184,11 +229,11 @@ class FFProbeMetadataParser(MetadataParser):
         if process.returncode:
             # check the file exists
             if not filename.exists():
-                raise MediaNotFoundError("Media file {} not found".format(filename))
+                raise MediaNotFoundError("Media file '{}' not found".format(filename))
 
             # otherwise
             raise MediaParseError(
-                "Error when processing media file {}".format(filename)
+                "Error when processing media file '{}'".format(filename)
             )
 
         return cls(json.loads(process.stdout.decode(sys.stdout.encoding)))
@@ -215,6 +260,32 @@ class FFProbeMetadataParser(MetadataParser):
         # if nothing is found
         return timedelta(0)
 
+    def get_audio_tracks_count(self):
+        """Get number of audio tracks
+
+        Returns:
+            int: Number of audio tracks.
+        """
+        if "streams" not in self.metadata:
+            return 0
+
+        return len(
+            [s for s in self.metadata["streams"] if s.get("codec_type") == "audio"]
+        )
+
+    def get_subtitle_tracks_count(self):
+        """Get number of subtitle tracks
+
+        Returns:
+            int: Number of subtitle tracks.
+        """
+        if "streams" not in self.metadata:
+            return 0
+
+        return len(
+            [s for s in self.metadata["streams"] if s.get("codec_type") == "subtitle"]
+        )
+
 
 class MediaParseError(DakaraError):
     """Error if the metadata cannot be parsed
@@ -223,4 +294,14 @@ class MediaParseError(DakaraError):
 
 class MediaNotFoundError(DakaraError, FileNotFoundError):
     """Error if the metadata file does not exist
+    """
+
+
+class MediainfoNotInstalledError(DakaraError):
+    """Error if MediainfoMetadataParser is used when mediainfo is not installed
+    """
+
+
+class FFProbeNotInstalledError(DakaraError):
+    """Error if FFProbeMetadataParser is used when FFProbe is not installed
     """

@@ -1,16 +1,16 @@
-def divide_chunks(target, n):
-    """Yield successive n-sized chunks from target
+def divide_chunks(listing, size):
+    """Yield successive chunks from given listing
 
     Args:
-        target (list): list to extract chunks from.
-        n (int): size of the chunk.
+        listing (list): List of objects to slice.
+        size (int): Maximum size of each chunk.
 
-    Yields:
-        list: chunk of size n.
+    Yield:
+        list: List of objects of limited size.
     """
-    # looping till length l
-    for i in range(0, len(target), n):
-        yield target[i : i + n]
+    # looping till length listing
+    for i in range(0, len(listing), size):
+        yield listing[i : i + size]
 
 
 def clean_dict(target, keys):

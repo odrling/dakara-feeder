@@ -1,12 +1,12 @@
 import logging
 from itertools import groupby
 
+import filetype
+
+from dakara_feeder.subtitle_parser import is_subtitle
+
 
 logger = logging.getLogger(__name__)
-
-
-VIDEO_EXTENSIONS = [".avi", ".mkv", ".mp4", ".mpeg", ".mpg", ".vob", ".webm"]
-SUBTITLE_EXTENSIONS = [".ass", ".ssa"]
 
 
 def list_directory(path):
@@ -19,15 +19,15 @@ def list_directory(path):
         list of SongPaths: paths of the files for each song. Paths are relative
         to the given path.
     """
-    logger.debug("Listing %s", path)
+    logger.debug("Listing '%s'", path)
     files_list = [p.relpath(path) for p in path.walkfiles()]
-    files_list.sort()
+    files_list.sort(key=lambda f: (get_path_without_extension(f), f))
     logger.debug("Listed %i files", len(files_list))
 
     listing = [
         item
-        for _, files in groupby(files_list, lambda f: f.dirname() / f.stem)
-        for item in group_by_type(files)
+        for _, files in groupby(files_list, get_path_without_extension)
+        for item in group_by_type(files, path)
     ]
 
     logger.debug("Found %i different videos", len(listing))
@@ -35,25 +35,64 @@ def list_directory(path):
     return listing
 
 
-def group_by_type(files):
+def get_path_without_extension(path):
+    """Remove extension from file path.
+
+    Args:
+        path (path.Path): Path to a file.
+
+    Returns:
+        path.Path: path to the file without the extension.
+        'directory/file0.mkv' will return 'directory/file0'.
+    """
+    return path.dirname() / path.stem
+
+
+def get_main_type(file):
+    """Get the first part of the MIME type of the given file
+
+    Args:
+        file (path.Path): Absolute path to the file to extract the MIME type.
+
+    Returns
+        str: Main type if the MIME type can be extracted, None otherwise.
+    """
+    kind = filetype.guess(str(file))
+
+    if not kind:
+        return None
+
+    maintype, _ = kind.mime.split("/")
+    return maintype
+
+
+def group_by_type(files, path):
     """Group files by extension
 
     Args:
-        files (list of path.Path): list of files to group.
+        files (list of path.Path): List of relative path to the files to group.
+        path (path.Path): Path of directory to scan.
 
     Returns:
         list of SongPaths: paths of the files for each song.
     """
     # sort files by their extension
     videos = []
+    audios = []
     subtitles = []
     others = []
     for file in files:
-        if file.ext.lower() in VIDEO_EXTENSIONS:
+        maintype = get_main_type(path / file)
+
+        if maintype == "video":
             videos.append(file)
             continue
 
-        if file.ext.lower() in SUBTITLE_EXTENSIONS:
+        if maintype == "audio":
+            audios.append(file)
+            continue
+
+        if is_subtitle(file):
             subtitles.append(file)
             continue
 
@@ -63,14 +102,24 @@ def group_by_type(files):
     if len(videos) == 0:
         return []
 
+    # check there if there are only one audio file
+    if len(audios) > 1:
+        logger.warning("More than one audio file for video '%s'", videos[0])
+        return []
+
     # check there if there are only one subtitle
     if len(subtitles) > 1:
-        logger.warning("More than one subtitle for video %s", videos[0])
+        logger.warning("More than one subtitle for video '%s'", videos[0])
         return []
 
     # recombine the files
     return [
-        SongPaths(video, subtitles[0] if subtitles else None, others)
+        SongPaths(
+            video,
+            audios[0] if audios else None,
+            subtitles[0] if subtitles else None,
+            others,
+        )
         for video in videos
     ]
 
@@ -80,12 +129,14 @@ class SongPaths:
 
     Attributes:
         video (path.Path): Path to the video file.
+        audio (path.Path): Path to the audio file.
         subtitle (path.Path): Path to the subtitle file.
         others (list of path.Path): Paths of other files.
     """
 
-    def __init__(self, video, subtitle=None, others=[]):
+    def __init__(self, video, audio=None, subtitle=None, others=[]):
         self.video = video
+        self.audio = audio
         self.subtitle = subtitle
         self.others = others
 
@@ -96,6 +147,6 @@ class SongPaths:
         return hash(str(self))
 
     def __repr__(self):
-        return "video: {}, subtitle: {}, others: {}".format(
-            self.video, self.subtitle, self.others
+        return "video: {}, audio: {}, subtitle: {}, others: {}".format(
+            self.video, self.audio, self.subtitle, self.others
         )

@@ -40,6 +40,19 @@
 
 - Feed command for songs moved from `dakara-feed` to `dakara-feed songs`.
 
+## 1.7.0 - 2021-06-20
+
+### Removed
+
+- Dropped support of Python 3.5 and 3.6.
+
+## 1.6.0 - 2020-09-05
+
+### Added
+
+- Detect instrumental tracks.
+>>>>>>> 1.7.0
+
 ## 1.5.1 - 2019-12-06
 
 ### Fixed
