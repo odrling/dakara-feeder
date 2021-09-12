@@ -63,7 +63,7 @@ for:
 
       # run commands
       - "python -m dakara_feeder --version"
-      - "dakara-feed --version"
+      - "dakara-feeder --version"
 
       # run code formatting tests
       - "python -m isort . --check"
