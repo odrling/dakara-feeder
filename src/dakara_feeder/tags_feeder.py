@@ -2,7 +2,6 @@ import logging
 
 from dakara_base.exceptions import DakaraError
 from dakara_base.progress_bar import null_bar, progress_bar
-from path import Path
 
 from dakara_feeder.dakara_server import DakaraServer, TagAlreadyExistsError
 from dakara_feeder.utils import clean_dict
@@ -17,7 +16,7 @@ class TagsFeeder:
 
     Args:
         config (dict): dictionary of config.
-        tags_file_path (str): path to the tags file.
+        tags_file_path (path.Path): path to the tags file.
         progress (bool): if True, a progress bar is displayed during long tasks.
 
     Attributes:
@@ -29,7 +28,7 @@ class TagsFeeder:
     def __init__(self, config, tags_file_path, progress=True):
         # create objects
         self.dakara_server = DakaraServer(config["server"], endpoint_prefix="api")
-        self.tags_file_path = Path(tags_file_path)
+        self.tags_file_path = tags_file_path
         self.bar = progress_bar if progress else null_bar
 
     def load(self):

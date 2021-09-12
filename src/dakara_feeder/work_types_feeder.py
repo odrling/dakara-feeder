@@ -2,7 +2,6 @@ import logging
 
 from dakara_base.exceptions import DakaraError
 from dakara_base.progress_bar import null_bar, progress_bar
-from path import Path
 
 from dakara_feeder.dakara_server import DakaraServer, WorkTypeAlreadyExistsError
 from dakara_feeder.utils import clean_dict
@@ -17,7 +16,7 @@ class WorkTypesFeeder:
 
     Args:
         config (dict): dictionary of config.
-        work_types_file_path (str): path to the work types file.
+        work_types_file_path (path.Path): path to the work types file.
         progress (bool): if True, a progress bar is displayed during long tasks.
 
     Attributes:
@@ -29,7 +28,7 @@ class WorkTypesFeeder:
     def __init__(self, config, work_types_file_path, progress=True):
         # create objects
         self.dakara_server = DakaraServer(config["server"], endpoint_prefix="api")
-        self.work_types_file_path = Path(work_types_file_path)
+        self.work_types_file_path = work_types_file_path
         self.bar = progress_bar if progress else null_bar
 
     def load(self):
