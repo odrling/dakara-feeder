@@ -1,22 +1,24 @@
+"""Open YAML files safely."""
+
 import yaml
 from dakara_base.exceptions import DakaraError
 
 
 def get_yaml_file_content(file_path, key=None):
-    """Load content of the given YAML file
+    """Load content of the given YAML file.
 
     Arguments:
-        file_path (path.Path): path to the YAML file.
-        key (str): if given, only this key of the YAML file will be given. If
+        file_path (path.Path): Path to the YAML file.
+        key (str): If given, only this key of the YAML file will be given. If
             the key does not exist, raise an YamlContentInvalidError error.
 
     Returns:
-        dict: content of the tags file.
+        dict: Content of the tags file.
 
     Raises:
-        YamlFileNotFoundError: if the YAML file cannot be found.
-        YamlFileInvalidError: if the content of the YAML file cannot be parsed.
-        YamlContentInvalidError: if the requested `key` cannot be found in the
+        YamlFileNotFoundError: If the YAML file cannot be found.
+        YamlFileInvalidError: If the content of the YAML file cannot be parsed.
+        YamlContentInvalidError: If the requested `key` cannot be found in the
             content of the YAML file.
     """
     try:
@@ -45,12 +47,12 @@ def get_yaml_file_content(file_path, key=None):
 
 
 class YamlFileNotFoundError(DakaraError, FileNotFoundError):
-    """Exception raised if the YAML file does not exist"""
+    """Exception raised if the YAML file does not exist."""
 
 
 class YamlFileInvalidError(DakaraError):
-    """Exception raised if the YAML file is invalid"""
+    """Exception raised if the YAML file is invalid."""
 
 
 class YamlContentInvalidError(DakaraError):
-    """Exception raised if the content of the YAML file is unexpected"""
+    """Exception raised if the content of the YAML file is unexpected."""

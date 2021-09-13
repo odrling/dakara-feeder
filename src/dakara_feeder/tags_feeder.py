@@ -1,3 +1,5 @@
+"""Feeder for tags."""
+
 import logging
 
 from dakara_base.exceptions import DakaraError
@@ -12,17 +14,17 @@ logger = logging.getLogger(__name__)
 
 
 class TagsFeeder:
-    """Class for the Dakara tags feeder
+    """Class to feed the Dakara server database with tags.
 
     Args:
-        config (dict): dictionary of config.
-        tags_file_path (path.Path): path to the tags file.
-        progress (bool): if True, a progress bar is displayed during long tasks.
+        config (dict): Dictionary of config.
+        tags_file_path (path.Path): Path to the tags file.
+        progress (bool): If True, a progress bar is displayed during long tasks.
 
     Attributes:
-        bar (function): progress bar to use.
-        dakara_server (dakara_server.DakaraServer): client for the Dakara server.
-        tags_file_path (str): path to the tags file.
+        bar (function): Progress bar to use.
+        dakara_server (dakara_server.DakaraServer): Client for the Dakara server.
+        tags_file_path (str): Path to the tags file.
     """
 
     def __init__(self, config, tags_file_path, progress=True):
@@ -32,7 +34,7 @@ class TagsFeeder:
         self.bar = progress_bar if progress else null_bar
 
     def load(self):
-        """Execute side-effect initialization tasks"""
+        """Execute side-effect initialization tasks."""
         # check version
         check_version()
 
@@ -40,7 +42,7 @@ class TagsFeeder:
         self.dakara_server.authenticate()
 
     def feed(self):
-        """Execute the feeding action"""
+        """Execute the feeding action."""
         # load file and get the key
         tags = get_yaml_file_content(self.tags_file_path, "tags")
 
@@ -67,4 +69,4 @@ class TagsFeeder:
 
 
 class InvalidTag(DakaraError):
-    """Exception raised if a tag is invalid"""
+    """Exception raised if a tag is invalid."""

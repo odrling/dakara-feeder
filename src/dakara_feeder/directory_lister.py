@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def list_directory(path):
-    """List video files in given directory recursively.
+    """List song files in given directory recursively.
 
     Args:
         path (path.Path): Path of directory to scan.

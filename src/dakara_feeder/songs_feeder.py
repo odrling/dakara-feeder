@@ -1,4 +1,4 @@
-"""Feeder."""
+"""Feeder for songs."""
 
 import logging
 
@@ -22,15 +22,15 @@ SONGS_PER_CHUNK = 100
 
 
 class SongsFeeder:
-    """Class for the Dakara songs feeder.
+    """Class to feed the Dakara server database with songs.
 
     Args:
         config (dict): Dictionary of config.
         force_update (bool): If True, the feeder will re-parse and re-upload
             songs that do not seem to have changed.
-        prune (bool): if True, artists and works without songs are deleted at
+        prune (bool): If True, artists and works without songs are deleted at
             the end.
-        progress (bool): if True, a progress bar is displayed during long tasks.
+        progress (bool): If True, a progress bar is displayed during long tasks.
 
     Attributes:
         dakara_server (dakara_server.DakaraServer): Client for the Dakara server.
@@ -41,7 +41,7 @@ class SongsFeeder:
         bar (function): Progress bar to use.
         song_class_module_name (str): Module name of the custom song class to
             use.
-        song_class (class): custom song class to use. Must be a subclass of
+        song_class (type): Custom song class to use. Must be a subclass of
             `dakara_feeder.song.BaseSong`.
     """
 
@@ -72,7 +72,11 @@ class SongsFeeder:
         self.dakara_server.authenticate()
 
     def check_kara_folder_path(self):
-        """Check the kara folder is valid."""
+        """Check the kara folder is valid.
+
+        Raises:
+            KaraFolderNotFound: If the karaoke folder does not exist.
+        """
         if not self.kara_folder_path.isdir():
             raise KaraFolderNotFound(
                 "Karaoke folder '{}' does not exist".format(self.kara_folder_path)

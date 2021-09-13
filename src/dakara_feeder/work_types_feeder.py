@@ -1,3 +1,5 @@
+"""Feeder for work types."""
+
 import logging
 
 from dakara_base.exceptions import DakaraError
@@ -12,17 +14,17 @@ logger = logging.getLogger(__name__)
 
 
 class WorkTypesFeeder:
-    """Class for the Dakara work types feeder
+    """Class to feed the Dakara server database with work types.
 
     Args:
-        config (dict): dictionary of config.
-        work_types_file_path (path.Path): path to the work types file.
-        progress (bool): if True, a progress bar is displayed during long tasks.
+        config (dict): Dictionary of config.
+        work_types_file_path (path.Path): Path to the work types file.
+        progress (bool): If True, a progress bar is displayed during long tasks.
 
     Attributes:
-        bar (function): progress bar to use.
-        dakara_server (dakara_server.DakaraServer): client for the Dakara server.
-        work_types_file_path (str): path to the work types file.
+        bar (function): Progress bar to use.
+        dakara_server (dakara_server.DakaraServer): Client for the Dakara server.
+        work_types_file_path (str): Path to the work types file.
     """
 
     def __init__(self, config, work_types_file_path, progress=True):
@@ -32,7 +34,7 @@ class WorkTypesFeeder:
         self.bar = progress_bar if progress else null_bar
 
     def load(self):
-        """Execute side-effect initialization tasks"""
+        """Execute side-effect initialization tasks."""
         # check version
         check_version()
 
@@ -40,7 +42,7 @@ class WorkTypesFeeder:
         self.dakara_server.authenticate()
 
     def feed(self):
-        """Execute the feeding action"""
+        """Execute the feeding action."""
         # load file and get the key
         work_types = get_yaml_file_content(self.work_types_file_path, "worktypes")
 
@@ -80,4 +82,4 @@ class WorkTypesFeeder:
 
 
 class WorkTypeInvalidError(DakaraError):
-    """Exception raised if a work type is invalid"""
+    """Exception raised if a work type is invalid."""

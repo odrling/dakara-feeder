@@ -12,7 +12,7 @@ class DakaraServer(HTTPClient):
     """Client to the Dakara server."""
 
     def get_songs(self):
-        """Retreive the songs of the library containing their path
+        """Retreive the songs of the library containing their path.
 
         Returns:
             list: List of path on the songs.
@@ -55,32 +55,34 @@ class DakaraServer(HTTPClient):
         self.put(endpoint, json=song)
 
     def prune_artists(self):
-        """Prune artists without songs
+        """Prune artists without songs.
 
-        Return:
-            Number of deleted artists.
+        Returns:
+            int: Number of deleted artists.
         """
         endpoint = "library/artists/prune/"
         return self.delete(endpoint)["deleted_count"]
 
     def prune_works(self):
-        """Prune works without songs
+        """Prune works without songs.
 
         Return:
-            Number of deleted works.
+            int: Number of deleted works.
         """
         endpoint = "library/works/prune/"
         return self.delete(endpoint)["deleted_count"]
 
     def create_tag(self, tag):
-        """Create a tag on the server
+        """Create a tag on the server.
 
         Args:
-            tag: JSON representation of a tag.
+            tag (dict): JSON representation of a tag.
 
         Raises:
-            TagAlreadyExistsError: if the tag exists on the server, i.e. if the
+            TagAlreadyExistsError: If the tag exists on the server, i.e. if the
                 server returns 400.
+            dakara_base.http_client.ResponseInvalidError: If the response of
+                the server is not OK.
         """
 
         def on_error(response):
@@ -97,14 +99,16 @@ class DakaraServer(HTTPClient):
         self.post(endpoint, tag, function_on_error=on_error)
 
     def create_work_type(self, work_type):
-        """Create a work type on the server
+        """Create a work type on the server.
 
         Args:
-            work_type: JSON representation of a work type.
+            work_type (dict): JSON representation of a work type.
 
         Raises:
-            WorkTypeAlreadyExistsError: if the work type exists on the server,
+            WorkTypeAlreadyExistsError: If the work type exists on the server,
                 i.e. if the server returns 400.
+            dakara_base.http_client.ResponseInvalidError: If the response of
+                the server is not OK.
         """
 
         def on_error(response):
@@ -122,8 +126,8 @@ class DakaraServer(HTTPClient):
 
 
 class TagAlreadyExistsError(Exception):
-    """Error if a tag already exists"""
+    """Error if a tag already exists."""
 
 
 class WorkTypeAlreadyExistsError(Exception):
-    """Error if a work type already exists"""
+    """Error if a work type already exists."""
