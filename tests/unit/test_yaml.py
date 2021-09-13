@@ -4,7 +4,7 @@ from unittest.mock import patch
 from path import Path
 from yaml import YAMLError
 
-from dakara_feeder.yaml_opener import (
+from dakara_feeder.yaml import (
     YamlContentInvalidError,
     YamlFileInvalidError,
     YamlFileNotFoundError,
@@ -42,7 +42,7 @@ class GetYamlFileContentTestCase(TestCase):
         ):
             get_yaml_file_content(Path("path/to/file"))
 
-    @patch("dakara_feeder.yaml_opener.yaml.load")
+    @patch("dakara_feeder.yaml.yaml.load")
     def test_get_error_invalid(self, mocked_load, mocked_text):
         """Test to get an invalid YAML file"""
         # create the mock

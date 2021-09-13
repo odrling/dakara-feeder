@@ -2,8 +2,8 @@ from unittest import TestCase
 
 from path import Path
 
-from dakara_feeder import diff_generator
-from dakara_feeder.similarity_calculator import calculate_file_path_similarity
+from dakara_feeder import difference
+from dakara_feeder.similarity import calculate_file_path_similarity
 
 
 class GenerateDiffTestCase(TestCase):
@@ -11,7 +11,7 @@ class GenerateDiffTestCase(TestCase):
 
     def test_generate_diff_all_added(self):
         """Test to generate diff when all files are added."""
-        added, deleted, unchanged = diff_generator.generate_diff([], ["a", "b", "c"])
+        added, deleted, unchanged = difference.generate_diff([], ["a", "b", "c"])
 
         self.assertCountEqual(["a", "b", "c"], added)
         self.assertCountEqual([], deleted)
@@ -19,7 +19,7 @@ class GenerateDiffTestCase(TestCase):
 
     def test_generate_diff_all_deleted(self):
         """Test to generate diff when all files are deleted."""
-        added, deleted, unchanged = diff_generator.generate_diff(["a", "b", "c"], [])
+        added, deleted, unchanged = difference.generate_diff(["a", "b", "c"], [])
 
         self.assertCountEqual([], added)
         self.assertCountEqual(["a", "b", "c"], deleted)
@@ -27,7 +27,7 @@ class GenerateDiffTestCase(TestCase):
 
     def test_generate_diff_no_diff(self):
         """Test to generate diff when nothing has changed."""
-        added, deleted, unchanged = diff_generator.generate_diff(
+        added, deleted, unchanged = difference.generate_diff(
             ["a", "b", "c"], ["a", "b", "c"]
         )
 
@@ -37,7 +37,7 @@ class GenerateDiffTestCase(TestCase):
 
     def test_generate_diff(self):
         """Test to generate diff when some filse are added and some others deleted."""
-        added, deleted, unchanged = diff_generator.generate_diff(
+        added, deleted, unchanged = difference.generate_diff(
             ["a", "b", "c"], ["d", "b", "a"]
         )
 
@@ -66,7 +66,7 @@ class MatchSimilarTestCase(TestCase):
             Path("directory/oldfile.mkv"),
         ]
 
-        similar, remaining1, remaining2 = diff_generator.match_similar(
+        similar, remaining1, remaining2 = difference.match_similar(
             list1, list2, calculate_file_path_similarity
         )
 

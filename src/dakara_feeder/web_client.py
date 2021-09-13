@@ -8,8 +8,8 @@ from path import Path
 logger = logging.getLogger(__name__)
 
 
-class DakaraServer(HTTPClient):
-    """Client to the Dakara server."""
+class HTTPClientDakara(HTTPClient):
+    """Client to communicate with the Dakara server."""
 
     def get_songs(self):
         """Retreive the songs of the library containing their path.

@@ -8,7 +8,7 @@ try:
 except ImportError:
     from importlib_resources import path
 
-from dakara_feeder.subtitle_extractor import FFmpegSubtitleExtractor
+from dakara_feeder.subtitle.extraction import FFmpegSubtitleExtractor
 
 
 @skipUnless(FFmpegSubtitleExtractor.is_available(), "FFmpeg not installed")

@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from path import Path
 
-from dakara_feeder.similarity_calculator import calculate_file_path_similarity
+from dakara_feeder.similarity import calculate_file_path_similarity
 
 
 class CalculateFilePathSimilarityTestCase(TestCase):

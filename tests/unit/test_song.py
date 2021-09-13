@@ -4,10 +4,10 @@ from unittest.mock import patch
 
 from path import Path
 
-from dakara_feeder.directory_lister import SongPaths
-from dakara_feeder.metadata_parser import FFProbeMetadataParser, MediaParseError
+from dakara_feeder.directory import SongPaths
+from dakara_feeder.metadata import FFProbeMetadataParser, MediaParseError
 from dakara_feeder.song import BaseSong
-from dakara_feeder.subtitle_parser import Pysubs2SubtitleParser, SubtitleParseError
+from dakara_feeder.subtitle.parsing import Pysubs2SubtitleParser, SubtitleParseError
 
 
 class BaseSongTestCase(TestCase):
@@ -45,7 +45,7 @@ class BaseSongTestCase(TestCase):
 
     @patch.object(Pysubs2SubtitleParser, "parse", autoset=True)
     @patch.object(FFProbeMetadataParser, "parse", autoset=True)
-    def test_metadata_parser_error(self, mocked_metadata_parse, mocked_subtitle_parse):
+    def test_metadata_error(self, mocked_metadata_parse, mocked_subtitle_parse):
         """Test an invalid video file raises no exception but logs error."""
         # setup mocks
         mocked_metadata_parse.side_effect = MediaParseError("invalid")
