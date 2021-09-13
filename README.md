@@ -131,9 +131,9 @@ All data can coexist in the same file.
 #### Tags
 
 Tags will be searched in the key `tags`.
-Tags are identified by their name (it will be converted to upper case, it
+Tags are identified by their name (it will be displayed in upper case, it
 should be just one word).
-You can provide a color hue (positive integer starting at from 0 to 360):
+You can provide a color hue (positive integer from 0 to 360):
 
 ```yaml
 tags:
@@ -145,10 +145,10 @@ tags:
 
 #### Work types
 
-Work typos will be searched in the key `worktypes`
+Work types will be searched in the key `worktypes`
 Work types are identified by their query name (hyphenated name, with no special
-characters, used as key word for querying).
-You can provide a work type display name and a icon name (choosen among the
+characters, used as keyword for querying).
+You can provide a work type display name (singular and plural) and an icon name (choosen among the
 [FontAwesome](http://fontawesome.io/icons/) font glyphes):
 
 ```yaml
