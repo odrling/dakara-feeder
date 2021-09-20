@@ -49,29 +49,40 @@ pip install .
 
 ### Commands
 
-The package provides the `dakara-feed` command which will find songs in the configured directory, parse them and send their data to a running instance of the Dakara server:
+The package provides the `dakara-feeder feed` command for creating data on a running instance of the Dakara server.
+Several sub-commands are available.
+To begin, `dakara-feeder feed songs` will find songs in the configured directory, parse them and send their data:
 
 ```sh
-dakara-feed
+dakara-feeder feed songs
 # or
-python -m dakara_feed
+python -m dakara_feeder feed songs
 ```
 
 One instance of the Dakara server should be running.
+
+Then, `dakara-feeder feed tags` and `dakara-feeder feed work-types` will find tags and work types in a configuration file (seed [this section](#tags-and-work-types-file) for more details):
+
+```sh
+dakara-feeder feed tags path/to/tags.yaml
+# or
+python -m dakara_feeder feed tags path/to/tags.yaml
+```
+
 For more help:
 
 ```sh
-dakara-feed -h
+dakara-feeder -h
 # or
-python -m dakara_feed -h
+python -m dakara_feeder -h
 ```
 
 Before calling the function, you should create a config file with:
 
 ```sh
-dakara-feed create-config
+dakara-feeder create-config
 # or
-python -m dakara_feed create-config
+python -m dakara_feeder create-config
 ```
 
 and complete it with your values. The file is stored in your user space: `~/.config/dakara` on Linux or `$APPDATA\Dakara` on Windows.
@@ -96,7 +107,7 @@ class Song(BaseSong):
         return [{"name": self.video_path.stem.split(" - ")[1]}]
 ```
 
-The file must be in the same directory you are calling `dakara-feed`, or in any directory reachable by Python.
+The file must be in the same directory you are calling `dakara-feeder`, or in any directory reachable by Python.
 To register your customized `Song` class, you simply enable it in the config file:
 
 ```yaml
@@ -110,7 +121,47 @@ To register your customized `Song` class, you simply enable it in the config fil
 custom_song_class: my_song.Song
 ```
 
-Now, `dakara-feed` will use your customized `Song` class instead of the default one.
+Now, `dakara-feeder` will use your customized `Song` class instead of the default one.
+
+### Tags and work types file
+
+Whilst data from songs are extracted directly from song files, data from tags and work types are extracted from a YAML file.
+All data can coexist in the same file.
+
+#### Tags
+
+Tags will be searched in the key `tags`.
+Tags are identified by their name (it will be displayed in upper case, it
+should be just one word).
+You can provide a color hue (positive integer from 0 to 360):
+
+```yaml
+tags:
+  - name: PV
+    color_hue: 162
+  - name: AMV
+    color_hue: 140
+```
+
+#### Work types
+
+Work types will be searched in the key `worktypes`
+Work types are identified by their query name (hyphenated name, with no special
+characters, used as keyword for querying).
+You can provide a work type display name (singular and plural) and an icon name (choosen among the
+[FontAwesome](http://fontawesome.io/icons/) font glyphes):
+
+```yaml
+worktypes:
+  - query_name: anime
+    name: Anime
+    name_plural: Animes
+    icon_name: television
+  - query_name: live-action
+    name: Live action
+    name_plural: Live actions
+    icon_name: film
+```
 
 ## Development
 

@@ -1,4 +1,4 @@
-"""Feeder."""
+"""Feeder for songs."""
 
 import logging
 
@@ -21,13 +21,15 @@ logger = logging.getLogger(__name__)
 SONGS_PER_CHUNK = 100
 
 
-class DakaraFeeder:
-    """Class for the Dakara feeder.
+class SongsFeeder:
+    """Class to feed the Dakara server database with songs.
 
     Args:
         config (dict): Dictionary of config.
         force_update (bool): If True, the feeder will re-parse and re-upload
             songs that do not seem to have changed.
+        prune (bool): If True, artists and works without songs are deleted at
+            the end.
         progress (bool): If True, a progress bar is displayed during long tasks.
 
     Attributes:
@@ -39,15 +41,16 @@ class DakaraFeeder:
         bar (function): Progress bar to use.
         song_class_module_name (str): Module name of the custom song class to
             use.
-        Song (class): Custom song class to use. Must be a subclass of
+        song_class (type): Custom song class to use. Must be a subclass of
             `dakara_feeder.song.BaseSong`.
     """
 
-    def __init__(self, config, force_update=False, progress=True):
+    def __init__(self, config, force_update=False, prune=True, progress=True):
         # create objects
         self.dakara_server = DakaraServer(config["server"], endpoint_prefix="api")
         self.kara_folder_path = Path(config["kara_folder"])
         self.force_update = force_update
+        self.prune = prune
         self.songs_per_chunk = config["server"].get("songs_per_chunk", SONGS_PER_CHUNK)
         self.bar = progress_bar if progress else null_bar
         self.song_class_module_name = config.get("custom_song_class")
@@ -69,7 +72,11 @@ class DakaraFeeder:
         self.dakara_server.authenticate()
 
     def check_kara_folder_path(self):
-        """Check the kara folder is valid."""
+        """Check the kara folder is valid.
+
+        Raises:
+            KaraFolderNotFound: If the karaoke folder does not exist.
+        """
         if not self.kara_folder_path.isdir():
             raise KaraFolderNotFound(
                 "Karaoke folder '{}' does not exist".format(self.kara_folder_path)
@@ -159,6 +166,16 @@ class DakaraFeeder:
                 deleted_songs_path, text="Deleting removed songs"
             ):
                 self.dakara_server.delete_song(old_songs_id_by_path[song_path])
+
+        # prune artists and works without songs
+        if self.prune:
+            artists_deleted_count = self.dakara_server.prune_artists()
+            logger.info(
+                "Deleted %i artists without songs on server", artists_deleted_count
+            )
+
+            works_deleted_count = self.dakara_server.prune_works()
+            logger.info("Deleted %i works without songs on server", works_deleted_count)
 
 
 class KaraFolderNotFound(DakaraError):
