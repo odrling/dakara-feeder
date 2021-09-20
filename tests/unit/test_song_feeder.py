@@ -198,8 +198,10 @@ class SongsFeederTestCase(TestCase):
                 "INFO:dakara_feeder.songs_feeder:Found 1 songs to add",
                 "INFO:dakara_feeder.songs_feeder:Found 1 songs to delete",
                 "INFO:dakara_feeder.songs_feeder:Found 0 songs to update",
-                "INFO:dakara_feeder.songs_feeder:Deleted 2 artists and 1 works "
-                "without songs",
+                "INFO:dakara_feeder.songs_feeder:Deleted 2 artists without songs "
+                "on server",
+                "INFO:dakara_feeder.songs_feeder:Deleted 1 works without songs "
+                "on server",
             ],
         )
         self.assertListEqual(
@@ -272,8 +274,10 @@ class SongsFeederTestCase(TestCase):
                 "INFO:dakara_feeder.songs_feeder:Found 0 songs to add",
                 "INFO:dakara_feeder.songs_feeder:Found 0 songs to delete",
                 "INFO:dakara_feeder.songs_feeder:Found 1 songs to update",
-                "INFO:dakara_feeder.songs_feeder:Deleted 0 artists and 0 works "
-                "without songs",
+                "INFO:dakara_feeder.songs_feeder:Deleted 0 artists without songs "
+                "on server",
+                "INFO:dakara_feeder.songs_feeder:Deleted 0 works without songs "
+                "on server",
             ],
         )
 
@@ -340,8 +344,10 @@ class SongsFeederTestCase(TestCase):
                 "INFO:dakara_feeder.songs_feeder:Found 0 songs to add",
                 "INFO:dakara_feeder.songs_feeder:Found 0 songs to delete",
                 "INFO:dakara_feeder.songs_feeder:Found 1 songs to update",
-                "INFO:dakara_feeder.songs_feeder:Deleted 0 artists and 0 works "
-                "without songs",
+                "INFO:dakara_feeder.songs_feeder:Deleted 0 artists without songs "
+                "on server",
+                "INFO:dakara_feeder.songs_feeder:Deleted 0 works without songs "
+                "on server",
             ],
         )
 
@@ -486,8 +492,10 @@ class SongsFeederTestCase(TestCase):
                 "INFO:dakara_feeder.songs_feeder:Found 2 songs to add",
                 "INFO:dakara_feeder.songs_feeder:Found 0 songs to delete",
                 "INFO:dakara_feeder.songs_feeder:Found 0 songs to update",
-                "INFO:dakara_feeder.songs_feeder:Deleted 0 artists and 0 works "
-                "without songs",
+                "INFO:dakara_feeder.songs_feeder:Deleted 0 artists without songs "
+                "on server",
+                "INFO:dakara_feeder.songs_feeder:Deleted 0 works without songs "
+                "on server",
             ],
         )
 

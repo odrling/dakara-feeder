@@ -45,14 +45,15 @@ class TagsFeeder:
         """Execute the feeding action."""
         # load file and get the key
         tags = get_yaml_file_content(self.tags_file_path, "tags")
+        logger.info("Found %i tags to create", len(tags))
 
         for index, tag in enumerate(self.bar(tags, text="Tags to create")):
             # check expected fields are present
             if "name" not in tag:
-                raise InvalidTag("Tag {} must have a name".format(index))
+                raise InvalidTag("Tag #{} must have a name".format(index))
 
             if "color_hue" not in tag:
-                raise InvalidTag("Tag {} must have a color hue".format(index))
+                raise InvalidTag("Tag #{} must have a color hue".format(index))
 
             # create corret tag (remove unnecessary keys)
             tag_correct = clean_dict(tag, ["name", "color_hue"])

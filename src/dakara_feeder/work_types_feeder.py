@@ -45,6 +45,7 @@ class WorkTypesFeeder:
         """Execute the feeding action."""
         # load file and get the key
         work_types = get_yaml_file_content(self.work_types_file_path, "worktypes")
+        logger.info("Found %i work types to create", len(work_types))
 
         for index, work_type in enumerate(
             self.bar(work_types, text="WorkTypes to create")
@@ -52,17 +53,17 @@ class WorkTypesFeeder:
             # check expected fields are present
             if "query_name" not in work_type:
                 raise WorkTypeInvalidError(
-                    "Work type {} must have a query name".format(index)
+                    "Work type #{} must have a query name".format(index)
                 )
 
             if "name" not in work_type:
                 raise WorkTypeInvalidError(
-                    "Work type {} must have a name".format(index)
+                    "Work type #{} must have a name".format(index)
                 )
 
             if "name_plural" not in work_type:
                 raise WorkTypeInvalidError(
-                    "Work type {} must have a plural name".format(index)
+                    "Work type #{} must have a plural name".format(index)
                 )
 
             # create corret work type (remove unnecessary keys)

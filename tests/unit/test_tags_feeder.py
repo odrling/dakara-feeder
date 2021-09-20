@@ -54,7 +54,7 @@ class TagsFeederTestCase(TestCase):
         feeder = TagsFeeder(self.config, "path/to/file", progress=False)
 
         # call the method
-        with self.assertRaisesRegex(InvalidTag, "Tag 0 must have a name"):
+        with self.assertRaisesRegex(InvalidTag, "Tag #0 must have a name"):
             feeder.feed()
 
     @patch("dakara_feeder.tags_feeder.get_yaml_file_content", autoset=True)
@@ -70,7 +70,7 @@ class TagsFeederTestCase(TestCase):
         feeder = TagsFeeder(self.config, "path/to/file", progress=False)
 
         # call the method
-        with self.assertRaisesRegex(InvalidTag, "Tag 0 must have a color hue"):
+        with self.assertRaisesRegex(InvalidTag, "Tag #0 must have a color hue"):
             feeder.feed()
 
     @patch("dakara_feeder.tags_feeder.get_yaml_file_content", autoset=True)
@@ -96,7 +96,8 @@ class TagsFeederTestCase(TestCase):
         self.assertListEqual(
             logger.output,
             [
+                "INFO:dakara_feeder.tags_feeder:Found 1 tags to create",
                 "INFO:dakara_feeder.tags_feeder:Tag tag1 already exists on server and "
-                "will not be updated"
+                "will not be updated",
             ],
         )

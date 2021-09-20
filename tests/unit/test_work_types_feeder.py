@@ -69,7 +69,7 @@ class WorkTypesFeederTestCase(TestCase):
 
         # call the method
         with self.assertRaisesRegex(
-            WorkTypeInvalidError, "Work type 0 must have a query name"
+            WorkTypeInvalidError, "Work type #0 must have a query name"
         ):
             feeder.feed()
 
@@ -91,7 +91,7 @@ class WorkTypesFeederTestCase(TestCase):
 
         # call the method
         with self.assertRaisesRegex(
-            WorkTypeInvalidError, "Work type 0 must have a name"
+            WorkTypeInvalidError, "Work type #0 must have a name"
         ):
             feeder.feed()
 
@@ -109,7 +109,7 @@ class WorkTypesFeederTestCase(TestCase):
 
         # call the method
         with self.assertRaisesRegex(
-            WorkTypeInvalidError, "Work type 0 must have a plural name"
+            WorkTypeInvalidError, "Work type #0 must have a plural name"
         ):
             feeder.feed()
 
@@ -141,7 +141,8 @@ class WorkTypesFeederTestCase(TestCase):
         self.assertListEqual(
             logger.output,
             [
+                "INFO:dakara_feeder.work_types_feeder:Found 1 work types to create",
                 "INFO:dakara_feeder.work_types_feeder:Work type wt1 already exists on "
-                "server and will not be updated"
+                "server and will not be updated",
             ],
         )
