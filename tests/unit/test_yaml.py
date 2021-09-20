@@ -14,10 +14,10 @@ from dakara_feeder.yaml import (
 
 @patch.object(Path, "text", autoset=True)
 class GetYamlFileContentTestCase(TestCase):
-    """Test the get_yaml_file_content function"""
+    """Test the get_yaml_file_content function."""
 
     def test_get(self, mocked_text):
-        """Test to get a YAML file"""
+        """Test to get a YAML file."""
         # create the mock
         content = {"name": "tag1"}
         mocked_text.return_value = str(content)
@@ -32,7 +32,7 @@ class GetYamlFileContentTestCase(TestCase):
         mocked_text.assert_called_with()
 
     def test_get_error_not_found(self, mocked_text):
-        """Test to get a YAML file that does not exist"""
+        """Test to get a YAML file that does not exist."""
         # create the mock
         mocked_text.side_effect = FileNotFoundError()
 
@@ -44,7 +44,7 @@ class GetYamlFileContentTestCase(TestCase):
 
     @patch("dakara_feeder.yaml.yaml.load")
     def test_get_error_invalid(self, mocked_load, mocked_text):
-        """Test to get an invalid YAML file"""
+        """Test to get an invalid YAML file."""
         # create the mock
         content = [{"name": "tag1"}]
         mocked_text.return_value = str(content)
@@ -58,7 +58,7 @@ class GetYamlFileContentTestCase(TestCase):
             get_yaml_file_content(Path("path/to/file"))
 
     def test_get_key(self, mocked_text):
-        """Test to get the key of a YAML file"""
+        """Test to get the key of a YAML file."""
         # create the mock
         content = {"tags": {"name": "tag1"}}
         mocked_text.return_value = str(content)
@@ -73,7 +73,7 @@ class GetYamlFileContentTestCase(TestCase):
         mocked_text.assert_called_with()
 
     def test_get_key_error(self, mocked_text):
-        """Test to get a invalid key of a YAML file"""
+        """Test to get a invalid key of a YAML file."""
         # create the mock
         content = {"tags": {"name": "tag1"}}
         mocked_text.return_value = str(content)

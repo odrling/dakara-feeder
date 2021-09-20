@@ -199,6 +199,9 @@ def load_config_securely(debug=False):
 
     Returns:
         dict: config values.
+
+    Raises:
+        ConfigNotFoundError: If loading the config raises the same error.
     """
     create_logger(wrap=True)
 
@@ -223,17 +226,19 @@ def load_feeder_securely(feeder):
     """Securely load the feeder.
 
     Consider that the config is incomplete if it fails.
+
+    Raises:
+        DakaraError: If loading the feeder raises an equivalent error.
     """
     try:
         feeder.load()
 
     except DakaraError as error:
-        error.args = (
+        raise error.__class__(
             "{}\nConfig may be incomplete, please check '{}'".format(
-                str(error), get_config_file(CONFIG_FILE)
-            ),
-        )
-        raise
+                error, get_config_file(CONFIG_FILE)
+            )
+        ) from error
 
 
 def main():

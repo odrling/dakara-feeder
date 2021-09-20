@@ -198,8 +198,10 @@ class SongsFeederTestCase(TestCase):
                 "INFO:dakara_feeder.feeder.songs:Found 1 songs to add",
                 "INFO:dakara_feeder.feeder.songs:Found 1 songs to delete",
                 "INFO:dakara_feeder.feeder.songs:Found 0 songs to update",
-                "INFO:dakara_feeder.feeder.songs:Deleted 2 artists and 1 works "
-                "without songs",
+                "INFO:dakara_feeder.feeder.songs:Deleted 2 artists without songs "
+                "on server",
+                "INFO:dakara_feeder.feeder.songs:Deleted 1 works without songs "
+                "on server",
             ],
         )
         self.assertListEqual(
@@ -272,8 +274,10 @@ class SongsFeederTestCase(TestCase):
                 "INFO:dakara_feeder.feeder.songs:Found 0 songs to add",
                 "INFO:dakara_feeder.feeder.songs:Found 0 songs to delete",
                 "INFO:dakara_feeder.feeder.songs:Found 1 songs to update",
-                "INFO:dakara_feeder.feeder.songs:Deleted 0 artists and 0 works "
-                "without songs",
+                "INFO:dakara_feeder.feeder.songs:Deleted 0 artists without songs "
+                "on server",
+                "INFO:dakara_feeder.feeder.songs:Deleted 0 works without songs "
+                "on server",
             ],
         )
 
@@ -340,8 +344,10 @@ class SongsFeederTestCase(TestCase):
                 "INFO:dakara_feeder.feeder.songs:Found 0 songs to add",
                 "INFO:dakara_feeder.feeder.songs:Found 0 songs to delete",
                 "INFO:dakara_feeder.feeder.songs:Found 1 songs to update",
-                "INFO:dakara_feeder.feeder.songs:Deleted 0 artists and 0 works "
-                "without songs",
+                "INFO:dakara_feeder.feeder.songs:Deleted 0 artists without songs "
+                "on server",
+                "INFO:dakara_feeder.feeder.songs:Deleted 0 works without songs "
+                "on server",
             ],
         )
 
@@ -355,7 +361,7 @@ class SongsFeederTestCase(TestCase):
         mocked_subtitle_parse,
         mocked_http_client_class,
     ):
-        """Test to feed without prune artists and works without songs"""
+        """Test to feed without prune artists and works without songs."""
         # create the mocks
         mocked_http_client_class.return_value.get_songs.return_value = [
             {"id": 0, "path": Path("directory_0") / "song_0.mp4"}
@@ -486,8 +492,10 @@ class SongsFeederTestCase(TestCase):
                 "INFO:dakara_feeder.feeder.songs:Found 2 songs to add",
                 "INFO:dakara_feeder.feeder.songs:Found 0 songs to delete",
                 "INFO:dakara_feeder.feeder.songs:Found 0 songs to update",
-                "INFO:dakara_feeder.feeder.songs:Deleted 0 artists and 0 works "
-                "without songs",
+                "INFO:dakara_feeder.feeder.songs:Deleted 0 artists without songs "
+                "on server",
+                "INFO:dakara_feeder.feeder.songs:Deleted 0 works without songs "
+                "on server",
             ],
         )
 

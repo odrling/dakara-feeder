@@ -170,12 +170,12 @@ class SongsFeeder:
         # prune artists and works without songs
         if self.prune:
             artists_deleted_count = self.http_client.prune_artists()
-            works_deleted_count = self.http_client.prune_works()
             logger.info(
-                "Deleted {} artists and {} works without songs".format(
-                    artists_deleted_count, works_deleted_count
-                )
+                "Deleted %i artists without songs on server", artists_deleted_count
             )
+
+            works_deleted_count = self.http_client.prune_works()
+            logger.info("Deleted %i works without songs on server", works_deleted_count)
 
 
 class KaraFolderNotFound(DakaraError):

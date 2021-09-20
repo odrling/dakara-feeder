@@ -20,11 +20,11 @@ def clean_dict(target, keys):
     """Rebuild a new dictionary from requested keys.
 
     Args:
-        target (dict): dictionary to extract keys from.
-        keys (list): list of keys to extract. If one key cannot be found in
+        target (dict): Dictionary to extract keys from.
+        keys (list): List of keys to extract. If one key cannot be found in
             target, it will be ignored.
 
     Returns:
-        dict: dictionary with requested keys.
+        dict: Dictionary with requested keys.
     """
     return {key: target[key] for key in keys if key in target}
