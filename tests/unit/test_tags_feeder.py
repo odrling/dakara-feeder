@@ -1,12 +1,12 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from dakara_feeder.tags_feeder import InvalidTag, TagAlreadyExistsError, TagsFeeder
+from dakara_feeder.tags_feeder import TagAlreadyExistsError, TagInvalidError, TagsFeeder
 
 
 @patch("dakara_feeder.tags_feeder.DakaraServer", autoset=True)
 class TagsFeederTestCase(TestCase):
-    """Test the TestCase class"""
+    """Test the TestCase class."""
 
     def setUp(self):
         # create base config
@@ -14,7 +14,7 @@ class TagsFeederTestCase(TestCase):
 
     @patch("dakara_feeder.tags_feeder.check_version", autoset=True)
     def test_load(self, mocked_check_version, mocked_dakara_server_class):
-        """Test to run side-effect tasks"""
+        """Test to run side-effect tasks."""
         # create the object
         feeder = TagsFeeder(self.config, "path/to/file", progress=False)
 
@@ -27,7 +27,7 @@ class TagsFeederTestCase(TestCase):
 
     @patch("dakara_feeder.tags_feeder.get_yaml_file_content", autoset=True)
     def test_feed(self, mocked_get_yaml_file_content, mocked_dakara_server_class):
-        """Test to feed tags"""
+        """Test to feed tags."""
         # create the mock
         tag = {"name": "tag1", "color_hue": 180}
         mocked_get_yaml_file_content.return_value = [tag]
@@ -45,7 +45,7 @@ class TagsFeederTestCase(TestCase):
     def test_feed_error_no_name(
         self, mocked_get_yaml_file_content, mocked_dakara_server_class
     ):
-        """Test to feed a tag without name"""
+        """Test to feed a tag without name."""
         # create the mock
         tag = {"color_hue": 180}
         mocked_get_yaml_file_content.return_value = [tag]
@@ -54,14 +54,14 @@ class TagsFeederTestCase(TestCase):
         feeder = TagsFeeder(self.config, "path/to/file", progress=False)
 
         # call the method
-        with self.assertRaisesRegex(InvalidTag, "Tag #0 must have a name"):
+        with self.assertRaisesRegex(TagInvalidError, "Tag #0 must have a name"):
             feeder.feed()
 
     @patch("dakara_feeder.tags_feeder.get_yaml_file_content", autoset=True)
     def test_feed_error_no_hue(
         self, mocked_get_yaml_file_content, mocked_dakara_server_class
     ):
-        """Test to feed a tag without color hue"""
+        """Test to feed a tag without color hue."""
         # create the mock
         tag = {"name": "tag1"}
         mocked_get_yaml_file_content.return_value = [tag]
@@ -70,14 +70,14 @@ class TagsFeederTestCase(TestCase):
         feeder = TagsFeeder(self.config, "path/to/file", progress=False)
 
         # call the method
-        with self.assertRaisesRegex(InvalidTag, "Tag #0 must have a color hue"):
+        with self.assertRaisesRegex(TagInvalidError, "Tag #0 must have a color hue"):
             feeder.feed()
 
     @patch("dakara_feeder.tags_feeder.get_yaml_file_content", autoset=True)
     def test_feed_error_tag_exists(
         self, mocked_get_yaml_file_content, mocked_dakara_server_class
     ):
-        """Test to feed a tag that already exists"""
+        """Test to feed a tag that already exists."""
         # create the mocks
         tag = {"name": "tag1", "color_hue": 180}
         mocked_get_yaml_file_content.return_value = [tag]

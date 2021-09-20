@@ -361,7 +361,7 @@ class SongsFeederTestCase(TestCase):
         mocked_subtitle_parse,
         mocked_dakara_server_class,
     ):
-        """Test to feed without prune artists and works without songs"""
+        """Test to feed without prune artists and works without songs."""
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = [
             {"id": 0, "path": Path("directory_0") / "song_0.mp4"}

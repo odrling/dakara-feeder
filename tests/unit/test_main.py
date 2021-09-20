@@ -21,13 +21,13 @@ from dakara_feeder.work_types_feeder import WorkTypesFeeder
 
 
 class CreateConfigTestCase(TestCase):
-    """Test the create-config subcommand"""
+    """Test the create-config subcommand."""
 
     @patch("dakara_feeder.__main__.CONFIG_FILE", "feeder.yaml")
     @patch("dakara_feeder.__main__.create_logger")
     @patch("dakara_feeder.__main__.create_config_file")
     def test_create_config(self, mocked_create_config_file, mocked_create_logger):
-        """Test a normall config creation"""
+        """Test a normall config creation."""
         # call the function
         with self.assertLogs("dakara_feeder.__main__") as logger:
             create_config(Namespace(force=False))
@@ -48,7 +48,7 @@ class CreateConfigTestCase(TestCase):
 
 
 class FeedSongsTestCase(TestCase):
-    """Test the feed songs subcommand"""
+    """Test the feed songs subcommand."""
 
     @patch.object(SongsFeeder, "feed")
     @patch("dakara_feeder.__main__.load_feeder_securely")
@@ -59,7 +59,7 @@ class FeedSongsTestCase(TestCase):
         mocked_load_feeder,
         mocked_feed,
     ):
-        """Test to feed songs"""
+        """Test to feed songs."""
         # setup the mocks
         config = {
             "kara_folder": Path("path") / "to" / "folder",
@@ -81,7 +81,7 @@ class FeedSongsTestCase(TestCase):
 
 
 class FeedTagsTestCase(TestCase):
-    """Test the feed tags subcommand"""
+    """Test the feed tags subcommand."""
 
     @patch.object(TagsFeeder, "feed")
     @patch("dakara_feeder.__main__.load_feeder_securely")
@@ -92,7 +92,7 @@ class FeedTagsTestCase(TestCase):
         mocked_load_feeder,
         mocked_feed,
     ):
-        """Test to feed tags"""
+        """Test to feed tags."""
         # setup the mocks
         config = {
             "kara_folder": Path("path") / "to" / "folder",
@@ -118,7 +118,7 @@ class FeedTagsTestCase(TestCase):
 
 
 class FeedWorkTypesTestCase(TestCase):
-    """Test the feed work types subcommand"""
+    """Test the feed work types subcommand."""
 
     @patch.object(WorkTypesFeeder, "feed")
     @patch("dakara_feeder.__main__.load_feeder_securely")
@@ -129,7 +129,7 @@ class FeedWorkTypesTestCase(TestCase):
         mocked_load_feeder,
         mocked_feed,
     ):
-        """Test to feed work types"""
+        """Test to feed work types."""
         # setup the mocks
         config = {
             "kara_folder": Path("path") / "to" / "folder",
@@ -168,7 +168,7 @@ class LoadConfigSafelyTestCase(TestCase):
         mocked_load_config,
         mocked_set_loglevel,
     ):
-        """Test to load config"""
+        """Test to load config."""
         # create the mocks
         config = {"key": "value"}
         mocked_get_config_file.return_value = Path("path") / "to" / "config"
@@ -197,7 +197,7 @@ class LoadConfigSafelyTestCase(TestCase):
         mocked_load_config,
         mocked_set_loglevel,
     ):
-        """Test to load config when the file is not found"""
+        """Test to load config when the file is not found."""
         # create the mocks
         mocked_get_config_file.return_value = Path("path") / "to" / "config"
         mocked_load_config.side_effect = ConfigNotFoundError("Config file not found")
@@ -222,7 +222,7 @@ class LoadFeederSafelyTestCase(TestCase):
         self,
         mocked_get_config_file,
     ):
-        """Test to load feeder"""
+        """Test to load feeder."""
         # create the mocks
         feeder = MagicMock()
         mocked_get_config_file.return_value = Path("path") / "to" / "config"
@@ -239,7 +239,7 @@ class LoadFeederSafelyTestCase(TestCase):
         self,
         mocked_get_config_file,
     ):
-        """Test to load feeder when config file is incomplete"""
+        """Test to load feeder when config file is incomplete."""
         # create the mocks
         feeder = MagicMock()
         feeder.load.side_effect = DakaraError("Any error message")
@@ -264,10 +264,10 @@ class LoadFeederSafelyTestCase(TestCase):
 @patch("dakara_feeder.__main__.exit")
 @patch.object(ArgumentParser, "parse_args")
 class MainTestCase(TestCase):
-    """Test the main action"""
+    """Test the main action."""
 
     def test_normal_exit(self, mocked_parse_args, mocked_exit):
-        """Test a normal exit"""
+        """Test a normal exit."""
         # create mocks
         function = MagicMock()
         mocked_parse_args.return_value = Namespace(function=function, debug=False)
@@ -280,7 +280,7 @@ class MainTestCase(TestCase):
         mocked_exit.assert_called_with(0)
 
     def test_keyboard_interrupt(self, mocked_parse_args, mocked_exit):
-        """Test a Ctrl+C exit"""
+        """Test a Ctrl+C exit."""
         # create mocks
         def function(args):
             raise KeyboardInterrupt()
@@ -300,7 +300,7 @@ class MainTestCase(TestCase):
         )
 
     def test_known_error(self, mocked_parse_args, mocked_exit):
-        """Test a known error exit"""
+        """Test a known error exit."""
         # create mocks
         def function(args):
             raise DakaraError("error")
@@ -318,7 +318,7 @@ class MainTestCase(TestCase):
         self.assertListEqual(logger.output, ["CRITICAL:dakara_feeder.__main__:error"])
 
     def test_known_error_debug(self, mocked_parse_args, mocked_exit):
-        """Test a known error exit in debug mode"""
+        """Test a known error exit in debug mode."""
         # create mocks
         def function(args):
             raise DakaraError("error message")
@@ -333,7 +333,7 @@ class MainTestCase(TestCase):
         mocked_exit.assert_not_called()
 
     def test_unknown_error(self, mocked_parse_args, mocked_exit):
-        """Test an unknown error exit"""
+        """Test an unknown error exit."""
         # create mocks
         def function(args):
             raise Exception("error")
@@ -358,7 +358,7 @@ class MainTestCase(TestCase):
         )
 
     def test_unknown_error_debug(self, mocked_parse_args, mocked_exit):
-        """Test an unknown error exit in debug mode"""
+        """Test an unknown error exit in debug mode."""
         # create mocks
         def function(args):
             raise Exception("error message")

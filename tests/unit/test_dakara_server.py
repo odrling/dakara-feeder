@@ -125,7 +125,7 @@ class DakaraServerTestCase(TestCase):
 
     @patch.object(dakara_server.DakaraServer, "delete", autoset=True)
     def test_prune_artists(self, mocked_delete):
-        """Test to prune artists"""
+        """Test to prune artists."""
         # mock objects
         mocked_delete.return_value = {"deleted_count": 2}
 
@@ -145,7 +145,7 @@ class DakaraServerTestCase(TestCase):
 
     @patch.object(dakara_server.DakaraServer, "delete", autoset=True)
     def test_prune_works(self, mocked_delete):
-        """Test to prune works"""
+        """Test to prune works."""
         # mock objects
         mocked_delete.return_value = {"deleted_count": 2}
 
@@ -165,7 +165,7 @@ class DakaraServerTestCase(TestCase):
 
     @patch.object(dakara_server.DakaraServer, "post", autoset=True)
     def test_create_tag(self, mocked_post):
-        """Test to create tag"""
+        """Test to create tag."""
         # create the object
         server = dakara_server.DakaraServer(
             self.config, endpoint_prefix=self.endpoint_prefix
@@ -182,7 +182,7 @@ class DakaraServerTestCase(TestCase):
 
     @patch("dakara_base.http_client.requests.post", autoset=True)
     def test_create_tag_error_already_exists(self, mocked_post):
-        """Test to create tag that already exists"""
+        """Test to create tag that already exists."""
         # create the mock
         mocked_post.return_value.ok = False
         mocked_post.return_value.status_code = 400
@@ -209,7 +209,7 @@ class DakaraServerTestCase(TestCase):
 
     @patch("dakara_base.http_client.requests.post", autoset=True)
     def test_create_tag_error_other(self, mocked_post):
-        """Test an unknown problem when creating a tag"""
+        """Test an unknown problem when creating a tag."""
         # create the mock
         mocked_post.return_value.ok = False
         mocked_post.return_value.status_code = 999
@@ -238,7 +238,7 @@ class DakaraServerTestCase(TestCase):
 
     @patch.object(dakara_server.DakaraServer, "post", autoset=True)
     def test_create_work_type(self, mocked_post):
-        """Test to create work type"""
+        """Test to create work type."""
         # create the object
         server = dakara_server.DakaraServer(
             self.config, endpoint_prefix=self.endpoint_prefix
@@ -257,7 +257,7 @@ class DakaraServerTestCase(TestCase):
 
     @patch("dakara_base.http_client.requests.post", autoset=True)
     def test_create_work_type_error_already_exists(self, mocked_post):
-        """Test to create work type that already exists"""
+        """Test to create work type that already exists."""
         # create the mock
         mocked_post.return_value.ok = False
         mocked_post.return_value.status_code = 400
@@ -284,7 +284,7 @@ class DakaraServerTestCase(TestCase):
 
     @patch("dakara_base.http_client.requests.post", autoset=True)
     def test_create_work_type_error_other(self, mocked_post):
-        """Test an unknown problem when creating a work type"""
+        """Test an unknown problem when creating a work type."""
         # create the mock
         mocked_post.return_value.ok = False
         mocked_post.return_value.status_code = 999

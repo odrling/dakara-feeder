@@ -42,7 +42,12 @@ class WorkTypesFeeder:
         self.dakara_server.authenticate()
 
     def feed(self):
-        """Execute the feeding action."""
+        """Execute the feeding action.
+
+        Raises:
+            WorkTypeInvalidError: If the work type has either no query name, no
+                name or plural name.
+        """
         # load file and get the key
         work_types = get_yaml_file_content(self.work_types_file_path, "worktypes")
         logger.info("Found %i work types to create", len(work_types))

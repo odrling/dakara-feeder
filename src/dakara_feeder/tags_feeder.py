@@ -42,7 +42,11 @@ class TagsFeeder:
         self.dakara_server.authenticate()
 
     def feed(self):
-        """Execute the feeding action."""
+        """Execute the feeding action.
+
+        Raises:
+            TagInvalidError: If the tag has either no name, or no color hue.
+        """
         # load file and get the key
         tags = get_yaml_file_content(self.tags_file_path, "tags")
         logger.info("Found %i tags to create", len(tags))
@@ -50,10 +54,10 @@ class TagsFeeder:
         for index, tag in enumerate(self.bar(tags, text="Tags to create")):
             # check expected fields are present
             if "name" not in tag:
-                raise InvalidTag("Tag #{} must have a name".format(index))
+                raise TagInvalidError("Tag #{} must have a name".format(index))
 
             if "color_hue" not in tag:
-                raise InvalidTag("Tag #{} must have a color hue".format(index))
+                raise TagInvalidError("Tag #{} must have a color hue".format(index))
 
             # create corret tag (remove unnecessary keys)
             tag_correct = clean_dict(tag, ["name", "color_hue"])
@@ -69,5 +73,5 @@ class TagsFeeder:
                 )
 
 
-class InvalidTag(DakaraError):
+class TagInvalidError(DakaraError):
     """Exception raised if a tag is invalid."""

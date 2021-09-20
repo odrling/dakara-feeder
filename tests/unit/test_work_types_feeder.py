@@ -10,7 +10,7 @@ from dakara_feeder.work_types_feeder import (
 
 @patch("dakara_feeder.work_types_feeder.DakaraServer", autoset=True)
 class WorkTypesFeederTestCase(TestCase):
-    """Test the WorkTypesFeeder class"""
+    """Test the WorkTypesFeeder class."""
 
     def setUp(self):
         # create base config
@@ -18,7 +18,7 @@ class WorkTypesFeederTestCase(TestCase):
 
     @patch("dakara_feeder.work_types_feeder.check_version", autoset=True)
     def test_load(self, mocked_check_version, mocked_dakara_server_class):
-        """Test to run side-effect tasks"""
+        """Test to run side-effect tasks."""
         # create the object
         feeder = WorkTypesFeeder(self.config, "path/to/file", progress=False)
 
@@ -31,7 +31,7 @@ class WorkTypesFeederTestCase(TestCase):
 
     @patch("dakara_feeder.work_types_feeder.get_yaml_file_content", autoset=True)
     def test_feed(self, mocked_get_yaml_file_content, mocked_dakara_server_class):
-        """Test to feed work types"""
+        """Test to feed work types."""
         # create the mock
         work_type = {
             "query_name": "wt1",
@@ -55,7 +55,7 @@ class WorkTypesFeederTestCase(TestCase):
     def test_feed_error_no_query_name(
         self, mocked_get_yaml_file_content, mocked_dakara_server_class
     ):
-        """Test to feed a work type without query name"""
+        """Test to feed a work type without query name."""
         # create the mock
         work_type = {
             "name": "Work Type 1",
@@ -77,7 +77,7 @@ class WorkTypesFeederTestCase(TestCase):
     def test_feed_error_no_name(
         self, mocked_get_yaml_file_content, mocked_dakara_server_class
     ):
-        """Test to feed a work type without name"""
+        """Test to feed a work type without name."""
         # create the mock
         work_type = {
             "query_name": "wt1",
@@ -99,7 +99,7 @@ class WorkTypesFeederTestCase(TestCase):
     def test_feed_error_no_name_plural(
         self, mocked_get_yaml_file_content, mocked_dakara_server_class
     ):
-        """Test to feed a work type without plural name"""
+        """Test to feed a work type without plural name."""
         # create the mock
         work_type = {"query_name": "wt1", "name": "Work Type 1", "icon_name": "icon_1"}
         mocked_get_yaml_file_content.return_value = [work_type]
@@ -117,7 +117,7 @@ class WorkTypesFeederTestCase(TestCase):
     def test_feed_error_work_type_exists(
         self, mocked_get_yaml_file_content, mocked_dakara_server_class
     ):
-        """Test to feed a work type that already exists"""
+        """Test to feed a work type that already exists."""
         # create the mocks
         work_type = {
             "query_name": "wt1",
