@@ -273,3 +273,7 @@ def main():
         value = 128
 
     exit(value)
+
+
+if __name__ == "__main__":
+    main()
