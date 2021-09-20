@@ -17,7 +17,7 @@ class DakaraServer(HTTPClient):
         Returns:
             list: List of path on the songs.
         """
-        endpoint = "library/feeder/retrieve/"
+        endpoint = "library/songs/retrieve/"
         songs = self.get(endpoint)
 
         # join the directory and the filename

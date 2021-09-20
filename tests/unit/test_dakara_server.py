@@ -57,7 +57,7 @@ class DakaraServerTestCase(TestCase):
         )
 
         # assert the mock
-        mocked_get.assert_called_with("library/feeder/retrieve/")
+        mocked_get.assert_called_with("library/songs/retrieve/")
 
     @patch.object(dakara_server.DakaraServer, "post", autoset=True)
     def test_post_song(self, mocked_post):
