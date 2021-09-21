@@ -134,7 +134,7 @@ class SongsFeederTestCase(TestCase):
     ):
         """Test to feed."""
         # create the mocks
-        mocked_http_client_class.return_value.get_songs.return_value = [
+        mocked_http_client_class.return_value.retrieve_songs.return_value = [
             {"id": 0, "path": Path("directory_0") / "song_0.mp4"},
             {"id": 1, "path": Path("directory_1") / "music_1.mp4"},
         ]
@@ -162,7 +162,7 @@ class SongsFeederTestCase(TestCase):
                 feeder.feed()
 
         # assert the mocked calls
-        mocked_http_client_class.return_value.get_songs.assert_called_with()
+        mocked_http_client_class.return_value.retrieve_songs.assert_called_with()
         mocked_list_directory.assert_called_with("basepath")
         mocked_http_client_class.return_value.post_song.assert_called_with(
             [
@@ -220,7 +220,7 @@ class SongsFeederTestCase(TestCase):
     ):
         """Test feed when a file has been renamed."""
         # mock content of server (old files)
-        mocked_http_client_class.return_value.get_songs.return_value = [
+        mocked_http_client_class.return_value.retrieve_songs.return_value = [
             {"id": 0, "path": Path("directory_0") / "song.mp4"},
             {"id": 1, "path": Path("directory_1") / "music.mp4"},
         ]
@@ -247,7 +247,7 @@ class SongsFeederTestCase(TestCase):
                 feeder.feed()
 
         # assert the mocked calls
-        mocked_http_client_class.return_value.get_songs.assert_called_with()
+        mocked_http_client_class.return_value.retrieve_songs.assert_called_with()
         mocked_list_directory.assert_called_with("basepath")
         mocked_http_client_class.return_value.put_song.assert_called_with(
             1,
@@ -293,7 +293,7 @@ class SongsFeederTestCase(TestCase):
     ):
         """Test to feed."""
         # create the mocks
-        mocked_http_client_class.return_value.get_songs.return_value = [
+        mocked_http_client_class.return_value.retrieve_songs.return_value = [
             {"id": 1, "path": Path("music_1.mp4")}
         ]
         mocked_http_client_class.return_value.prune_artists.return_value = 0
@@ -316,7 +316,7 @@ class SongsFeederTestCase(TestCase):
                 feeder.feed()
 
         # assert the mocked calls
-        mocked_http_client_class.return_value.get_songs.assert_called_with()
+        mocked_http_client_class.return_value.retrieve_songs.assert_called_with()
         mocked_list_directory.assert_called_with("basepath")
         mocked_http_client_class.return_value.put_song.assert_called_with(
             1,
@@ -363,7 +363,7 @@ class SongsFeederTestCase(TestCase):
     ):
         """Test to feed without prune artists and works without songs."""
         # create the mocks
-        mocked_http_client_class.return_value.get_songs.return_value = [
+        mocked_http_client_class.return_value.retrieve_songs.return_value = [
             {"id": 0, "path": Path("directory_0") / "song_0.mp4"}
         ]
         mocked_list_directory.return_value = [
@@ -382,7 +382,7 @@ class SongsFeederTestCase(TestCase):
             feeder.feed()
 
         # assert the mocked calls
-        mocked_http_client_class.return_value.get_songs.assert_called_with()
+        mocked_http_client_class.return_value.retrieve_songs.assert_called_with()
         mocked_list_directory.assert_called_with("basepath")
         mocked_http_client_class.return_value.post_song.assert_not_called()
         mocked_http_client_class.return_value.delete_song.assert_not_called()
@@ -413,7 +413,7 @@ class SongsFeederTestCase(TestCase):
     ):
         """Test to create two songs."""
         # create the mocks
-        mocked_http_client_class.return_value.get_songs.return_value = []
+        mocked_http_client_class.return_value.retrieve_songs.return_value = []
         mocked_http_client_class.return_value.prune_artists.return_value = 0
         mocked_http_client_class.return_value.prune_works.return_value = 0
         mocked_list_directory.return_value = [
@@ -434,7 +434,7 @@ class SongsFeederTestCase(TestCase):
                 feeder.feed()
 
         # assert the mocked calls
-        mocked_http_client_class.return_value.get_songs.assert_called_with()
+        mocked_http_client_class.return_value.retrieve_songs.assert_called_with()
         mocked_list_directory.assert_called_with("basepath")
         songs = [
             {
@@ -506,7 +506,7 @@ class SongsFeederTestCase(TestCase):
     ):
         """Test to feed using a custom song class."""
         # create the mocks
-        mocked_http_client_class.return_value.get_songs.return_value = []
+        mocked_http_client_class.return_value.retrieve_songs.return_value = []
         mocked_http_client_class.return_value.prune_artists.return_value = 0
         mocked_http_client_class.return_value.prune_works.return_value = 0
         mocked_list_directory.return_value = [
@@ -569,7 +569,7 @@ class SongsFeederTestCase(TestCase):
     ):
         """Test to feed a song with an extra audio file."""
         # create the mocks
-        mocked_http_client_class.return_value.get_songs.return_value = []
+        mocked_http_client_class.return_value.retrieve_songs.return_value = []
         mocked_list_directory.return_value = [
             SongPaths(
                 Path("music_1.mp4"),
@@ -595,7 +595,7 @@ class SongsFeederTestCase(TestCase):
             feeder.feed()
 
         # assert the mocked calls
-        mocked_http_client_class.return_value.get_songs.assert_called_with()
+        mocked_http_client_class.return_value.retrieve_songs.assert_called_with()
         mocked_list_directory.assert_called_with("basepath")
         mocked_http_client_class.return_value.post_song.assert_called_with(
             [

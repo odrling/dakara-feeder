@@ -31,7 +31,7 @@ class HTTPClientDakaraTestCase(TestCase):
         }
 
     @patch.object(web_client.HTTPClientDakara, "get", autoset=True)
-    def test_get_songs(self, mocked_get):
+    def test_retrieve_songs(self, mocked_get):
         """Test to obtain the list of song paths."""
         # create the mock
         mocked_get.return_value = [
@@ -45,7 +45,7 @@ class HTTPClientDakaraTestCase(TestCase):
         )
 
         # call the method
-        songs_list = http_client.get_songs()
+        songs_list = http_client.retrieve_songs()
 
         # assert the songs are present and filename and directory is joined
         self.assertCountEqual(
@@ -164,7 +164,7 @@ class HTTPClientDakaraTestCase(TestCase):
         mocked_delete.assert_called_with("library/works/prune/")
 
     @patch.object(web_client.HTTPClientDakara, "post", autoset=True)
-    def test_create_tag(self, mocked_post):
+    def test_post_tag(self, mocked_post):
         """Test to create tag."""
         # create the object
         http_client = web_client.HTTPClientDakara(
@@ -175,13 +175,13 @@ class HTTPClientDakaraTestCase(TestCase):
         tag = {"name": "tag1", "color_hue": 250}
 
         # call the method
-        http_client.create_tag(tag)
+        http_client.post_tag(tag)
 
         # assert the call
         mocked_post.assert_called_with("library/song-tags/", tag, function_on_error=ANY)
 
     @patch("dakara_base.http_client.requests.post", autoset=True)
-    def test_create_tag_error_already_exists(self, mocked_post):
+    def test_post_tag_error_already_exists(self, mocked_post):
         """Test to create tag that already exists."""
         # create the mock
         mocked_post.return_value.ok = False
@@ -200,7 +200,7 @@ class HTTPClientDakaraTestCase(TestCase):
 
         # call the method
         with self.assertRaises(web_client.TagAlreadyExistsError):
-            http_client.create_tag(tag)
+            http_client.post_tag(tag)
 
         # assert the call
         mocked_post.assert_called_with(
@@ -208,7 +208,7 @@ class HTTPClientDakaraTestCase(TestCase):
         )
 
     @patch("dakara_base.http_client.requests.post", autoset=True)
-    def test_create_tag_error_other(self, mocked_post):
+    def test_post_tag_error_other(self, mocked_post):
         """Test an unknown problem when creating a tag."""
         # create the mock
         mocked_post.return_value.ok = False
@@ -228,7 +228,7 @@ class HTTPClientDakaraTestCase(TestCase):
 
         # call the method
         with self.assertRaises(web_client.ResponseInvalidError) as error:
-            http_client.create_tag(tag)
+            http_client.post_tag(tag)
 
         # assert the error
         self.assertEqual(
@@ -237,7 +237,7 @@ class HTTPClientDakaraTestCase(TestCase):
         )
 
     @patch.object(web_client.HTTPClientDakara, "post", autoset=True)
-    def test_create_work_type(self, mocked_post):
+    def test_post_work_type(self, mocked_post):
         """Test to create work type."""
         # create the object
         http_client = web_client.HTTPClientDakara(
@@ -248,7 +248,7 @@ class HTTPClientDakaraTestCase(TestCase):
         work_type = {"query_name": "wt1", "name": "Work Type 1"}
 
         # call the method
-        http_client.create_work_type(work_type)
+        http_client.post_work_type(work_type)
 
         # assert the call
         mocked_post.assert_called_with(
@@ -256,7 +256,7 @@ class HTTPClientDakaraTestCase(TestCase):
         )
 
     @patch("dakara_base.http_client.requests.post", autoset=True)
-    def test_create_work_type_error_already_exists(self, mocked_post):
+    def test_post_work_type_error_already_exists(self, mocked_post):
         """Test to create work type that already exists."""
         # create the mock
         mocked_post.return_value.ok = False
@@ -275,7 +275,7 @@ class HTTPClientDakaraTestCase(TestCase):
 
         # call the method
         with self.assertRaises(web_client.WorkTypeAlreadyExistsError):
-            http_client.create_work_type(work_type)
+            http_client.post_work_type(work_type)
 
         # assert the call
         mocked_post.assert_called_with(
@@ -283,7 +283,7 @@ class HTTPClientDakaraTestCase(TestCase):
         )
 
     @patch("dakara_base.http_client.requests.post", autoset=True)
-    def test_create_work_type_error_other(self, mocked_post):
+    def test_post_work_type_error_other(self, mocked_post):
         """Test an unknown problem when creating a work type."""
         # create the mock
         mocked_post.return_value.ok = False
@@ -306,4 +306,4 @@ class HTTPClientDakaraTestCase(TestCase):
             web_client.ResponseInvalidError,
             "Error 999 when communicating with the server: error message",
         ):
-            http_client.create_work_type(work_type)
+            http_client.post_work_type(work_type)

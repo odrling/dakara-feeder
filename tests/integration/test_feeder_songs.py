@@ -21,7 +21,7 @@ class SongsFeederIntegrationTestCase(TestCase):
     def test_feed(self, mocked_dakara_server_class):
         """Test to feed."""
         # create the mocks
-        mocked_dakara_server_class.return_value.get_songs.return_value = []
+        mocked_dakara_server_class.return_value.retrieve_songs.return_value = []
 
         # create the object
         with TempDir() as temp:
@@ -41,7 +41,7 @@ class SongsFeederIntegrationTestCase(TestCase):
                     feeder.feed()
 
         # assert the mocked calls
-        mocked_dakara_server_class.return_value.get_songs.assert_called_with()
+        mocked_dakara_server_class.return_value.retrieve_songs.assert_called_with()
         mocked_dakara_server_class.return_value.post_song.assert_called_with(
             [
                 {

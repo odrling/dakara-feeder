@@ -39,7 +39,7 @@ class TagsFeederTestCase(TestCase):
         feeder.feed()
 
         # assert the call
-        mocked_http_client_class.return_value.create_tag.assert_called_with(tag)
+        mocked_http_client_class.return_value.post_tag.assert_called_with(tag)
 
     @patch("dakara_feeder.feeder.tags.get_yaml_file_content", autoset=True)
     def test_feed_error_no_name(
@@ -81,7 +81,7 @@ class TagsFeederTestCase(TestCase):
         # create the mocks
         tag = {"name": "tag1", "color_hue": 180}
         mocked_get_yaml_file_content.return_value = [tag]
-        mocked_http_client_class.return_value.create_tag.side_effect = (
+        mocked_http_client_class.return_value.post_tag.side_effect = (
             TagAlreadyExistsError
         )
 

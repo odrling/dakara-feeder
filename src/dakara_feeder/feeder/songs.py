@@ -85,7 +85,7 @@ class SongsFeeder:
     def feed(self):
         """Execute the feeding action."""
         # get list of songs on the server
-        old_songs = self.http_client.get_songs()
+        old_songs = self.http_client.retrieve_songs()
         logger.info("Found %i songs in server", len(old_songs))
 
         old_songs_id_by_path = {song["path"]: song["id"] for song in old_songs}

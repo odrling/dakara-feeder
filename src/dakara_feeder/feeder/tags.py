@@ -64,7 +64,7 @@ class TagsFeeder:
 
             # try to create tag on server
             try:
-                self.http_client.create_tag(tag_correct)
+                self.http_client.post_tag(tag_correct)
 
             except TagAlreadyExistsError:
                 logger.info(

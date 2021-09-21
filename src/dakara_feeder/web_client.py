@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class HTTPClientDakara(HTTPClient):
     """Client to communicate with the Dakara server."""
 
-    def get_songs(self):
+    def retrieve_songs(self):
         """Retreive the songs of the library containing their path.
 
         Returns:
@@ -72,7 +72,7 @@ class HTTPClientDakara(HTTPClient):
         endpoint = "library/works/prune/"
         return self.delete(endpoint)["deleted_count"]
 
-    def create_tag(self, tag):
+    def post_tag(self, tag):
         """Create a tag on the server.
 
         Args:
@@ -98,7 +98,7 @@ class HTTPClientDakara(HTTPClient):
         endpoint = "library/song-tags/"
         self.post(endpoint, tag, function_on_error=on_error)
 
-    def create_work_type(self, work_type):
+    def post_work_type(self, work_type):
         """Create a work type on the server.
 
         Args:

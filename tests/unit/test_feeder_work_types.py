@@ -47,7 +47,7 @@ class WorkTypesFeederTestCase(TestCase):
         feeder.feed()
 
         # assert the call
-        mocked_http_client_class.return_value.create_work_type.assert_called_with(
+        mocked_http_client_class.return_value.post_work_type.assert_called_with(
             work_type
         )
 
@@ -126,7 +126,7 @@ class WorkTypesFeederTestCase(TestCase):
             "icon_name": "icon_1",
         }
         mocked_get_yaml_file_content.return_value = [work_type]
-        mocked_http_client_class.return_value.create_work_type.side_effect = (
+        mocked_http_client_class.return_value.post_work_type.side_effect = (
             WorkTypeAlreadyExistsError
         )
 

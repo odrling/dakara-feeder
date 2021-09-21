@@ -78,7 +78,7 @@ class WorkTypesFeeder:
 
             # try to create work type on server
             try:
-                self.http_client.create_work_type(work_type_correct)
+                self.http_client.post_work_type(work_type_correct)
 
             except WorkTypeAlreadyExistsError:
                 logger.info(
