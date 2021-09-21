@@ -11,36 +11,32 @@ except ImportError:
 
 from dakara_feeder.subtitle_parser import (
     Pysubs2SubtitleParser,
-    SubtitleParseError,
     SubtitleNotFoundError,
+    SubtitleParseError,
     TXTSubtitleParser,
 )
 
 
 class TXTSubtitleParserTestCase(TestCase):
-    """Test the subtitle parser based on plain txt files
-    """
+    """Test the subtitle parser based on plain txt files."""
 
     def test_parse(self):
-        """Parse text file
-        """
+        """Parse text file."""
         with path("tests.resources.subtitles", "plain.txt") as file:
             parser = TXTSubtitleParser.parse(Path(file))
             self.assertEqual(parser.get_lyrics(), file.read_text())
 
     def test_parse_string(self):
-        """Parse text
-        """
+        """Parse text."""
         parser = TXTSubtitleParser.parse_string("Piyo!")
         self.assertEqual(parser.get_lyrics(), "Piyo!")
 
 
 class Pysubs2SubtitleParserTestCase(TestCase):
-    """Test the subtitle parser based on pysubs2
-    """
+    """Test the subtitle parser based on pysubs2."""
 
     def generic_test_subtitle(self, file_name):
-        """Run lyrics extraction test on specified file
+        """Run lyrics extraction test on specified file.
 
         Open and extract lyrics from the file, and test that the result is the
         same as the corresponding file with "_expected" prefix.
@@ -61,13 +57,11 @@ class Pysubs2SubtitleParserTestCase(TestCase):
         self.assertListEqual(lines, expected_lines)
 
     def test_simple(self):
-        """Test simple ass
-        """
+        """Test simple ass."""
         self.generic_test_subtitle("simple.ass")
 
     def test_simple_string(self):
-        """Test simple ass file from string
-        """
+        """Test simple ass file from string."""
         # open and parse given file
         with path("tests.resources.subtitles", "simple.ass") as file:
             content = file.read_text()
@@ -83,23 +77,19 @@ class Pysubs2SubtitleParserTestCase(TestCase):
         self.assertListEqual(lines, expected_lines)
 
     def test_duplicate_lines(self):
-        """Test ass with duplicate lines
-        """
+        """Test ass with duplicate lines."""
         self.generic_test_subtitle("duplicate_lines.ass")
 
     def test_drawing_commands(self):
-        """Test ass containing drawing commands
-        """
+        """Test ass containing drawing commands."""
         self.generic_test_subtitle("drawing_commands.ass")
 
     def test_comment_and_whitespace(self):
-        """Test ass containing comment and whitespace
-        """
+        """Test ass containing comment and whitespace."""
         self.generic_test_subtitle("comment_and_whitespace.ass")
 
     def test_not_found_error(self):
-        """Test when the ass file to parse does not exist
-        """
+        """Test when the ass file to parse does not exist."""
         # call the method
         with self.assertRaisesRegex(
             SubtitleNotFoundError, "Subtitle file 'nowhere' not found"
@@ -108,8 +98,7 @@ class Pysubs2SubtitleParserTestCase(TestCase):
 
     @patch("dakara_feeder.subtitle_parser.pysubs2.load")
     def test_parse_error(self, mocked_load):
-        """Test when the ass file to parse is invalid
-        """
+        """Test when the ass file to parse is invalid."""
         # prepare the mock
         mocked_load.side_effect = Exception("invalid")
 
@@ -121,8 +110,7 @@ class Pysubs2SubtitleParserTestCase(TestCase):
 
     @patch("dakara_feeder.subtitle_parser.pysubs2.SSAFile.from_string")
     def test_parse_string_error(self, mocked_from_string):
-        """Test when the ass stream to parse is invalid
-        """
+        """Test when the ass stream to parse is invalid."""
         # prepare the mock
         mocked_from_string.side_effect = Exception("invalid")
 

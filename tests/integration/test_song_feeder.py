@@ -9,19 +9,17 @@ except ImportError:
 
 from path import Path, TempDir
 
-from dakara_feeder.dakara_feeder import DakaraFeeder
 from dakara_feeder.metadata_parser import FFProbeMetadataParser
+from dakara_feeder.songs_feeder import SongsFeeder
 
 
 @skipUnless(FFProbeMetadataParser.is_available(), "FFProbe not installed")
-class DakaraFeederIntegrationTestCase(TestCase):
-    """Integration test for the Feeder class
-    """
+class SongsFeederIntegrationTestCase(TestCase):
+    """Integration test for the Feeder class."""
 
-    @patch("dakara_feeder.dakara_feeder.DakaraServer", autoset=True)
+    @patch("dakara_feeder.songs_feeder.DakaraServer", autoset=True)
     def test_feed(self, mocked_dakara_server_class):
-        """Test to feed
-        """
+        """Test to feed."""
         # create the mocks
         mocked_dakara_server_class.return_value.get_songs.return_value = []
 
@@ -35,10 +33,10 @@ class DakaraFeederIntegrationTestCase(TestCase):
                 Path(file).copy(temp)
 
             config = {"server": {}, "kara_folder": str(temp)}
-            feeder = DakaraFeeder(config, progress=False)
+            feeder = SongsFeeder(config, progress=False)
 
             # call the method
-            with self.assertLogs("dakara_feeder.dakara_feeder", "DEBUG"):
+            with self.assertLogs("dakara_feeder.songs_feeder", "DEBUG"):
                 with self.assertLogs("dakara_base.progress_bar"):
                     feeder.feed()
 

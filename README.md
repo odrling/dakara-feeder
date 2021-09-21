@@ -42,36 +42,47 @@ pip install dakarafeeder
 If you have downloaded the repo, you can install the package directly with:
 
 ```sh
-python setup.py install
+pip install .
 ```
 
 ## Usage
 
 ### Commands
 
-The package provides the `dakara-feed` command which will find songs in the configured directory, parse them and send their data to a running instance of the Dakara server:
+The package provides the `dakara-feeder feed` command for creating data on a running instance of the Dakara server.
+Several sub-commands are available.
+To begin, `dakara-feeder feed songs` will find songs in the configured directory, parse them and send their data:
 
 ```sh
-dakara-feed
+dakara-feeder feed songs
 # or
-python -m dakara_feed
+python -m dakara_feeder feed songs
 ```
 
 One instance of the Dakara server should be running.
+
+Then, `dakara-feeder feed tags` and `dakara-feeder feed work-types` will find tags and work types in a configuration file (seed [this section](#tags-and-work-types-file) for more details):
+
+```sh
+dakara-feeder feed tags path/to/tags.yaml
+# or
+python -m dakara_feeder feed tags path/to/tags.yaml
+```
+
 For more help:
 
 ```sh
-dakara-feed -h
+dakara-feeder -h
 # or
-python -m dakara_feed -h
+python -m dakara_feeder -h
 ```
 
 Before calling the function, you should create a config file with:
 
 ```sh
-dakara-feed create-config
+dakara-feeder create-config
 # or
-python -m dakara_feed create-config
+python -m dakara_feeder create-config
 ```
 
 and complete it with your values. The file is stored in your user space: `~/.config/dakara` on Linux or `$APPDATA\Dakara` on Windows.
@@ -96,7 +107,7 @@ class Song(BaseSong):
         return [{"name": self.video_path.stem.split(" - ")[1]}]
 ```
 
-The file must be in the same directory you are calling `dakara-feed`, or in any directory reachable by Python.
+The file must be in the same directory you are calling `dakara-feeder`, or in any directory reachable by Python.
 To register your customized `Song` class, you simply enable it in the config file:
 
 ```yaml
@@ -110,77 +121,48 @@ To register your customized `Song` class, you simply enable it in the config fil
 custom_song_class: my_song.Song
 ```
 
-Now, `dakara-feed` will use your customized `Song` class instead of the default one.
+Now, `dakara-feeder` will use your customized `Song` class instead of the default one.
 
-## Developpment
+### Tags and work types file
 
-### Install dependencies
+Whilst data from songs are extracted directly from song files, data from tags and work types are extracted from a YAML file.
+All data can coexist in the same file.
 
-Please ensure you have a recent enough version of `setuptools`:
+#### Tags
 
-```sh
-pip install --upgrade "setuptools>=40.0"
+Tags will be searched in the key `tags`.
+Tags are identified by their name (it will be displayed in upper case, it
+should be just one word).
+You can provide a color hue (positive integer from 0 to 360):
+
+```yaml
+tags:
+  - name: PV
+    color_hue: 162
+  - name: AMV
+    color_hue: 140
 ```
 
-Install the dependencies with:
+#### Work types
 
-```sh
-pip install -e ".[tests]"
+Work types will be searched in the key `worktypes`
+Work types are identified by their query name (hyphenated name, with no special
+characters, used as keyword for querying).
+You can provide a work type display name (singular and plural) and an icon name (choosen among the
+[FontAwesome](http://fontawesome.io/icons/) font glyphes):
+
+```yaml
+worktypes:
+  - query_name: anime
+    name: Anime
+    name_plural: Animes
+    icon_name: television
+  - query_name: live-action
+    name: Live action
+    name_plural: Live actions
+    icon_name: film
 ```
 
-This installs the normal dependencies of the package plus the dependencies for tests.
+## Development
 
-### Run tests
-
-Run tests simply with:
-
-```sh
-pytest
-# or
-python -m pytest
-```
-
-Tests are split between unit tests, which are ligthweight and do not require mediainfo or FFmpeg to be installed, and integration tests, which are heavier:
-
-```sh
-pytest tests/unit
-pytest tests/integration
-# or
-python -m pytest tests/unit
-python -m pytest tests/integration
-```
-
-To check coverage, use the `coverage` command:
-
-```sh
-coverage run -m pytest
-coverage report -m
-# or
-python -m coverage run -m pytest
-python -m coverage report -m
-```
-
-### Hooks
-
-Git hooks are included in the `hooks` directory.
-
-Use the following command to use this hook folder for the project:
-
-```
-git config core.hooksPath hooks
-```
-
-If you're using git < 2.9 you can make a symlink instead:
-
-```
-ln -s -f ../../hooks/pre-commit .git/hooks/pre-commit
-```
-
-### Code style
-
-The code follows the [PEP8](https://www.python.org/dev/peps/pep-0008/) style guide (88 chars per line).
-Quality of code is checked with [Flake8](https://pypi.org/project/flake8/).
-Style is enforced using [Black](https://github.com/ambv/black).
-You need to call Black before committing changes.
-You may want to configure your editor to call it automatically.
-Additionnal checking can be manually performed with [Pylint](https://www.pylint.org/).
+Please read the [developers documentation](CONTRIBUTING.md).

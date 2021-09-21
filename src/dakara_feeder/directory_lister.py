@@ -1,3 +1,5 @@
+"""List directoryes to extract song files."""
+
 import logging
 from itertools import groupby
 
@@ -5,18 +7,17 @@ import filetype
 
 from dakara_feeder.subtitle_parser import is_subtitle
 
-
 logger = logging.getLogger(__name__)
 
 
 def list_directory(path):
-    """List video files in given directory recursively
+    """List song files in given directory recursively.
 
     Args:
         path (path.Path): Path of directory to scan.
 
     Returns:
-        list of SongPaths: paths of the files for each song. Paths are relative
+        list of SongPaths: Paths of the files for each song. Paths are relative
         to the given path.
     """
     logger.debug("Listing '%s'", path)
@@ -42,14 +43,14 @@ def get_path_without_extension(path):
         path (path.Path): Path to a file.
 
     Returns:
-        path.Path: path to the file without the extension.
+        path.Path: Path to the file without the extension.
         'directory/file0.mkv' will return 'directory/file0'.
     """
     return path.dirname() / path.stem
 
 
 def get_main_type(file):
-    """Get the first part of the MIME type of the given file
+    """Get the first part of the MIME type of the given file.
 
     Args:
         file (path.Path): Absolute path to the file to extract the MIME type.
@@ -67,14 +68,14 @@ def get_main_type(file):
 
 
 def group_by_type(files, path):
-    """Group files by extension
+    """Group files by extension.
 
     Args:
         files (list of path.Path): List of relative path to the files to group.
         path (path.Path): Path of directory to scan.
 
     Returns:
-        list of SongPaths: paths of the files for each song.
+        list of SongPaths: Paths of the files for each song.
     """
     # sort files by their extension
     videos = []
@@ -125,7 +126,7 @@ def group_by_type(files, path):
 
 
 class SongPaths:
-    """Paths of files related to a song
+    """Paths of files related to a song.
 
     Attributes:
         video (path.Path): Path to the video file.
