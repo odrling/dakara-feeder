@@ -15,9 +15,9 @@ from dakara_feeder.__main__ import (
     load_feeder_securely,
     main,
 )
-from dakara_feeder.songs_feeder import SongsFeeder
-from dakara_feeder.tags_feeder import TagsFeeder
-from dakara_feeder.work_types_feeder import WorkTypesFeeder
+from dakara_feeder.feeder.songs import SongsFeeder
+from dakara_feeder.feeder.tags import TagsFeeder
+from dakara_feeder.feeder.work_types import WorkTypesFeeder
 
 
 class CreateConfigTestCase(TestCase):

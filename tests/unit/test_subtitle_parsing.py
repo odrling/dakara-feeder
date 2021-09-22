@@ -9,7 +9,7 @@ try:
 except ImportError:
     from importlib_resources import path
 
-from dakara_feeder.subtitle_parser import (
+from dakara_feeder.subtitle.parsing import (
     Pysubs2SubtitleParser,
     SubtitleNotFoundError,
     SubtitleParseError,
@@ -96,7 +96,7 @@ class Pysubs2SubtitleParserTestCase(TestCase):
         ):
             Pysubs2SubtitleParser.parse(Path("nowhere"))
 
-    @patch("dakara_feeder.subtitle_parser.pysubs2.load")
+    @patch("dakara_feeder.subtitle.parsing.pysubs2.load")
     def test_parse_error(self, mocked_load):
         """Test when the ass file to parse is invalid."""
         # prepare the mock
@@ -108,7 +108,7 @@ class Pysubs2SubtitleParserTestCase(TestCase):
         ):
             Pysubs2SubtitleParser.parse(Path("nowhere"))
 
-    @patch("dakara_feeder.subtitle_parser.pysubs2.SSAFile.from_string")
+    @patch("dakara_feeder.subtitle.parsing.pysubs2.SSAFile.from_string")
     def test_parse_string_error(self, mocked_from_string):
         """Test when the ass stream to parse is invalid."""
         # prepare the mock

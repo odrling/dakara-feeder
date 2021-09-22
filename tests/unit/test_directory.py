@@ -9,7 +9,7 @@ try:
 except ImportError:
     from importlib_resources import path
 
-from dakara_feeder.directory_lister import (
+from dakara_feeder.directory import (
     SongPaths,
     get_main_type,
     group_by_type,
@@ -20,7 +20,7 @@ from dakara_feeder.directory_lister import (
 class ListDirectoryTestCase(TestCase):
     """Test the directory lister."""
 
-    @patch("dakara_feeder.directory_lister.get_main_type", autoset=True)
+    @patch("dakara_feeder.directory.get_main_type", autoset=True)
     @patch.object(Path, "walkfiles", autoset=True)
     def test_list_directory(self, mocked_walkfiles, mocked_get_main_type):
         """Test to list a directory."""
@@ -41,7 +41,7 @@ class ListDirectoryTestCase(TestCase):
         )
         mocked_get_main_type.side_effect = get_main_type_mock
         # call the function
-        with self.assertLogs("dakara_feeder.directory_lister", "DEBUG") as logger:
+        with self.assertLogs("dakara_feeder.directory", "DEBUG") as logger:
             listing = list_directory(Path("directory"))
 
         # check the structure
@@ -67,13 +67,13 @@ class ListDirectoryTestCase(TestCase):
         self.assertListEqual(
             logger.output,
             [
-                "DEBUG:dakara_feeder.directory_lister:Listing 'directory'",
-                "DEBUG:dakara_feeder.directory_lister:Listed 9 files",
-                "DEBUG:dakara_feeder.directory_lister:Found 4 different videos",
+                "DEBUG:dakara_feeder.directory:Listing 'directory'",
+                "DEBUG:dakara_feeder.directory:Listed 9 files",
+                "DEBUG:dakara_feeder.directory:Found 4 different videos",
             ],
         )
 
-    @patch("dakara_feeder.directory_lister.get_main_type", autoset=True)
+    @patch("dakara_feeder.directory.get_main_type", autoset=True)
     @patch.object(Path, "walkfiles", autoset=True)
     def test_list_directory_same_stem(self, mocked_walkfiles, mocked_get_main_type):
         """Test case when files with the same name exists in different directories."""
@@ -90,7 +90,7 @@ class ListDirectoryTestCase(TestCase):
         mocked_get_main_type.side_effect = get_main_type_mock
 
         # call the function
-        with self.assertLogs("dakara_feeder.directory_lister", "DEBUG") as logger:
+        with self.assertLogs("dakara_feeder.directory", "DEBUG") as logger:
             listing = list_directory(Path("directory"))
 
         # check the structure
@@ -110,13 +110,13 @@ class ListDirectoryTestCase(TestCase):
         self.assertListEqual(
             logger.output,
             [
-                "DEBUG:dakara_feeder.directory_lister:Listing 'directory'",
-                "DEBUG:dakara_feeder.directory_lister:Listed 4 files",
-                "DEBUG:dakara_feeder.directory_lister:Found 2 different videos",
+                "DEBUG:dakara_feeder.directory:Listing 'directory'",
+                "DEBUG:dakara_feeder.directory:Listed 4 files",
+                "DEBUG:dakara_feeder.directory:Found 2 different videos",
             ],
         )
 
-    @patch("dakara_feeder.directory_lister.get_main_type", autoset=True)
+    @patch("dakara_feeder.directory.get_main_type", autoset=True)
     @patch.object(Path, "walkfiles", autoset=True)
     def test_list_dot_in_filename(self, mocked_walkfiles, mocked_get_main_type):
         """Test case with a dot in filename."""
@@ -132,7 +132,7 @@ class ListDirectoryTestCase(TestCase):
         mocked_get_main_type.side_effect = get_main_type_mock
 
         # call the function
-        with self.assertLogs("dakara_feeder.directory_lister", "DEBUG") as logger:
+        with self.assertLogs("dakara_feeder.directory", "DEBUG") as logger:
             listing = list_directory(Path("directory"))
 
         # check the structure
@@ -146,9 +146,9 @@ class ListDirectoryTestCase(TestCase):
         self.assertListEqual(
             logger.output,
             [
-                "DEBUG:dakara_feeder.directory_lister:Listing 'directory'",
-                "DEBUG:dakara_feeder.directory_lister:Listed 3 files",
-                "DEBUG:dakara_feeder.directory_lister:Found 1 different videos",
+                "DEBUG:dakara_feeder.directory:Listing 'directory'",
+                "DEBUG:dakara_feeder.directory:Listed 3 files",
+                "DEBUG:dakara_feeder.directory:Found 1 different videos",
             ],
         )
 
@@ -167,7 +167,7 @@ class ListDirectoryIntegrationTestCase(TestCase):
             with path("tests.resources.media", "dummy.mkv") as file:
                 Path(file).copy(temp)
 
-            with self.assertLogs("dakara_feeder.directory_lister", "DEBUG"):
+            with self.assertLogs("dakara_feeder.directory", "DEBUG"):
                 listing = list_directory(Path(temp))
 
         # check the structure
@@ -217,7 +217,7 @@ class GetMainTypeTestCase(TestCase):
             self.assertIsNone(get_main_type(Path(file)))
 
 
-@patch("dakara_feeder.directory_lister.get_main_type", autoset=True)
+@patch("dakara_feeder.directory.get_main_type", autoset=True)
 class GroupByTypeTestCase(TestCase):
     """Test the group_by_type function."""
 
@@ -273,7 +273,7 @@ class GroupByTypeTestCase(TestCase):
     def test_one_video_two_subtitles(self, mocked_get_main_type):
         """Test to group one video and two subtitles."""
         mocked_get_main_type.side_effect = get_main_type_mock
-        with self.assertLogs("dakara_feeder.directory_lister") as logger:
+        with self.assertLogs("dakara_feeder.directory") as logger:
             results = group_by_type(
                 [Path("video.mp4"), Path("subtitles.ass"), Path("subtitles.ssa")],
                 Path("directory"),
@@ -284,7 +284,7 @@ class GroupByTypeTestCase(TestCase):
         self.assertListEqual(
             logger.output,
             [
-                "WARNING:dakara_feeder.directory_lister:"
+                "WARNING:dakara_feeder.directory:"
                 "More than one subtitle for video 'video.mp4'"
             ],
         )
@@ -292,7 +292,7 @@ class GroupByTypeTestCase(TestCase):
     def test_one_video_two_audios(self, mocked_get_main_type):
         """Test to group one video and two audio files."""
         mocked_get_main_type.side_effect = get_main_type_mock
-        with self.assertLogs("dakara_feeder.directory_lister") as logger:
+        with self.assertLogs("dakara_feeder.directory") as logger:
             results = group_by_type(
                 [Path("video.mp4"), Path("audio.ogg"), Path("audio.flac")],
                 Path("directory"),
@@ -303,7 +303,7 @@ class GroupByTypeTestCase(TestCase):
         self.assertListEqual(
             logger.output,
             [
-                "WARNING:dakara_feeder.directory_lister:"
+                "WARNING:dakara_feeder.directory:"
                 "More than one audio file for video 'video.mp4'"
             ],
         )

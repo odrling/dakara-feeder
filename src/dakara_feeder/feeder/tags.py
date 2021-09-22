@@ -5,10 +5,10 @@ import logging
 from dakara_base.exceptions import DakaraError
 from dakara_base.progress_bar import null_bar, progress_bar
 
-from dakara_feeder.dakara_server import DakaraServer, TagAlreadyExistsError
 from dakara_feeder.utils import clean_dict
 from dakara_feeder.version import check_version
-from dakara_feeder.yaml_opener import get_yaml_file_content
+from dakara_feeder.web_client import HTTPClientDakara, TagAlreadyExistsError
+from dakara_feeder.yaml import get_yaml_file_content
 
 logger = logging.getLogger(__name__)
 
@@ -23,13 +23,13 @@ class TagsFeeder:
 
     Attributes:
         bar (function): Progress bar to use.
-        dakara_server (dakara_server.DakaraServer): Client for the Dakara server.
+        http_client (web_client.HTTPClientDakara): Client for the Dakara server.
         tags_file_path (str): Path to the tags file.
     """
 
     def __init__(self, config, tags_file_path, progress=True):
         # create objects
-        self.dakara_server = DakaraServer(config["server"], endpoint_prefix="api")
+        self.http_client = HTTPClientDakara(config["server"], endpoint_prefix="api")
         self.tags_file_path = tags_file_path
         self.bar = progress_bar if progress else null_bar
 
@@ -39,7 +39,7 @@ class TagsFeeder:
         check_version()
 
         # authenticate to server
-        self.dakara_server.authenticate()
+        self.http_client.authenticate()
 
     def feed(self):
         """Execute the feeding action.
@@ -64,7 +64,7 @@ class TagsFeeder:
 
             # try to create tag on server
             try:
-                self.dakara_server.create_tag(tag_correct)
+                self.http_client.post_tag(tag_correct)
 
             except TagAlreadyExistsError:
                 logger.info(
