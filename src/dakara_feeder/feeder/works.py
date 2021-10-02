@@ -5,12 +5,32 @@ import logging
 from dakara_base.exceptions import DakaraError
 from dakara_base.progress_bar import null_bar, progress_bar
 
-from dakara_feeder.web_client import HTTPClientDakara
-from dakara_feeder.yaml import get_yaml_file_content
+from dakara_feeder.difference import generate_diff
+from dakara_feeder.json import get_json_file_content
 from dakara_feeder.version import check_version
+from dakara_feeder.web_client import HTTPClientDakara
+
+logger = logging.getLogger(__name__)
 
 
-class WorkFeeder:
+class WorksFeeder:
+    """Class to feed the Dakara server database with works.
+
+    Args:
+        config (dict): Dictionary of config.
+        works_file_path (path.Path): Path to the JSON file containing works.
+        update_only (bool): If True, will not create works that do not exist on
+            the server.
+        progress (bool): If True, a progress bar is displayed during long tasks.
+
+    Attributes:
+        http_client (web_client.HTTPClientDakara): Client for the Dakara server.
+        bar (function): Progress bar to use.
+        works_file_path (path.Path): Path to the JSON file containing works.
+        update_only (bool): If True, will not create works that do not exist on
+            the server.
+    """
+
     def __init__(self, config, works_file_path, update_only=False, progress=True):
         # create objects
         self.http_client = HTTPClientDakara(config["server"], endpoint_prefix="api")
@@ -26,15 +46,42 @@ class WorkFeeder:
         # authenticate to server
         self.http_client.authenticate()
 
+    @staticmethod
+    def stringify_work(work):
+        """Create a string version of a work.
+
+        The string contain the title, the subtitle (replaced by an empty string
+        if not present) and the query name of the work type.
+
+        Args:
+            work (dict): Work to stringiny, with the same structure accepted by
+                the server.
+
+        Returns
+            str: Stringified version of the work.
+        """
+        return "-".join(
+            [work["title"], work.get("subtitle", ""), work["work_type"]["query_name"]]
+        )
+
     def feed(self):
-        # load file
-        works_by_type = get_yaml_file_content(self.works_file_path, "works")
+        """Execute the feeding action."""
+        # get list of works on the server
+        old_works = self.http_client.retrieve_works()
+        logger.info("Found %i works in server", len(old_works))
+
+        old_works_by_str = {self.stringify_work(w): w for w in old_works}
+        old_works_str = list(old_works_by_str.keys())
+
+        # get list of works on file
+        works_by_type = get_json_file_content(self.works_file_path)
         logger.info(
             "Found %i work types and %i works to create",
             len(works_by_type),
             sum(len(ws) for ws in works_by_type.values()),
         )
 
+        # check works validity
         for work_type_query_name, works in self.bar(
             works_by_type.items(), text="Checking works"
         ):
@@ -53,6 +100,37 @@ class WorkFeeder:
                             work_type_query_name, index
                         )
                     )
+
+        # reformat works to include the work type
+        new_works = [
+            {**w, "work_type": {"query_name": qn}}
+            for qn, ws in works_by_type.items()
+            for w in ws
+        ]
+        new_works_by_str = {self.stringify_work(w): w for w in new_works}
+        new_works_str = list(new_works_by_str.keys())
+
+        # separate works to add and works to update
+        added_works_str, _, updated_works_str = generate_diff(
+            old_works_str, new_works_str
+        )
+
+        # works to add
+        if not self.update_only and added_works_str:
+            # upload to server by chunks
+            for work_str in self.bar(
+                added_works_str,
+                text="Uploading added works",
+            ):
+                self.http_client.post_work(new_works_by_str[work_str])
+
+        # works to update
+        if updated_works_str:
+            # upload to server
+            for work_str in self.bar(updated_works_str, text="Uploading updated works"):
+                work = new_works_by_str[work_str]
+                id = old_works_by_str[work_str]["id"]
+                self.http_client.put_work(id, work)
 
 
 class WorksInvalidError(DakaraError):

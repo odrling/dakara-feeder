@@ -4,7 +4,7 @@ import itertools
 
 
 def generate_diff(old_list, new_list):
-    """Returns 2 lists of added, deleted and unchanged elements.
+    """Returns 3 lists of added, deleted and unchanged elements.
 
     Added elements are elements presents in new_list but not in old_list.
     Deleted elements are elements presents in old_list but not in new_list.
@@ -14,7 +14,7 @@ def generate_diff(old_list, new_list):
         new_list (list): New list.
 
     Returns:
-        tuple: Contains 2 elements:
+        tuple: Contains 3 elements:
             - A list of added elements;
             - A list of deleted elements.
             - A list of unchanged elements.
