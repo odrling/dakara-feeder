@@ -123,6 +123,38 @@ custom_song_class: my_song.Song
 
 Now, `dakara-feeder` will use your customized `Song` class instead of the default one.
 
+### Works file
+
+You can provide more information about works (especially alternative names) from a JSON file.
+The file should contain a dictionary where keys are work types query name and values lists of works representation:
+
+```json
+{
+  'WorkType 1':
+    [
+      {
+        'title': 'Work 1',
+        'subtitle': 'Subtitle 1',
+        'alternative_titles': [
+          {
+            'title': 'AltTitle 1'
+          },
+          {
+            'title': 'AltTitle 2'
+          }
+        ],
+      },
+      {
+        'title': 'Work 2',
+        'subtitle': 'Subtitle 2'
+      }
+    ],
+  'WorkType 2': []
+}
+```
+
+Identification with existing works on the server is made with the work type, the title and the subtitle, case insensitively.
+
 ### Tags and work types file
 
 Whilst data from songs are extracted directly from song files, data from tags and work types are extracted from a YAML file.
