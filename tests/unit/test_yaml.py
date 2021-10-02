@@ -2,7 +2,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from path import Path
-from yaml import YAMLError
+from yaml import Dumper, YAMLError, dump
 
 from dakara_feeder.yaml import (
     YamlContentInvalidError,
@@ -20,7 +20,7 @@ class GetYamlFileContentTestCase(TestCase):
         """Test to get a YAML file."""
         # create the mock
         content = {"name": "tag1"}
-        mocked_text.return_value = str(content)
+        mocked_text.return_value = dump(content, Dumper=Dumper)
 
         # call the method
         content_parsed = get_yaml_file_content(Path("path/to/file"))
@@ -47,7 +47,7 @@ class GetYamlFileContentTestCase(TestCase):
         """Test to get an invalid YAML file."""
         # create the mock
         content = [{"name": "tag1"}]
-        mocked_text.return_value = str(content)
+        mocked_text.return_value = dump(content, Dumper=Dumper)
         mocked_load.side_effect = YAMLError("error message")
 
         # call the method
@@ -61,7 +61,7 @@ class GetYamlFileContentTestCase(TestCase):
         """Test to get the key of a YAML file."""
         # create the mock
         content = {"tags": {"name": "tag1"}}
-        mocked_text.return_value = str(content)
+        mocked_text.return_value = dump(content, Dumper=Dumper)
 
         # call the method
         content_parsed = get_yaml_file_content(Path("path/to/file"), "tags")
