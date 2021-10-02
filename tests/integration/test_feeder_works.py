@@ -19,10 +19,10 @@ class WorksFeederIntegrationTestCase(TestCase):
     def setUp(self):
         self.config = {"server": {}}
 
-    def test_correct_work_file(self, mocked_dakara_server_class):
+    def test_correct_work_file(self, mocked_http_client_dakara_class):
         """Test to feed correct work file."""
         # create the mocks
-        mocked_dakara_server_class.return_value.retrieve_songs.return_value = []
+        mocked_http_client_dakara_class.return_value.retrieve_songs.return_value = []
 
         # create the object
         with path(
@@ -35,7 +35,7 @@ class WorksFeederIntegrationTestCase(TestCase):
                 with self.assertLogs("dakara_base.progress_bar"):
                     feeder.feed()
 
-        mocked_dakara_server_class.return_value.post_work.assert_has_calls(
+        mocked_http_client_dakara_class.return_value.post_work.assert_has_calls(
             [
                 call(
                     {
