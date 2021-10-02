@@ -186,6 +186,89 @@ class WorksFeederTestCase(TestCase):
         mocked_http_client_class.return_value.post_work.assert_not_called()
 
     @patch("dakara_feeder.feeder.works.get_json_file_content")
+    def test_feed_case(self, mocked_get_json_file_content, mocked_http_client_class):
+        """Test to feed with case differences."""
+        mocked_http_client_class.return_value.retrieve_works.return_value = [
+            {
+                "id": 0,
+                "title": "Work 0",
+                "subtitle": "",
+                "work_type": {"query_name": "anime"},
+            },
+            {
+                "id": 1,
+                "title": "Work 1",
+                "subtitle": "subtitle",
+                "work_type": {"query_name": "anime"},
+            },
+        ]
+        mocked_get_json_file_content.return_value = {
+            "anime": [
+                {
+                    "title": "work 0",
+                    "subtitle": "",
+                },
+                {
+                    "title": "work 1",
+                    "subtitle": "subtitle",
+                    "alternavite_titles": [{"title": "Work 01"}, {"title": "Work 001"}],
+                },
+                {
+                    "title": "work 2",
+                    "subtitle": "",
+                },
+            ]
+        }
+
+        # create the object
+        feeder = WorksFeeder(self.config, self.works_file_path, progress=False)
+
+        # call the method
+        with self.assertLogs("dakara_feeder.feeder.works", "DEBUG"):
+            with self.assertLogs("dakara_base.progress_bar"):
+                feeder.feed()
+
+        # assert the mocks
+        mocked_http_client_class.return_value.retrieve_works.assert_called_with()
+        mocked_get_json_file_content.assert_called_with(Path("works"))
+        mocked_http_client_class.return_value.post_work.assert_has_calls(
+            [
+                call(
+                    {
+                        "title": "work 2",
+                        "subtitle": "",
+                        "work_type": {"query_name": "anime"},
+                    }
+                )
+            ]
+        )
+        mocked_http_client_class.return_value.put_work.assert_has_calls(
+            [
+                call(
+                    0,
+                    {
+                        "title": "work 0",
+                        "subtitle": "",
+                        "work_type": {"query_name": "anime"},
+                    },
+                ),
+                call(
+                    1,
+                    {
+                        "title": "work 1",
+                        "subtitle": "subtitle",
+                        "alternavite_titles": [
+                            {"title": "Work 01"},
+                            {"title": "Work 001"},
+                        ],
+                        "work_type": {"query_name": "anime"},
+                    },
+                ),
+            ],
+            any_order=True,
+        )
+
+    @patch("dakara_feeder.feeder.works.get_json_file_content")
     def test_feed_works_invalid(
         self, mocked_get_json_file_content, mocked_http_client_class
     ):
