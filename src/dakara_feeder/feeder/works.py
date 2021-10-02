@@ -51,7 +51,8 @@ class WorksFeeder:
         """Create a string version of a work.
 
         The string contain the title, the subtitle (replaced by an empty string
-        if not present) and the query name of the work type.
+        if not present) and the query name of the work type. The string is made
+        lower case.
 
         Args:
             work (dict): Work to stringiny, with the same structure accepted by
@@ -62,7 +63,7 @@ class WorksFeeder:
         """
         return "-".join(
             [work["title"], work.get("subtitle", ""), work["work_type"]["query_name"]]
-        )
+        ).lower()
 
     def feed(self):
         """Execute the feeding action."""
@@ -96,7 +97,7 @@ class WorksFeeder:
             for index, work in enumerate(works):
                 if "title" not in work:
                     raise WorkInvalidError(
-                        "Work {} #{} must have a title".format(
+                        "Work of type {} #{} must have a title".format(
                             work_type_query_name, index
                         )
                     )

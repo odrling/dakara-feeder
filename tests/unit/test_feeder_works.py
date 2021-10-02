@@ -3,7 +3,7 @@ from unittest.mock import call, patch
 
 from path import Path
 
-from dakara_feeder.feeder.works import WorksFeeder
+from dakara_feeder.feeder.works import WorkInvalidError, WorksFeeder, WorksInvalidError
 
 
 @patch("dakara_feeder.feeder.works.HTTPClientDakara", autoset=True)
@@ -184,3 +184,71 @@ class WorksFeederTestCase(TestCase):
 
         # assert the mocks
         mocked_http_client_class.return_value.post_work.assert_not_called()
+
+    @patch("dakara_feeder.feeder.works.get_json_file_content")
+    def test_feed_works_invalid(
+        self, mocked_get_json_file_content, mocked_http_client_class
+    ):
+        mocked_http_client_class.return_value.retrieve_works.return_value = []
+        mocked_get_json_file_content.return_value = {
+            "anime": {
+                "Work 0": {
+                    "subtitle": "",
+                },
+                "Work 1": {
+                    "subtitle": "subtitle",
+                    "alternavite_titles": [{"title": "Work 01"}, {"title": "Work 001"}],
+                },
+                "Work 2": {
+                    "subtitle": "",
+                },
+            }
+        }
+
+        # create the object
+        feeder = WorksFeeder(
+            self.config, self.works_file_path, update_only=True, progress=False
+        )
+
+        # call the method
+        with self.assertLogs("dakara_feeder.feeder.works", "DEBUG"):
+            with self.assertLogs("dakara_base.progress_bar"):
+                with self.assertRaisesRegex(
+                    WorksInvalidError, "Works of type anime must be stored in a list"
+                ):
+                    feeder.feed()
+
+    @patch("dakara_feeder.feeder.works.get_json_file_content")
+    def test_feed_work_invalid(
+        self, mocked_get_json_file_content, mocked_http_client_class
+    ):
+        mocked_http_client_class.return_value.retrieve_works.return_value = []
+        mocked_get_json_file_content.return_value = {
+            "anime": [
+                {
+                    "subtitle": "",
+                },
+                {
+                    "title": "Work 1",
+                    "subtitle": "subtitle",
+                    "alternavite_titles": [{"title": "Work 01"}, {"title": "Work 001"}],
+                },
+                {
+                    "title": "Work 2",
+                    "subtitle": "",
+                },
+            ]
+        }
+
+        # create the object
+        feeder = WorksFeeder(
+            self.config, self.works_file_path, update_only=True, progress=False
+        )
+
+        # call the method
+        with self.assertLogs("dakara_feeder.feeder.works", "DEBUG"):
+            with self.assertLogs("dakara_base.progress_bar"):
+                with self.assertRaisesRegex(
+                    WorkInvalidError, "Work of type anime #0 must have a title"
+                ):
+                    feeder.feed()
