@@ -11,6 +11,7 @@ from dakara_feeder.__main__ import (
     feed_songs,
     feed_tags,
     feed_work_types,
+    feed_works,
     load_config_securely,
     load_feeder_securely,
     main,
@@ -18,6 +19,7 @@ from dakara_feeder.__main__ import (
 from dakara_feeder.feeder.songs import SongsFeeder
 from dakara_feeder.feeder.tags import TagsFeeder
 from dakara_feeder.feeder.work_types import WorkTypesFeeder
+from dakara_feeder.feeder.works import WorksFeeder
 
 
 class CreateConfigTestCase(TestCase):
@@ -73,6 +75,41 @@ class FeedSongsTestCase(TestCase):
 
         # call the function
         feed_songs(Namespace(debug=False, force=False, progress=True, prune=True))
+
+        # assert the call
+        mocked_load_config.assert_called_with(False)
+        mocked_load_feeder.assert_called_with(ANY)
+        mocked_feed.assert_called_with()
+
+
+class FeedWorksTestCase(TestCase):
+    """Test the feed works subcommand."""
+
+    @patch.object(WorksFeeder, "feed")
+    @patch("dakara_feeder.__main__.load_feeder_securely")
+    @patch("dakara_feeder.__main__.load_config_securely")
+    def test_feed(
+        self,
+        mocked_load_config,
+        mocked_load_feeder,
+        mocked_feed,
+    ):
+        """Test to feed songs."""
+        # setup the mocks
+        config = {
+            "kara_folder": Path("path") / "to" / "folder",
+            "server": {
+                "url": "www.example.com",
+                "login": "login",
+                "password": "password",
+            },
+        }
+        mocked_load_config.return_value = config
+
+        # call the function
+        feed_works(
+            Namespace(debug=False, file=Path("file"), progress=True, update_only=False)
+        )
 
         # assert the call
         mocked_load_config.assert_called_with(False)
