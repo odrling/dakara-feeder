@@ -55,7 +55,7 @@ class WorksFeeder:
     def stringify_work(work):
         """Create a string version of a work.
 
-        The string contain the title, the subtitle (replaced by an empty string
+        The string contains the title, the subtitle (replaced by an empty string
         if not present) and the query name of the work type. The string is made
         lower case.
 
@@ -71,7 +71,13 @@ class WorksFeeder:
         ).lower()
 
     def feed(self):
-        """Execute the feeding action."""
+        """Execute the feeding action.
+
+        Raises:
+            WorksInvalidError: If works of a work type are not stored in a
+                list.
+            WorkInvalidError: If one work has no title.
+        """
         # get list of works on the server
         old_works = self.http_client.retrieve_works()
         logger.info("Found %i works in server", len(old_works))
