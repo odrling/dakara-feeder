@@ -16,6 +16,12 @@ server:
   # Default is 100
   # songs_per_chunk: 100
 
+  # Number of works per chunk to send to server when creating works
+  # This allows to reduce server jamming when creating a large amount of works
+  # for the first time, especially for the first feeding (before feeding songs).
+  # Default is 100
+  # works_per_chunk: 100
+
 # Path of the karaoke folder
 kara_folder: /path/to/folder
 

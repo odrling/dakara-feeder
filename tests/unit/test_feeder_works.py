@@ -80,15 +80,13 @@ class WorksFeederTestCase(TestCase):
         # assert the mocks
         mocked_http_client_class.return_value.retrieve_works.assert_called_with()
         mocked_get_json_file_content.assert_called_with(Path("works"))
-        mocked_http_client_class.return_value.post_work.assert_has_calls(
+        mocked_http_client_class.return_value.post_work.assert_called_with(
             [
-                call(
-                    {
-                        "title": "Work 2",
-                        "subtitle": "",
-                        "work_type": {"query_name": "anime"},
-                    }
-                )
+                {
+                    "title": "Work 2",
+                    "subtitle": "",
+                    "work_type": {"query_name": "anime"},
+                }
             ]
         )
         mocked_http_client_class.return_value.put_work.assert_has_calls(
@@ -124,6 +122,8 @@ class WorksFeederTestCase(TestCase):
                 "INFO:dakara_feeder.feeder.works:Found 2 works in server",
                 "INFO:dakara_feeder.feeder.works:Found 1 work types and 3 "
                 "works to create",
+                "INFO:dakara_feeder.feeder.works:Found 1 works to add",
+                "INFO:dakara_feeder.feeder.works:Found 2 works to update",
             ],
         )
         self.assertListEqual(
@@ -231,15 +231,13 @@ class WorksFeederTestCase(TestCase):
         # assert the mocks
         mocked_http_client_class.return_value.retrieve_works.assert_called_with()
         mocked_get_json_file_content.assert_called_with(Path("works"))
-        mocked_http_client_class.return_value.post_work.assert_has_calls(
+        mocked_http_client_class.return_value.post_work.assert_called_with(
             [
-                call(
-                    {
-                        "title": "work 2",
-                        "subtitle": "",
-                        "work_type": {"query_name": "anime"},
-                    }
-                )
+                {
+                    "title": "work 2",
+                    "subtitle": "",
+                    "work_type": {"query_name": "anime"},
+                }
             ]
         )
         mocked_http_client_class.return_value.put_work.assert_has_calls(

@@ -22,7 +22,20 @@ class WorksFeederIntegrationTestCase(TestCase):
     def test_correct_work_file(self, mocked_http_client_dakara_class):
         """Test to feed correct work file."""
         # create the mocks
-        mocked_http_client_dakara_class.return_value.retrieve_songs.return_value = []
+        mocked_http_client_dakara_class.return_value.retrieve_works.return_value = [
+            {
+                "id": 1,
+                "title": "Work 1",
+                "subtitle": "Subtitle 1",
+                "work_type": {"query_name": "WorkType 1"},
+            },
+            {
+                "id": 2,
+                "title": "Work 2",
+                "subtitle": "Subtitle 2",
+                "work_type": {"query_name": "WorkType 1"},
+            },
+        ]
 
         # create the object
         with path(
@@ -35,29 +48,33 @@ class WorksFeederIntegrationTestCase(TestCase):
                 with self.assertLogs("dakara_base.progress_bar"):
                     feeder.feed()
 
-        mocked_http_client_dakara_class.return_value.post_work.assert_has_calls(
+        mocked_http_client_dakara_class.return_value.post_work.assert_called_with(
+            [
+                {
+                    "title": "Work 3",
+                    "alternative_titles": ["AltTitle 1", "AltTitle 3"],
+                    "work_type": {"query_name": "WorkType 1"},
+                }
+            ]
+        )
+        mocked_http_client_dakara_class.return_value.put_work.assert_has_calls(
             [
                 call(
+                    1,
                     {
                         "title": "Work 1",
                         "subtitle": "Subtitle 1",
                         "alternative_titles": ["AltTitle 1", "AltTitle 2"],
                         "work_type": {"query_name": "WorkType 1"},
-                    }
+                    },
                 ),
                 call(
+                    2,
                     {
                         "title": "Work 2",
                         "subtitle": "Subtitle 2",
                         "work_type": {"query_name": "WorkType 1"},
-                    }
-                ),
-                call(
-                    {
-                        "title": "Work 3",
-                        "alternative_titles": ["AltTitle 1", "AltTitle 3"],
-                        "work_type": {"query_name": "WorkType 1"},
-                    }
+                    },
                 ),
             ],
             any_order=True,

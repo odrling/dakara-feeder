@@ -7,10 +7,14 @@ from dakara_base.progress_bar import null_bar, progress_bar
 
 from dakara_feeder.difference import generate_diff
 from dakara_feeder.json import get_json_file_content
+from dakara_feeder.utils import divide_chunks
 from dakara_feeder.version import check_version
 from dakara_feeder.web_client import HTTPClientDakara
 
 logger = logging.getLogger(__name__)
+
+
+WORKS_PER_CHUNK = 100
 
 
 class WorksFeeder:
@@ -37,6 +41,7 @@ class WorksFeeder:
         self.bar = progress_bar if progress else null_bar
         self.works_file_path = works_file_path
         self.update_only = update_only
+        self.works_per_chunk = config["server"].get("works_per_chunk", WORKS_PER_CHUNK)
 
     def load(self):
         """Execute side-effect initialization tasks."""
@@ -116,14 +121,21 @@ class WorksFeeder:
             old_works_str, new_works_str
         )
 
+        if not self.update_only:
+            logger.info("Found %i works to add", len(added_works_str))
+
+        logger.info("Found %i works to update", len(updated_works_str))
+
         # works to add
         if not self.update_only and added_works_str:
             # upload to server by chunks
-            for work_str in self.bar(
-                added_works_str,
+            for work_str_chunk in self.bar(
+                list(divide_chunks(added_works_str, self.works_per_chunk)),
                 text="Uploading added works",
             ):
-                self.http_client.post_work(new_works_by_str[work_str])
+                self.http_client.post_work(
+                    [new_works_by_str[ws] for ws in work_str_chunk]
+                )
 
         # works to update
         if updated_works_str:

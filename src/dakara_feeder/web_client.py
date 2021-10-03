@@ -73,10 +73,10 @@ class HTTPClientDakara(HTTPClient):
         return self.get(endpoint)
 
     def post_work(self, work):
-        """Create one work on the server.
+        """Create one or several works on the server.
 
         Args:
-            work (dict): New work representation.
+            work (dict or list of dict): New work(s) representation.
         """
         endpoint = "library/works/"
         self.post(endpoint, json=work)
