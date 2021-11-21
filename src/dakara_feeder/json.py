@@ -14,7 +14,7 @@ def get_json_file_content(file_path, key=None):
             the key does not exist, raise an JsonContentInvalidError error.
 
     Returns:
-        dict: Content of the tags file.
+        dict: Content of the JSON file.
 
     Raises:
         JsonFileNotFoundError: If the JSON file cannot be found.

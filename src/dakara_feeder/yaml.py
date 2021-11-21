@@ -13,7 +13,7 @@ def get_yaml_file_content(file_path, key=None):
             the key does not exist, raise an YamlContentInvalidError error.
 
     Returns:
-        dict: Content of the tags file.
+        dict: Content of the YAML file.
 
     Raises:
         YamlFileNotFoundError: If the YAML file cannot be found.
