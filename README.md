@@ -130,7 +130,7 @@ The file should contain a dictionary where keys are work types query name and va
 
 ```json
 {
-  'WorkType 1':
+  'work_type_1':
     [
       {
         'title': 'Work 1',
@@ -142,14 +142,14 @@ The file should contain a dictionary where keys are work types query name and va
           {
             'title': 'AltTitle 2'
           }
-        ],
+        ]
       },
       {
         'title': 'Work 2',
         'subtitle': 'Subtitle 2'
       }
     ],
-  'WorkType 2': []
+  'work_type_2': []
 }
 ```
 
