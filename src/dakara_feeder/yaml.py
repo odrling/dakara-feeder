@@ -22,7 +22,7 @@ def get_yaml_file_content(file_path, key=None):
             content of the YAML file.
     """
     try:
-        content = yaml.load(file_path.text(), Loader=yaml.Loader)
+        content = yaml.safe_load(file_path.text())
 
     except FileNotFoundError as error:
         raise YamlFileNotFoundError(

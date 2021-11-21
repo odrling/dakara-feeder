@@ -1,8 +1,8 @@
 from unittest import TestCase
 from unittest.mock import patch
 
+import yaml
 from path import Path
-from yaml import Dumper, YAMLError, dump
 
 from dakara_feeder.yaml import (
     YamlContentInvalidError,
@@ -20,7 +20,7 @@ class GetYamlFileContentTestCase(TestCase):
         """Test to get a YAML file."""
         # create the mock
         content = {"name": "tag1"}
-        mocked_text.return_value = dump(content, Dumper=Dumper)
+        mocked_text.return_value = yaml.safe_dump(content)
 
         # call the method
         content_parsed = get_yaml_file_content(Path("path/to/file"))
@@ -42,13 +42,13 @@ class GetYamlFileContentTestCase(TestCase):
         ):
             get_yaml_file_content(Path("path/to/file"))
 
-    @patch("dakara_feeder.yaml.yaml.load")
-    def test_get_error_invalid(self, mocked_load, mocked_text):
+    @patch("dakara_feeder.yaml.yaml.safe_load")
+    def test_get_error_invalid(self, mocked_safe_load, mocked_text):
         """Test to get an invalid YAML file."""
         # create the mock
         content = [{"name": "tag1"}]
-        mocked_text.return_value = dump(content, Dumper=Dumper)
-        mocked_load.side_effect = YAMLError("error message")
+        mocked_text.return_value = yaml.safe_dump(content)
+        mocked_safe_load.side_effect = yaml.YAMLError("error message")
 
         # call the method
         with self.assertRaisesRegex(
@@ -61,7 +61,7 @@ class GetYamlFileContentTestCase(TestCase):
         """Test to get the key of a YAML file."""
         # create the mock
         content = {"tags": {"name": "tag1"}}
-        mocked_text.return_value = dump(content, Dumper=Dumper)
+        mocked_text.return_value = yaml.safe_dump(content)
 
         # call the method
         content_parsed = get_yaml_file_content(Path("path/to/file"), "tags")
