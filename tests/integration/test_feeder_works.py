@@ -52,7 +52,10 @@ class WorksFeederIntegrationTestCase(TestCase):
             [
                 {
                     "title": "Work 3",
-                    "alternative_titles": ["AltTitle 1", "AltTitle 3"],
+                    "alternative_titles": [
+                        {"title": "AltTitle 1"},
+                        {"title": "AltTitle 3"},
+                    ],
                     "work_type": {"query_name": "WorkType 1"},
                 }
             ]
@@ -64,7 +67,10 @@ class WorksFeederIntegrationTestCase(TestCase):
                     {
                         "title": "Work 1",
                         "subtitle": "Subtitle 1",
-                        "alternative_titles": ["AltTitle 1", "AltTitle 2"],
+                        "alternative_titles": [
+                            {"title": "AltTitle 1"},
+                            {"title": "AltTitle 2"},
+                        ],
                         "work_type": {"query_name": "WorkType 1"},
                     },
                 ),

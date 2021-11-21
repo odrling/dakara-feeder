@@ -70,14 +70,55 @@ class WorksFeeder:
             [work["title"], work.get("subtitle", ""), work["work_type"]["query_name"]]
         ).lower()
 
-    def feed(self):
-        """Execute the feeding action.
+    def check(self, works_by_type):
+        """Check works format.
+
+        Args:
+            works_by_type (dict): Key is work type, value is list of
+                representation of works.
 
         Raises:
             WorksInvalidError: If works of a work type are not stored in a
                 list.
             WorkInvalidError: If one work has no title.
         """
+        for work_type_query_name, works in self.bar(
+            works_by_type.items(), text="Checking works"
+        ):
+            # check works is a list
+            if not isinstance(works, list):
+                raise WorksInvalidError(
+                    "Works of type {} must be stored in a list".format(
+                        work_type_query_name
+                    )
+                )
+
+            # check work has a title
+            for index_work, work in enumerate(works):
+                if "title" not in work:
+                    raise WorkInvalidError(
+                        "Work of type {} #{} must have a title".format(
+                            work_type_query_name, index_work
+                        )
+                    )
+
+                if "alternavite_titles" in work:
+                    # check the alternative title is set with a dict
+                    for index_alternative_title, alternative_title in enumerate(
+                        work["alternavite_titles"]
+                    ):
+                        if "title" not in alternative_title:
+                            raise WorkInvalidError(
+                                "Alternative title #{} of work of type {} #{} "
+                                "must be set with the key 'title'".format(
+                                    index_alternative_title,
+                                    work_type_query_name,
+                                    index_work,
+                                )
+                            )
+
+    def feed(self):
+        """Execute the feeding action."""
         # get list of works on the server
         old_works = self.http_client.retrieve_works()
         logger.info("Found %i works in server", len(old_works))
@@ -94,24 +135,7 @@ class WorksFeeder:
         )
 
         # check works validity
-        for work_type_query_name, works in self.bar(
-            works_by_type.items(), text="Checking works"
-        ):
-            # check works is a list
-            if not isinstance(works, list):
-                raise WorksInvalidError(
-                    "Works of type {} must be stored in a list".format(
-                        work_type_query_name
-                    )
-                )
-
-            for index, work in enumerate(works):
-                if "title" not in work:
-                    raise WorkInvalidError(
-                        "Work of type {} #{} must have a title".format(
-                            work_type_query_name, index
-                        )
-                    )
+        self.check(works_by_type)
 
         # reformat works to include the work type
         new_works = [
