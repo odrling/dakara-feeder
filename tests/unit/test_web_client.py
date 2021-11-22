@@ -81,23 +81,6 @@ class HTTPClientDakaraTestCase(TestCase):
         # assert the mock
         mocked_post.assert_called_with("library/songs/", json=song)
 
-    @patch.object(web_client.HTTPClientDakara, "delete", autoset=True)
-    def test_delete_song(self, mocked_delete):
-        """Test to delete one song on the server."""
-        # create song ID
-        song_id = 42
-
-        # create the object
-        http_client = web_client.HTTPClientDakara(
-            self.config, endpoint_prefix=self.endpoint_prefix
-        )
-
-        # call the method
-        http_client.delete_song(song_id)
-
-        # assert the mock
-        mocked_delete.assert_called_with("library/songs/42/")
-
     @patch.object(web_client.HTTPClientDakara, "put", autoset=True)
     def test_put_song(self, mocked_put):
         """Test to update one song on the server."""
@@ -124,6 +107,23 @@ class HTTPClientDakaraTestCase(TestCase):
         mocked_put.assert_called_with("library/songs/42/", json=song)
 
     @patch.object(web_client.HTTPClientDakara, "delete", autoset=True)
+    def test_delete_song(self, mocked_delete):
+        """Test to delete one song on the server."""
+        # create song ID
+        song_id = 42
+
+        # create the object
+        http_client = web_client.HTTPClientDakara(
+            self.config, endpoint_prefix=self.endpoint_prefix
+        )
+
+        # call the method
+        http_client.delete_song(song_id)
+
+        # assert the mock
+        mocked_delete.assert_called_with("library/songs/42/")
+
+    @patch.object(web_client.HTTPClientDakara, "delete", autoset=True)
     def test_prune_artists(self, mocked_delete):
         """Test to prune artists."""
         # mock objects
@@ -142,6 +142,116 @@ class HTTPClientDakaraTestCase(TestCase):
 
         # assert the mock
         mocked_delete.assert_called_with("library/artists/prune/")
+
+    @patch.object(web_client.HTTPClientDakara, "get", autoset=True)
+    def test_retrieve_works(self, mocked_get):
+        """Test to obtain the list of works."""
+        # create the mock
+        mocked_get.return_value = [
+            {
+                "id": 0,
+                "title": "title 0",
+                "subtitle": "subtitle 0",
+                "work_type": {"query_name": "anime"},
+            },
+            {
+                "id": 1,
+                "title": "title 1",
+                "subtitle": "subtitle 1",
+                "work_type": {"query_name": "anime"},
+            },
+        ]
+
+        # create the object
+        http_client = web_client.HTTPClientDakara(
+            self.config, endpoint_prefix=self.endpoint_prefix
+        )
+
+        # call the method
+        works_list = http_client.retrieve_works()
+
+        # assert the songs are present and filename and directory is joined
+        self.assertCountEqual(
+            works_list,
+            [
+                {
+                    "id": 0,
+                    "title": "title 0",
+                    "subtitle": "subtitle 0",
+                    "work_type": {"query_name": "anime"},
+                },
+                {
+                    "id": 1,
+                    "title": "title 1",
+                    "subtitle": "subtitle 1",
+                    "work_type": {"query_name": "anime"},
+                },
+            ],
+        )
+
+        # assert the mock
+        mocked_get.assert_called_with("library/works/retrieve/")
+
+    @patch.object(web_client.HTTPClientDakara, "post", autoset=True)
+    def test_post_work(self, mocked_post):
+        """Test to create one work on the server."""
+        # create work
+        work = {
+            "title": "title 0",
+            "subtitle": "subtitle 0",
+            "alternative_names": [
+                {
+                    "title": "title 00",
+                },
+                {
+                    "title": "title 000",
+                },
+            ],
+            "work_type": {"query_name": "anime"},
+        }
+
+        # create the object
+        http_client = web_client.HTTPClientDakara(
+            self.config, endpoint_prefix=self.endpoint_prefix
+        )
+
+        # call the method
+        http_client.post_work(work)
+
+        # assert the mock
+        mocked_post.assert_called_with("library/works/", json=work)
+
+    @patch.object(web_client.HTTPClientDakara, "put", autoset=True)
+    def test_put_work(self, mocked_put):
+        """Test to update one work on the server."""
+        # create work ID
+        work_id = 42
+
+        # create work
+        work = {
+            "title": "title 0",
+            "subtitle": "subtitle 0",
+            "alternative_names": [
+                {
+                    "title": "title 00",
+                },
+                {
+                    "title": "title 000",
+                },
+            ],
+            "work_type": {"query_name": "anime"},
+        }
+
+        # create the object
+        http_client = web_client.HTTPClientDakara(
+            self.config, endpoint_prefix=self.endpoint_prefix
+        )
+
+        # call the method
+        http_client.put_work(work_id, work)
+
+        # assert the mock
+        mocked_put.assert_called_with("library/works/42/", json=work)
 
     @patch.object(web_client.HTTPClientDakara, "delete", autoset=True)
     def test_prune_works(self, mocked_delete):

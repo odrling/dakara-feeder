@@ -14,14 +14,14 @@ from dakara_feeder.metadata import FFProbeMetadataParser
 
 
 @skipUnless(FFProbeMetadataParser.is_available(), "FFProbe not installed")
+@patch("dakara_feeder.feeder.songs.HTTPClientDakara", autoset=True)
 class SongsFeederIntegrationTestCase(TestCase):
-    """Integration test for the Feeder class."""
+    """Integration tests for the SongsFeeder class."""
 
-    @patch("dakara_feeder.feeder.songs.HTTPClientDakara", autoset=True)
-    def test_feed(self, mocked_dakara_server_class):
+    def test_feed(self, mocked_http_client_dakara_class):
         """Test to feed."""
         # create the mocks
-        mocked_dakara_server_class.return_value.retrieve_songs.return_value = []
+        mocked_http_client_dakara_class.return_value.retrieve_songs.return_value = []
 
         # create the object
         with TempDir() as temp:
@@ -41,8 +41,8 @@ class SongsFeederIntegrationTestCase(TestCase):
                     feeder.feed()
 
         # assert the mocked calls
-        mocked_dakara_server_class.return_value.retrieve_songs.assert_called_with()
-        mocked_dakara_server_class.return_value.post_song.assert_called_with(
+        mocked_http_client_dakara_class.return_value.retrieve_songs.assert_called_with()
+        mocked_http_client_dakara_class.return_value.post_song.assert_called_with(
             [
                 {
                     "title": "dummy",
