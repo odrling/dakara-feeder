@@ -130,26 +130,26 @@ The file should contain a dictionary where keys are work types query name and va
 
 ```json
 {
-  'work_type_1':
+  "work_type_1":
     [
       {
-        'title': 'Work 1',
-        'subtitle': 'Subtitle 1',
-        'alternative_titles': [
+        "title": "Work 1",
+        "subtitle": "Subtitle 1",
+        "alternative_titles": [
           {
-            'title': 'AltTitle 1'
+            "title": "AltTitle 1"
           },
           {
-            'title': 'AltTitle 2'
+            "title": "AltTitle 2"
           }
         ]
       },
       {
-        'title': 'Work 2',
-        'subtitle': 'Subtitle 2'
+        "title": "Work 2",
+        "subtitle": "Subtitle 2"
       }
     ],
-  'work_type_2': []
+  "work_type_2": []
 }
 ```
 
