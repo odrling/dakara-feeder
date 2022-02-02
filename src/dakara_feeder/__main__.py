@@ -14,10 +14,11 @@ from dakara_base.config import (
 from dakara_base.exceptions import DakaraError
 from path import Path
 
-from dakara_feeder.songs_feeder import SongsFeeder
-from dakara_feeder.tags_feeder import TagsFeeder
+from dakara_feeder.feeder.songs import SongsFeeder
+from dakara_feeder.feeder.tags import TagsFeeder
+from dakara_feeder.feeder.work_types import WorkTypesFeeder
+from dakara_feeder.feeder.works import WorksFeeder
 from dakara_feeder.version import __date__, __version__
-from dakara_feeder.work_types_feeder import WorkTypesFeeder
 
 CONFIG_FILE = "feeder.yaml"
 
@@ -107,6 +108,27 @@ def get_parser():
         help="do not delete artists and works without songs at end of feed",
     )
 
+    # feed works subparser
+    works_subparser = feed_subparser.add_parser(
+        "works",
+        description="Feed works to the server",
+        help="Feed works to the server",
+    )
+    works_subparser.set_defaults(function=feed_works)
+
+    works_subparser.add_argument(
+        "file",
+        help="path to the works JSON file",
+        type=Path,
+    )
+
+    works_subparser.add_argument(
+        "-u",
+        "--update-only",
+        help="only update existing works on the server",
+        action="store_true",
+    )
+
     # feed tags subparser
     tags_subparser = feed_subparser.add_parser(
         "tags",
@@ -158,6 +180,20 @@ def feed_songs(args):
     config = load_config_securely(args.debug)
     feeder = SongsFeeder(
         config, force_update=args.force, prune=args.prune, progress=args.progress
+    )
+    load_feeder_securely(feeder)
+    feeder.feed()
+
+
+def feed_works(args):
+    """Feed works.
+
+    Args:
+        args (argparse.Namespace): Arguments from command line.
+    """
+    config = load_config_securely(args.debug)
+    feeder = WorksFeeder(
+        config, args.file, update_only=args.update_only, progress=args.progress
     )
     load_feeder_securely(feeder)
     feeder.feed()
@@ -273,3 +309,7 @@ def main():
         value = 128
 
     exit(value)
+
+
+if __name__ == "__main__":
+    main()

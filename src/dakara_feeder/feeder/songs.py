@@ -7,13 +7,13 @@ from dakara_base.progress_bar import null_bar, progress_bar
 from path import Path
 
 from dakara_feeder.customization import get_custom_song
-from dakara_feeder.dakara_server import DakaraServer
-from dakara_feeder.diff_generator import generate_diff, match_similar
-from dakara_feeder.directory_lister import list_directory
-from dakara_feeder.similarity_calculator import calculate_file_path_similarity
+from dakara_feeder.difference import generate_diff, match_similar
+from dakara_feeder.directory import list_directory
+from dakara_feeder.similarity import calculate_file_path_similarity
 from dakara_feeder.song import BaseSong
 from dakara_feeder.utils import divide_chunks
 from dakara_feeder.version import check_version
+from dakara_feeder.web_client import HTTPClientDakara
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ class SongsFeeder:
         progress (bool): If True, a progress bar is displayed during long tasks.
 
     Attributes:
-        dakara_server (dakara_server.DakaraServer): Client for the Dakara server.
+        http_client (web_client.HTTPClientDakara): Client for the Dakara server.
         kara_folder_path (path.Path): Path to the scanned folder containing karaoke
             files.
         songs_per_chunk (int): Number of songs per chunk to send to server when
@@ -47,7 +47,7 @@ class SongsFeeder:
 
     def __init__(self, config, force_update=False, prune=True, progress=True):
         # create objects
-        self.dakara_server = DakaraServer(config["server"], endpoint_prefix="api")
+        self.http_client = HTTPClientDakara(config["server"], endpoint_prefix="api")
         self.kara_folder_path = Path(config["kara_folder"])
         self.force_update = force_update
         self.prune = prune
@@ -69,7 +69,7 @@ class SongsFeeder:
         self.check_kara_folder_path()
 
         # authenticate to server
-        self.dakara_server.authenticate()
+        self.http_client.authenticate()
 
     def check_kara_folder_path(self):
         """Check the kara folder is valid.
@@ -85,7 +85,7 @@ class SongsFeeder:
     def feed(self):
         """Execute the feeding action."""
         # get list of songs on the server
-        old_songs = self.dakara_server.get_songs()
+        old_songs = self.http_client.retrieve_songs()
         logger.info("Found %i songs in server", len(old_songs))
 
         old_songs_id_by_path = {song["path"]: song["id"] for song in old_songs}
@@ -151,30 +151,30 @@ class SongsFeeder:
                 list(divide_chunks(added_songs, self.songs_per_chunk)),
                 text="Uploading added songs",
             ):
-                self.dakara_server.post_song(songs_chunk)
+                self.http_client.post_song(songs_chunk)
 
         # update renamed songs on server
         if updated_songs:
             for song, song_id in self.bar(
                 updated_songs, text="Uploading updated songs"
             ):
-                self.dakara_server.put_song(song_id, song)
+                self.http_client.put_song(song_id, song)
 
         # remove deleted songs on server
         if deleted_songs_path:
             for song_path in self.bar(
                 deleted_songs_path, text="Deleting removed songs"
             ):
-                self.dakara_server.delete_song(old_songs_id_by_path[song_path])
+                self.http_client.delete_song(old_songs_id_by_path[song_path])
 
         # prune artists and works without songs
         if self.prune:
-            artists_deleted_count = self.dakara_server.prune_artists()
+            artists_deleted_count = self.http_client.prune_artists()
             logger.info(
                 "Deleted %i artists without songs on server", artists_deleted_count
             )
 
-            works_deleted_count = self.dakara_server.prune_works()
+            works_deleted_count = self.http_client.prune_works()
             logger.info("Deleted %i works without songs on server", works_deleted_count)
 
 

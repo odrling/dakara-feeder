@@ -9,7 +9,7 @@ try:
 except ImportError:
     from importlib_resources import path
 
-from dakara_feeder.metadata_parser import (
+from dakara_feeder.metadata import (
     FFProbeMetadataParser,
     MediainfoMetadataParser,
     MediaNotFoundError,

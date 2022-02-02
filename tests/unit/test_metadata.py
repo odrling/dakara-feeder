@@ -5,7 +5,7 @@ from unittest.mock import ANY, patch
 from path import Path
 from pymediainfo import MediaInfo
 
-from dakara_feeder.metadata_parser import (
+from dakara_feeder.metadata import (
     FFProbeMetadataParser,
     FFProbeNotInstalledError,
     MediainfoMetadataParser,
@@ -41,7 +41,7 @@ class NullMetadataParserTestCase(TestCase):
 class MediainfoMetadataParserTestCase(TestCase):
     """Test the Mediainfo metadata parser."""
 
-    @patch("dakara_feeder.metadata_parser.MediaInfo.can_parse", autoset=True)
+    @patch("dakara_feeder.metadata.MediaInfo.can_parse", autoset=True)
     def test_available(self, mocked_can_parse):
         """Test when the parser is available."""
         # call the method
@@ -53,7 +53,7 @@ class MediainfoMetadataParserTestCase(TestCase):
         # assert the call
         mocked_can_parse.assert_called_with()
 
-    @patch("dakara_feeder.metadata_parser.MediaInfo.can_parse", autoset=True)
+    @patch("dakara_feeder.metadata.MediaInfo.can_parse", autoset=True)
     def test_not_available(self, mocked_can_parse):
         """Test when the parser is not available."""
         # prepare the mock
@@ -93,7 +93,7 @@ class MediainfoMetadataParserTestCase(TestCase):
 class FFProbeMetadataParserTestCase(TestCase):
     """Test the FFProbe metadata parser."""
 
-    @patch("dakara_feeder.metadata_parser.subprocess.run", autoset=True)
+    @patch("dakara_feeder.metadata.subprocess.run", autoset=True)
     def test_available(self, mocked_run):
         """Test when the parser is available."""
         # call the method
@@ -105,7 +105,7 @@ class FFProbeMetadataParserTestCase(TestCase):
         # assert the call
         mocked_run.assert_called_with(["ffprobe", "-version"], stdout=ANY, stderr=ANY)
 
-    @patch("dakara_feeder.metadata_parser.subprocess.run", autoset=True)
+    @patch("dakara_feeder.metadata.subprocess.run", autoset=True)
     def test_not_available(self, mocked_run):
         """Test when the parser is not available."""
         # prepare the mock

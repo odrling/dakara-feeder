@@ -8,10 +8,10 @@ from path import Path
 logger = logging.getLogger(__name__)
 
 
-class DakaraServer(HTTPClient):
-    """Client to the Dakara server."""
+class HTTPClientDakara(HTTPClient):
+    """Client to communicate with the Dakara server."""
 
-    def get_songs(self):
+    def retrieve_songs(self):
         """Retreive the songs of the library containing their path.
 
         Returns:
@@ -35,15 +35,6 @@ class DakaraServer(HTTPClient):
         endpoint = "library/songs/"
         self.post(endpoint, json=song)
 
-    def delete_song(self, song_id):
-        """Delete one song on the server.
-
-        Args:
-            song_id (int): ID of the song to delete.
-        """
-        endpoint = "library/songs/{}/".format(song_id)
-        self.delete(endpoint)
-
     def put_song(self, song_id, song):
         """Update one song on the server.
 
@@ -54,6 +45,15 @@ class DakaraServer(HTTPClient):
         endpoint = "library/songs/{}/".format(song_id)
         self.put(endpoint, json=song)
 
+    def delete_song(self, song_id):
+        """Delete one song on the server.
+
+        Args:
+            song_id (int): ID of the song to delete.
+        """
+        endpoint = "library/songs/{}/".format(song_id)
+        self.delete(endpoint)
+
     def prune_artists(self):
         """Prune artists without songs.
 
@@ -62,6 +62,34 @@ class DakaraServer(HTTPClient):
         """
         endpoint = "library/artists/prune/"
         return self.delete(endpoint)["deleted_count"]
+
+    def retrieve_works(self):
+        """Retreive the works of the library with minimal data.
+
+        Returns:
+            list: List of works.
+        """
+        endpoint = "library/works/retrieve/"
+        return self.get(endpoint)
+
+    def post_work(self, work):
+        """Create one or several works on the server.
+
+        Args:
+            work (dict or list of dict): New work(s) representation.
+        """
+        endpoint = "library/works/"
+        self.post(endpoint, json=work)
+
+    def put_work(self, work_id, work):
+        """Update one work on the server.
+
+        Args:
+            work_id (int): ID of the work to update.
+            work (dict): Work representation.
+        """
+        endpoint = "library/works/{}/".format(work_id)
+        self.put(endpoint, json=work)
 
     def prune_works(self):
         """Prune works without songs.
@@ -72,7 +100,7 @@ class DakaraServer(HTTPClient):
         endpoint = "library/works/prune/"
         return self.delete(endpoint)["deleted_count"]
 
-    def create_tag(self, tag):
+    def post_tag(self, tag):
         """Create a tag on the server.
 
         Args:
@@ -98,7 +126,7 @@ class DakaraServer(HTTPClient):
         endpoint = "library/song-tags/"
         self.post(endpoint, tag, function_on_error=on_error)
 
-    def create_work_type(self, work_type):
+    def post_work_type(self, work_type):
         """Create a work type on the server.
 
         Args:

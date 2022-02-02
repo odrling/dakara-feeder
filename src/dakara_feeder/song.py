@@ -2,12 +2,12 @@
 
 import logging
 
-from dakara_feeder.metadata_parser import (
+from dakara_feeder.metadata import (
     FFProbeMetadataParser,
     MediaParseError,
     NullMetadataParser,
 )
-from dakara_feeder.subtitle_parser import Pysubs2SubtitleParser, SubtitleParseError
+from dakara_feeder.subtitle.parsing import Pysubs2SubtitleParser, SubtitleParseError
 
 logger = logging.getLogger(__name__)
 
@@ -48,20 +48,20 @@ class BaseSong:
 
     Metadata of the video file are extracted using a metadata parser and stored
     in the `metadata` attribute. The metadata parser to chose is decided by
-    setting the class attribute `metadata_parser_class`. The class must
-    implement `dakara_feeder.metadata_parser.MetadataParser` base class. So far,
+    setting the class attribute `metadata_class`. The class must
+    implement `dakara_feeder.metadata.MetadataParser` base class. So far,
     two implemenations are available in the project:
-        - `dakara_feeder.metadata_parser.FFProbeMetadataParser`, based on
+        - `dakara_feeder.metadata.FFProbeMetadataParser`, based on
             FFProbe, part of FFMpeg (external dependency). This is the recommended
             and the default parser;
-        - `dakara_feeder.metadata_parser.MediainfoMetadataParser`, based on
+        - `dakara_feeder.metadata.MediainfoMetadataParser`, based on
             MediaInfo (external dependency). Slower, may not work on Windows.
 
     Metadata are available when calling `pre_process`.
 
     If the metadata cannot be extracted from the video file for any reason, the
     `metadata` attribute will contain a
-    `dakara_feeder.metadata_parser.NullMetadataParser` that always return null
+    `dakara_feeder.metadata.NullMetadataParser` that always return null
     values (e.g. 0 seconds duration).
 
     Args.
@@ -69,8 +69,8 @@ class BaseSong:
         paths (directory_lister.SongPaths): Paths of the song file.
 
     Attributes:
-        metadata_parser_class (type): Class of the metadata parser to use.
-            Default to `dakara_feeder.metadata_parser.FFProbeMetadataParser`.
+        metadata_class (type): Class of the metadata parser to use.
+            Default to `dakara_feeder.metadata.FFProbeMetadataParser`.
         base_directory (path.Path): Path to the scanned directory.
         video_path (path.Path): Path to the song file, relative to the base
             directory.
@@ -80,11 +80,11 @@ class BaseSong:
             base directory.
         others_path (list of path.Path): List of paths to the other files,
             relative to the base directory.
-        metadata (dakara_feeder.metadata_parser.MetadataParser): Object for
+        metadata (dakara_feeder.metadata.MetadataParser): Object for
             containing metadata of the video file.
     """
 
-    metadata_parser_class = FFProbeMetadataParser
+    metadata_class = FFProbeMetadataParser
 
     def __init__(self, base_directory, paths):
         self.base_directory = base_directory
@@ -97,7 +97,7 @@ class BaseSong:
     def parse_metadata(self):
         """Use the requested metadata parser to parse video file."""
         try:
-            self.metadata = self.metadata_parser_class.parse(
+            self.metadata = self.metadata_class.parse(
                 self.base_directory / self.video_path
             )
 
@@ -273,7 +273,7 @@ class BaseSong:
 
         Lyrics can be extracted from the subtitle file using a parser. One
         parser is available in the project:
-            - `dakara_feeder.subtitle_parser.Pysubs2SubtitleParser`, based on
+            - `dakara_feeder.subtitle.parsing.Pysubs2SubtitleParser`, based on
                 Pysubs2.
 
         Returns:
