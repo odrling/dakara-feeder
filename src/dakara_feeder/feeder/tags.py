@@ -39,6 +39,7 @@ class TagsFeeder:
         check_version()
 
         # authenticate to server
+        self.http_client.load()
         self.http_client.authenticate()
 
     def feed(self):

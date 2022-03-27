@@ -1,17 +1,22 @@
 """Command line interface to run the feeder."""
 
 import logging
+import sys
 from argparse import ArgumentParser
 
 from dakara_base.config import (
+    Config,
     ConfigNotFoundError,
     create_config_file,
     create_logger,
-    get_config_file,
-    load_config,
     set_loglevel,
 )
-from dakara_base.exceptions import DakaraError
+from dakara_base.directory import directories
+from dakara_base.exceptions import (
+    DakaraError,
+    generate_exception_handler,
+    handle_all_exceptions,
+)
 from path import Path
 
 from dakara_feeder.feeder.songs import SongsFeeder
@@ -21,9 +26,19 @@ from dakara_feeder.feeder.works import WorksFeeder
 from dakara_feeder.version import __date__, __version__
 
 CONFIG_FILE = "feeder.yaml"
+CONFIG_PREFIX = "DAKARA"
 
 
 logger = logging.getLogger(__name__)
+handle_config_not_found = generate_exception_handler(
+    ConfigNotFoundError, "Please run 'dakara-feeder create-config'"
+)
+handle_config_incomplete = generate_exception_handler(
+    DakaraError,
+    "Config may be incomplete, please check '{}'".format(
+        directories.user_config_dir / CONFIG_FILE
+    ),
+)
 
 
 def get_parser():
@@ -161,7 +176,7 @@ def get_parser():
 
 
 def create_config(args):
-    """Create the config.
+    """Create a new config file.
 
     Args:
         args (argparse.Namespace): Arguments from command line.
@@ -177,11 +192,21 @@ def feed_songs(args):
     Args:
         args (argparse.Namespace): Arguments from command line.
     """
-    config = load_config_securely(args.debug)
+    with handle_config_not_found():
+        create_logger(wrap=True)
+        config = Config(CONFIG_PREFIX)
+        config.load_file(directories.user_config_dir / CONFIG_FILE)
+        config.check_mandatory_keys(["kara_folder", "server"])
+        config.set_debug(args.debug)
+        set_loglevel(config)
+
     feeder = SongsFeeder(
         config, force_update=args.force, prune=args.prune, progress=args.progress
     )
-    load_feeder_securely(feeder)
+
+    with handle_config_incomplete():
+        feeder.load()
+
     feeder.feed()
 
 
@@ -191,11 +216,24 @@ def feed_works(args):
     Args:
         args (argparse.Namespace): Arguments from command line.
     """
-    config = load_config_securely(args.debug)
+    with handle_config_not_found():
+        create_logger(wrap=True)
+        config = Config(CONFIG_PREFIX)
+        config.load_file(directories.user_config_dir / CONFIG_FILE)
+        config.check_mandatory_keys(["server"])
+        config.set_debug(args.debug)
+        set_loglevel(config)
+
     feeder = WorksFeeder(
-        config, args.file, update_only=args.update_only, progress=args.progress
+        config,
+        works_file_path=args.file,
+        update_only=args.update_only,
+        progress=args.progress,
     )
-    load_feeder_securely(feeder)
+
+    with handle_config_incomplete():
+        feeder.load()
+
     feeder.feed()
 
 
@@ -205,9 +243,19 @@ def feed_tags(args):
     Args:
         args (argparse.Namespace): Arguments from command line.
     """
-    config = load_config_securely(args.debug)
+    with handle_config_not_found():
+        create_logger(wrap=True)
+        config = Config(CONFIG_PREFIX)
+        config.load_file(directories.user_config_dir / CONFIG_FILE)
+        config.check_mandatory_keys(["server"])
+        config.set_debug(args.debug)
+        set_loglevel(config)
+
     feeder = TagsFeeder(config, tags_file_path=args.file, progress=args.progress)
-    load_feeder_securely(feeder)
+
+    with handle_config_incomplete():
+        feeder.load()
+
     feeder.feed()
 
 
@@ -217,64 +265,22 @@ def feed_work_types(args):
     Args:
         args (argparse.Namespace): Arguments from command line.
     """
-    config = load_config_securely(args.debug)
+    with handle_config_not_found():
+        create_logger(wrap=True)
+        config = Config(CONFIG_PREFIX)
+        config.load_file(directories.user_config_dir / CONFIG_FILE)
+        config.check_mandatory_keys(["server"])
+        config.set_debug(args.debug)
+        set_loglevel(config)
+
     feeder = WorkTypesFeeder(
         config, work_types_file_path=args.file, progress=args.progress
     )
-    load_feeder_securely(feeder)
-    feeder.feed()
 
-
-def load_config_securely(debug=False):
-    """Securely load the config.
-
-    Display help to create config if it fails.
-
-    Args:
-        debug (bool): enable debug mode.
-
-    Returns:
-        dict: config values.
-
-    Raises:
-        ConfigNotFoundError: If loading the config raises the same error.
-    """
-    create_logger(wrap=True)
-
-    try:
-        config = load_config(
-            get_config_file(CONFIG_FILE),
-            debug,
-            mandatory_keys=["kara_folder", "server"],
-        )
-
-    except ConfigNotFoundError as error:
-        raise ConfigNotFoundError(
-            "{}, please run 'dakara-feed create-config'".format(error)
-        ) from error
-
-    set_loglevel(config)
-
-    return config
-
-
-def load_feeder_securely(feeder):
-    """Securely load the feeder.
-
-    Consider that the config is incomplete if it fails.
-
-    Raises:
-        DakaraError: If loading the feeder raises an equivalent error.
-    """
-    try:
+    with handle_config_incomplete():
         feeder.load()
 
-    except DakaraError as error:
-        raise error.__class__(
-            "{}\nConfig may be incomplete, please check '{}'".format(
-                error, get_config_file(CONFIG_FILE)
-            )
-        ) from error
+    feeder.feed()
 
 
 def main():
@@ -282,34 +288,11 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
 
-    try:
+    with handle_all_exceptions(
+        bugtracker_url="https://github.com/DakaraProject/dakara-feeder/issues",
+        logger=logger,
+        debug=args.debug,
+    ) as exit_value:
         args.function(args)
-        value = 0
 
-    except KeyboardInterrupt:
-        logger.info("Quit by user")
-        value = 255
-
-    except DakaraError as error:
-        if args.debug:
-            raise
-
-        logger.critical(error)
-        value = 1
-
-    except BaseException as error:
-        if args.debug:
-            raise
-
-        logger.exception("Unexpected error: %s", error)
-        logger.critical(
-            "Please fill a bug report at "
-            "https://github.com/DakaraProject/dakara-feeder/issues"
-        )
-        value = 128
-
-    exit(value)
-
-
-if __name__ == "__main__":
-    main()
+    sys.exit(exit_value.value)

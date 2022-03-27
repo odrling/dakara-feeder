@@ -69,6 +69,7 @@ class SongsFeeder:
         self.check_kara_folder_path()
 
         # authenticate to server
+        self.http_client.load()
         self.http_client.authenticate()
 
     def check_kara_folder_path(self):

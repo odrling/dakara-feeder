@@ -2,8 +2,7 @@ from argparse import ArgumentParser, Namespace
 from unittest import TestCase
 from unittest.mock import ANY, MagicMock, patch
 
-from dakara_base.config import ConfigNotFoundError
-from dakara_base.exceptions import DakaraError
+from dakara_base.config import Config
 from path import Path
 
 from dakara_feeder.__main__ import (
@@ -12,22 +11,16 @@ from dakara_feeder.__main__ import (
     feed_tags,
     feed_work_types,
     feed_works,
-    load_config_securely,
-    load_feeder_securely,
     main,
 )
-from dakara_feeder.feeder.songs import SongsFeeder
-from dakara_feeder.feeder.tags import TagsFeeder
-from dakara_feeder.feeder.work_types import WorkTypesFeeder
-from dakara_feeder.feeder.works import WorksFeeder
 
 
+@patch("dakara_feeder.__main__.CONFIG_FILE", "feeder.yaml")
+@patch("dakara_feeder.__main__.create_logger")
+@patch("dakara_feeder.__main__.create_config_file")
 class CreateConfigTestCase(TestCase):
     """Test the create-config subcommand."""
 
-    @patch("dakara_feeder.__main__.CONFIG_FILE", "feeder.yaml")
-    @patch("dakara_feeder.__main__.create_logger")
-    @patch("dakara_feeder.__main__.create_config_file")
     def test_create_config(self, mocked_create_config_file, mocked_create_logger):
         """Test a normall config creation."""
         # call the function
@@ -49,256 +42,165 @@ class CreateConfigTestCase(TestCase):
         )
 
 
+@patch("dakara_feeder.__main__.SongsFeeder", autospec=True)
+@patch("dakara_feeder.__main__.set_loglevel")
+@patch.object(Config, "set_debug")
+@patch.object(Config, "check_mandatory_keys")
+@patch.object(Config, "load_file")
+@patch("dakara_feeder.__main__.create_logger")
 class FeedSongsTestCase(TestCase):
     """Test the feed songs subcommand."""
 
-    @patch.object(SongsFeeder, "feed")
-    @patch("dakara_feeder.__main__.load_feeder_securely")
-    @patch("dakara_feeder.__main__.load_config_securely")
     def test_feed(
         self,
-        mocked_load_config,
-        mocked_load_feeder,
-        mocked_feed,
+        mocked_create_logger,
+        mocked_load_file,
+        mocked_check_mandatory_keys,
+        mocked_set_debug,
+        mocked_set_loglevel,
+        mocked_songs_feeder_class,
     ):
         """Test to feed songs."""
-        # setup the mocks
-        config = {
-            "kara_folder": Path("path") / "to" / "folder",
-            "server": {
-                "url": "www.example.com",
-                "login": "login",
-                "password": "password",
-            },
-        }
-        mocked_load_config.return_value = config
-
         # call the function
         feed_songs(Namespace(debug=False, force=False, progress=True, prune=True))
 
         # assert the call
-        mocked_load_config.assert_called_with(False)
-        mocked_load_feeder.assert_called_with(ANY)
-        mocked_feed.assert_called_with()
+        mocked_create_logger.assert_called_with(wrap=True)
+        mocked_load_file.assert_called_with(ANY)
+        mocked_check_mandatory_keys.assert_called_with(["kara_folder", "server"])
+        mocked_set_debug.assert_called_with(False)
+        mocked_set_loglevel.assert_called_with(ANY)
+        mocked_songs_feeder_class.assert_called_with(
+            ANY, force_update=False, prune=True, progress=True
+        )
+        mocked_songs_feeder_class.return_value.load.assert_called_with()
+        mocked_songs_feeder_class.return_value.feed.assert_called_with()
 
 
+@patch("dakara_feeder.__main__.WorksFeeder", autospec=True)
+@patch("dakara_feeder.__main__.set_loglevel")
+@patch.object(Config, "set_debug")
+@patch.object(Config, "check_mandatory_keys")
+@patch.object(Config, "load_file")
+@patch("dakara_feeder.__main__.create_logger")
 class FeedWorksTestCase(TestCase):
     """Test the feed works subcommand."""
 
-    @patch.object(WorksFeeder, "feed")
-    @patch("dakara_feeder.__main__.load_feeder_securely")
-    @patch("dakara_feeder.__main__.load_config_securely")
     def test_feed(
         self,
-        mocked_load_config,
-        mocked_load_feeder,
-        mocked_feed,
+        mocked_create_logger,
+        mocked_load_file,
+        mocked_check_mandatory_keys,
+        mocked_set_debug,
+        mocked_set_loglevel,
+        mocked_works_feeder_class,
     ):
         """Test to feed songs."""
-        # setup the mocks
-        config = {
-            "kara_folder": Path("path") / "to" / "folder",
-            "server": {
-                "url": "www.example.com",
-                "login": "login",
-                "password": "password",
-            },
-        }
-        mocked_load_config.return_value = config
-
         # call the function
         feed_works(
-            Namespace(debug=False, file=Path("file"), progress=True, update_only=False)
-        )
-
-        # assert the call
-        mocked_load_config.assert_called_with(False)
-        mocked_load_feeder.assert_called_with(ANY)
-        mocked_feed.assert_called_with()
-
-
-class FeedTagsTestCase(TestCase):
-    """Test the feed tags subcommand."""
-
-    @patch.object(TagsFeeder, "feed")
-    @patch("dakara_feeder.__main__.load_feeder_securely")
-    @patch("dakara_feeder.__main__.load_config_securely")
-    def test_feed(
-        self,
-        mocked_load_config,
-        mocked_load_feeder,
-        mocked_feed,
-    ):
-        """Test to feed tags."""
-        # setup the mocks
-        config = {
-            "kara_folder": Path("path") / "to" / "folder",
-            "server": {
-                "url": "www.example.com",
-                "login": "login",
-                "password": "password",
-            },
-        }
-        mocked_load_config.return_value = config
-
-        # call the function
-        feed_tags(
             Namespace(
-                debug=False, file=Path("path") / "to" / "tags" / "file", progress=True
+                debug=False,
+                file=Path("path") / "to" / "file",
+                progress=True,
+                update_only=False,
             )
         )
 
         # assert the call
-        mocked_load_config.assert_called_with(False)
-        mocked_load_feeder.assert_called_with(ANY)
-        mocked_feed.assert_called_with()
+        mocked_create_logger.assert_called_with(wrap=True)
+        mocked_load_file.assert_called_with(ANY)
+        mocked_check_mandatory_keys.assert_called_with(["server"])
+        mocked_set_debug.assert_called_with(False)
+        mocked_set_loglevel.assert_called_with(ANY)
+        mocked_works_feeder_class.assert_called_with(
+            ANY,
+            works_file_path=Path("path") / "to" / "file",
+            progress=True,
+            update_only=False,
+        )
+        mocked_works_feeder_class.return_value.load.assert_called_with()
+        mocked_works_feeder_class.return_value.feed.assert_called_with()
 
 
+@patch("dakara_feeder.__main__.TagsFeeder", autospec=True)
+@patch("dakara_feeder.__main__.set_loglevel")
+@patch.object(Config, "set_debug")
+@patch.object(Config, "check_mandatory_keys")
+@patch.object(Config, "load_file")
+@patch("dakara_feeder.__main__.create_logger")
+class FeedTagsTestCase(TestCase):
+    """Test the feed tags subcommand."""
+
+    def test_feed(
+        self,
+        mocked_create_logger,
+        mocked_load_file,
+        mocked_check_mandatory_keys,
+        mocked_set_debug,
+        mocked_set_loglevel,
+        mocked_tags_feeder_class,
+    ):
+        """Test to feed tags."""
+        # call the function
+        feed_tags(
+            Namespace(debug=False, file=Path("path") / "to" / "file", progress=True)
+        )
+
+        # assert the call
+        mocked_create_logger.assert_called_with(wrap=True)
+        mocked_load_file.assert_called_with(ANY)
+        mocked_check_mandatory_keys.assert_called_with(["server"])
+        mocked_set_debug.assert_called_with(False)
+        mocked_set_loglevel.assert_called_with(ANY)
+        mocked_tags_feeder_class.assert_called_with(
+            ANY, tags_file_path=Path("path") / "to" / "file", progress=True
+        )
+        mocked_tags_feeder_class.return_value.load.assert_called_with()
+        mocked_tags_feeder_class.return_value.feed.assert_called_with()
+
+
+@patch("dakara_feeder.__main__.WorkTypesFeeder", autospec=True)
+@patch("dakara_feeder.__main__.set_loglevel")
+@patch.object(Config, "set_debug")
+@patch.object(Config, "check_mandatory_keys")
+@patch.object(Config, "load_file")
+@patch("dakara_feeder.__main__.create_logger")
 class FeedWorkTypesTestCase(TestCase):
     """Test the feed work types subcommand."""
 
-    @patch.object(WorkTypesFeeder, "feed")
-    @patch("dakara_feeder.__main__.load_feeder_securely")
-    @patch("dakara_feeder.__main__.load_config_securely")
     def test_feed(
         self,
-        mocked_load_config,
-        mocked_load_feeder,
-        mocked_feed,
+        mocked_create_logger,
+        mocked_load_file,
+        mocked_check_mandatory_keys,
+        mocked_set_debug,
+        mocked_set_loglevel,
+        mocked_work_types_feeder_class,
     ):
         """Test to feed work types."""
-        # setup the mocks
-        config = {
-            "kara_folder": Path("path") / "to" / "folder",
-            "server": {
-                "url": "www.example.com",
-                "login": "login",
-                "password": "password",
-            },
-        }
-        mocked_load_config.return_value = config
-
         # call the function
         feed_work_types(
             Namespace(
                 debug=False,
-                file=Path("path") / "to" / "work_types" / "file",
+                file=Path("path") / "to" / "file",
                 progress=True,
             )
         )
 
         # assert the call
-        mocked_load_config.assert_called_with(False)
-        mocked_load_feeder.assert_called_with(ANY)
-        mocked_feed.assert_called_with()
-
-
-class LoadConfigSafelyTestCase(TestCase):
-    @patch("dakara_feeder.__main__.set_loglevel")
-    @patch("dakara_feeder.__main__.load_config")
-    @patch("dakara_feeder.__main__.get_config_file")
-    @patch("dakara_feeder.__main__.create_logger")
-    def test_load_config(
-        self,
-        mocked_create_logger,
-        mocked_get_config_file,
-        mocked_load_config,
-        mocked_set_loglevel,
-    ):
-        """Test to load config."""
-        # create the mocks
-        config = {"key": "value"}
-        mocked_get_config_file.return_value = Path("path") / "to" / "config"
-        mocked_load_config.return_value = config
-
-        # call the function
-        config_loaded = load_config_securely()
-
-        # assert the result
-        self.assertEqual(config, config_loaded)
-
-        # assert the call
         mocked_create_logger.assert_called_with(wrap=True)
-        mocked_get_config_file.assert_called_with(ANY)
-        mocked_load_config.assert_called_with(ANY, False, mandatory_keys=ANY)
-        mocked_set_loglevel.assert_called_with(config)
-
-    @patch("dakara_feeder.__main__.set_loglevel")
-    @patch("dakara_feeder.__main__.load_config")
-    @patch("dakara_feeder.__main__.get_config_file")
-    @patch("dakara_feeder.__main__.create_logger")
-    def test_load_config_error(
-        self,
-        mocked_create_logger,
-        mocked_get_config_file,
-        mocked_load_config,
-        mocked_set_loglevel,
-    ):
-        """Test to load config when the file is not found."""
-        # create the mocks
-        mocked_get_config_file.return_value = Path("path") / "to" / "config"
-        mocked_load_config.side_effect = ConfigNotFoundError("Config file not found")
-
-        # call the function
-        with self.assertRaisesRegex(
-            ConfigNotFoundError,
-            "Config file not found, please run 'dakara-feed create-config'",
-        ):
-            load_config_securely()
-
-        # assert the call
-        mocked_create_logger.assert_called_with(wrap=True)
-        mocked_get_config_file.assert_called_with(ANY)
-        mocked_load_config.assert_called_with(ANY, False, mandatory_keys=ANY)
-        mocked_set_loglevel.assert_not_called()
-
-
-class LoadFeederSafelyTestCase(TestCase):
-    @patch("dakara_feeder.__main__.get_config_file")
-    def test_load_feeder(
-        self,
-        mocked_get_config_file,
-    ):
-        """Test to load feeder."""
-        # create the mocks
-        feeder = MagicMock()
-        mocked_get_config_file.return_value = Path("path") / "to" / "config"
-
-        # call the function
-        load_feeder_securely(feeder)
-
-        # assert the call
-        mocked_get_config_file.assert_not_called()
-        feeder.load.assert_called_with()
-
-    @patch("dakara_feeder.__main__.get_config_file")
-    def test_load_feeder_error(
-        self,
-        mocked_get_config_file,
-    ):
-        """Test to load feeder when config file is incomplete."""
-        # create the mocks
-        feeder = MagicMock()
-        feeder.load.side_effect = DakaraError("Any error message")
-        mocked_get_config_file.return_value = Path("path") / "to" / "config"
-
-        # call the function
-        with self.assertRaises(DakaraError) as error:
-            load_feeder_securely(feeder)
-
-        # assert the error
-        self.assertEqual(
-            str(error.exception),
-            "Any error message\nConfig may be incomplete, please check '{}'".format(
-                Path("path") / "to" / "config"
-            ),
+        mocked_load_file.assert_called_with(ANY)
+        mocked_check_mandatory_keys.assert_called_with(["server"])
+        mocked_set_debug.assert_called_with(False)
+        mocked_set_loglevel.assert_called_with(ANY)
+        mocked_work_types_feeder_class.assert_called_with(
+            ANY, work_types_file_path=Path("path") / "to" / "file", progress=True
         )
+        mocked_work_types_feeder_class.return_value.load.assert_called_with()
+        mocked_work_types_feeder_class.return_value.feed.assert_called_with()
 
-        # assert the call
-        mocked_get_config_file.assert_called_with(ANY)
 
-
-@patch("dakara_feeder.__main__.exit")
+@patch("dakara_feeder.__main__.sys.exit")
 @patch.object(ArgumentParser, "parse_args")
 class MainTestCase(TestCase):
     """Test the main action."""
@@ -315,96 +217,3 @@ class MainTestCase(TestCase):
         # assert the call
         function.assert_called_with(ANY)
         mocked_exit.assert_called_with(0)
-
-    def test_keyboard_interrupt(self, mocked_parse_args, mocked_exit):
-        """Test a Ctrl+C exit."""
-        # create mocks
-        def function(args):
-            raise KeyboardInterrupt()
-
-        mocked_parse_args.return_value = Namespace(function=function, debug=False)
-
-        # call the function
-        with self.assertLogs("dakara_feeder.__main__", "DEBUG") as logger:
-            main()
-
-        # assert the call
-        mocked_exit.assert_called_with(255)
-
-        # assert the logs
-        self.assertListEqual(
-            logger.output, ["INFO:dakara_feeder.__main__:Quit by user"]
-        )
-
-    def test_known_error(self, mocked_parse_args, mocked_exit):
-        """Test a known error exit."""
-        # create mocks
-        def function(args):
-            raise DakaraError("error")
-
-        mocked_parse_args.return_value = Namespace(function=function, debug=False)
-
-        # call the function
-        with self.assertLogs("dakara_feeder.__main__", "DEBUG") as logger:
-            main()
-
-        # assert the call
-        mocked_exit.assert_called_with(1)
-
-        # assert the logs
-        self.assertListEqual(logger.output, ["CRITICAL:dakara_feeder.__main__:error"])
-
-    def test_known_error_debug(self, mocked_parse_args, mocked_exit):
-        """Test a known error exit in debug mode."""
-        # create mocks
-        def function(args):
-            raise DakaraError("error message")
-
-        mocked_parse_args.return_value = Namespace(function=function, debug=True)
-
-        # call the function
-        with self.assertRaisesRegex(DakaraError, "error message"):
-            main()
-
-        # assert the call
-        mocked_exit.assert_not_called()
-
-    def test_unknown_error(self, mocked_parse_args, mocked_exit):
-        """Test an unknown error exit."""
-        # create mocks
-        def function(args):
-            raise Exception("error")
-
-        mocked_parse_args.return_value = Namespace(function=function, debug=False)
-
-        # call the function
-        with self.assertLogs("dakara_feeder.__main__", "DEBUG") as logger:
-            main()
-
-        # assert the call
-        mocked_exit.assert_called_with(128)
-
-        # assert the logs
-        self.assertListEqual(
-            logger.output,
-            [
-                ANY,
-                "CRITICAL:dakara_feeder.__main__:Please fill a bug report at "
-                "https://github.com/DakaraProject/dakara-feeder/issues",
-            ],
-        )
-
-    def test_unknown_error_debug(self, mocked_parse_args, mocked_exit):
-        """Test an unknown error exit in debug mode."""
-        # create mocks
-        def function(args):
-            raise Exception("error message")
-
-        mocked_parse_args.return_value = Namespace(function=function, debug=True)
-
-        # call the function
-        with self.assertRaisesRegex(Exception, "error message"):
-            main()
-
-        # assert the call
-        mocked_exit.assert_not_called()
