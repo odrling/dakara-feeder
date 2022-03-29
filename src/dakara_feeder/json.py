@@ -24,7 +24,7 @@ def get_json_file_content(file_path, key=None):
             content of the JSON file.
     """
     try:
-        content = json.loads(file_path.text())
+        content = json.loads(file_path.read_text())
 
     except FileNotFoundError as error:
         raise JsonFileNotFoundError(

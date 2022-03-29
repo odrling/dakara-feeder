@@ -12,7 +12,7 @@ from dakara_feeder.json import (
 )
 
 
-@patch.object(Path, "text", autoset=True)
+@patch.object(Path, "read_text", autoset=True)
 class GetJsonFileContentTestCase(TestCase):
     """Test the get_json_file_content function."""
 
