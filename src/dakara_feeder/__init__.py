@@ -22,19 +22,19 @@ from dakara_feeder import (
 from dakara_feeder.version import __date__, __version__
 
 __all__ = [
+    "__date__",
+    "__version__",
     "customization",
-    "directory",
-    "similarity",
-    "subtitle",
-    "version",
-    "yaml",
     "difference",
+    "directory",
+    "feeder",
     "json",
     "metadata",
+    "similarity",
     "song",
+    "subtitle",
     "utils",
-    "feeder",
+    "version",
     "web_client",
-    "__version__",
-    "__date__",
+    "yaml",
 ]

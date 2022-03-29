@@ -44,7 +44,11 @@ def get_path_without_extension(path):
 
     Returns:
         path.Path: Path to the file without the extension.
-        'directory/file0.mkv' will return 'directory/file0'.
+
+    Example:
+
+    >>> get_path_without_extension(Path("directory/file0.mkv"))
+    ... Path('directory/file0')
     """
     return path.dirname() / path.stem
 
@@ -56,7 +60,7 @@ def get_main_type(file):
         file (path.Path): Absolute path to the file to extract the MIME type.
 
     Returns
-        str: Main type if the MIME type can be extracted, None otherwise.
+        str: Main type if the MIME type can be extracted, `None` otherwise.
     """
     kind = filetype.guess(str(file))
 
