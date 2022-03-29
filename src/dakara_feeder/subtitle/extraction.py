@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class SubtitleExtractor(ABC):
     """Abstract class for subtitle extractor.
 
-    Arg:
+    Args:
         content (anything): Object containing the lyrics. Can be a complete
             object or the full text of the lyrics.
     """
@@ -24,7 +24,11 @@ class SubtitleExtractor(ABC):
     @staticmethod
     @abstractmethod
     def is_available():
-        """Check if the parser is callable."""
+        """Check if the parser is callable.
+
+        Returns:
+            bool: `True` if the parser can be called.
+        """
 
     @classmethod
     @abstractmethod
@@ -36,6 +40,11 @@ class SubtitleExtractor(ABC):
         """
 
     def get_subtitle(self):
+        """Retrieve lyrics.
+
+        Returns:
+            str: Lyrics.
+        """
         return self.content
 
 
@@ -44,7 +53,6 @@ class FFmpegSubtitleExtractor(SubtitleExtractor):
 
     @staticmethod
     def is_available():
-        """Check if the parser is callable"""
         try:
             subprocess.run(
                 ["ffmpeg", "-version"],

@@ -26,11 +26,11 @@ class SongsFeeder:
 
     Args:
         config (dict): Dictionary of config.
-        force_update (bool): If True, the feeder will re-parse and re-upload
+        force_update (bool): If `True`, the feeder will re-parse and re-upload
             songs that do not seem to have changed.
-        prune (bool): If True, artists and works without songs are deleted at
+        prune (bool): If `True`, artists and works without songs are deleted at
             the end.
-        progress (bool): If True, a progress bar is displayed during long tasks.
+        progress (bool): If `True`, a progress bar is displayed during long tasks.
 
     Attributes:
         http_client (web_client.HTTPClientDakara): Client for the Dakara server.

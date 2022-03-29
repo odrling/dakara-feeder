@@ -2,10 +2,9 @@
 
 import logging
 
-import importlib_metadata
 from pkg_resources import parse_version
 
-__version__ = importlib_metadata.version("dakarafeeder")
+__version__ = "1.8.0-dev"
 __date__ = "2021-06-20"
 
 logger = logging.getLogger(__name__)
