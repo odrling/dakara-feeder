@@ -19,7 +19,7 @@ class WorkTypesFeeder:
     Args:
         config (dict): Dictionary of config.
         work_types_file_path (path.Path): Path to the work types file.
-        progress (bool): If True, a progress bar is displayed during long tasks.
+        progress (bool): If `True`, a progress bar is displayed during long tasks.
 
     Attributes:
         bar (function): Progress bar to use.

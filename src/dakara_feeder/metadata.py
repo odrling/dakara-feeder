@@ -22,7 +22,11 @@ class MetadataParser(ABC):
     @staticmethod
     @abstractmethod
     def is_available():
-        """Check if the parser is callable."""
+        """Check if the parser is callable.
+
+        Returns:
+            bool: `True` if the parser can be called.
+        """
 
     @classmethod
     @abstractmethod
@@ -37,7 +41,9 @@ class MetadataParser(ABC):
     def get_duration(self):
         """Get duration as timedelta object.
 
-        Returns timedelta 0 if unable to get duration.
+        Returns:
+            datetime.timedelta: Duration or `timedelta(0)` if unable to get
+            it.
         """
 
     @abstractmethod
@@ -45,7 +51,7 @@ class MetadataParser(ABC):
         """Get number of audio tracks.
 
         Returns:
-            int: Number of audio tracks.
+            int: Number of audio tracks. 0 if unable to detect a track.
         """
 
     @abstractmethod
@@ -53,7 +59,7 @@ class MetadataParser(ABC):
         """Get number of subtitle tracks.
 
         Returns:
-            int: Number of subtitle tracks.
+            int: Number of subtitle tracks. 0 if unable to detect a track.
         """
 
 
@@ -108,7 +114,6 @@ class MediainfoMetadataParser(MetadataParser):
 
     @staticmethod
     def is_available():
-        """Check if the parser is callable."""
         return MediaInfo.can_parse()
 
     @classmethod
@@ -142,30 +147,14 @@ class MediainfoMetadataParser(MetadataParser):
         return cls(metadata)
 
     def get_duration(self):
-        """Get duration as timedelta object.
-
-        Returns:
-            datetime.timedelta: Duration of the media. Timedelta of 0 if unable
-            to get duration.
-        """
         general_track = self.metadata.tracks[0]
         duration = getattr(general_track, "duration", 0) or 0
         return timedelta(milliseconds=int(duration))
 
     def get_audio_tracks_count(self):
-        """Get number of audio tracks.
-
-        Returns:
-            int: Number of audio tracks.
-        """
         return len([t for t in self.metadata.tracks if t.track_type == "Audio"])
 
     def get_subtitle_tracks_count(self):
-        """Get number of subtitle tracks.
-
-        Returns:
-            int: Number of subtitle tracks.
-        """
         return len([t for t in self.metadata.tracks if t.track_type == "Text"])
 
 
@@ -194,7 +183,6 @@ class FFProbeMetadataParser(MetadataParser):
 
     @staticmethod
     def is_available():
-        """Check if the parser is callable."""
         try:
             subprocess.run(
                 ["ffprobe", "-version"],
@@ -250,12 +238,6 @@ class FFProbeMetadataParser(MetadataParser):
         return cls(json.loads(process.stdout.decode(sys.stdout.encoding)))
 
     def get_duration(self):
-        """Get duration as timedelta object.
-
-        Returns:
-            datetime.timedelta: Duration of the media. Timedelta of 0 if unable
-            to get duration.
-        """
         # try in generic location
         if "format" in self.metadata:
             if "duration" in self.metadata["format"]:
@@ -272,11 +254,6 @@ class FFProbeMetadataParser(MetadataParser):
         return timedelta(0)
 
     def get_audio_tracks_count(self):
-        """Get number of audio tracks.
-
-        Returns:
-            int: Number of audio tracks.
-        """
         if "streams" not in self.metadata:
             return 0
 
@@ -285,11 +262,6 @@ class FFProbeMetadataParser(MetadataParser):
         )
 
     def get_subtitle_tracks_count(self):
-        """Get number of subtitle tracks.
-
-        Returns:
-            int: Number of subtitle tracks.
-        """
         if "streams" not in self.metadata:
             return 0
 

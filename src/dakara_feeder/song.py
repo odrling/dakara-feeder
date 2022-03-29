@@ -21,25 +21,27 @@ class BaseSong:
     The main entry point of the class when used by the feeder is the
     `get_representation` method, that will call all the methods to get the song
     data:
-        - `get_title`;
-        - `get_duration`;
-        - `get_has_instrumental`;
-        - `get_version`;
-        - `get_detail`;
-        - `get_detail_video`;
-        - `get_tags`;
-        - `get_artists`;
-        - `get_works`;
-        - `get_lyrics`.
+
+    - `get_title`;
+    - `get_duration`;
+    - `get_has_instrumental`;
+    - `get_version`;
+    - `get_detail`;
+    - `get_detail_video`;
+    - `get_tags`;
+    - `get_artists`;
+    - `get_works`;
+    - `get_lyrics`.
 
     You should override those methods to suit your needs. See the documentation
-    of each method to learn what data format the must return.
+    of each method to learn what data format they must return.
 
     When calling `get_representation`, two special methods are also called for
     performing custom actions, the first one just on entering
     `get_representation`, and the other just befor leaving it:
-        - `pre_process`;
-        - `post_process`.
+
+    - `pre_process`;
+    - `post_process`.
 
     You should override those two methods as well. Typically, `pre_process`
     should be overriden to perform preparative actions which result would be
@@ -49,13 +51,14 @@ class BaseSong:
     Metadata of the video file are extracted using a metadata parser and stored
     in the `metadata` attribute. The metadata parser to chose is decided by
     setting the class attribute `metadata_class`. The class must
-    implement `dakara_feeder.metadata.MetadataParser` base class. So far,
+    implement the `dakara_feeder.metadata.MetadataParser` base class. So far,
     two implemenations are available in the project:
-        - `dakara_feeder.metadata.FFProbeMetadataParser`, based on
-            FFProbe, part of FFMpeg (external dependency). This is the recommended
-            and the default parser;
-        - `dakara_feeder.metadata.MediainfoMetadataParser`, based on
-            MediaInfo (external dependency). Slower, may not work on Windows.
+
+    - `dakara_feeder.metadata.FFProbeMetadataParser`, based on
+        FFProbe, part of FFMpeg (external dependency). This is the recommended
+        and the default parser;
+    - `dakara_feeder.metadata.MediainfoMetadataParser`, based on
+        MediaInfo (external dependency). Slower, may not work on Windows.
 
     Metadata are available when calling `pre_process`.
 
@@ -64,7 +67,7 @@ class BaseSong:
     `dakara_feeder.metadata.NullMetadataParser` that always return null
     values (e.g. 0 seconds duration).
 
-    Args.
+    Args:
         base_directory (path.Path): Path to the scanned directory.
         paths (directory_lister.SongPaths): Paths of the song file.
 
@@ -124,7 +127,7 @@ class BaseSong:
 
         Args:
             representation (dict): JSON-compiliant structure representing the
-            song.
+                song.
         """
         pass
 
@@ -155,7 +158,7 @@ class BaseSong:
         """Get the flag if the song has an instrumental track.
 
         Returns:
-            bool: True either if there is an extra audio file siding with the
+            bool: `True` either if there is an extra audio file siding with the
             video file, or if the video file has more than 2 audio tracks.
         """
         if self.audio_path:
@@ -174,7 +177,8 @@ class BaseSong:
         Returns:
             list of dict: List of representations of artists. An artist is a
             dictionary containing only one key:
-                - name (str): The name of the artist.
+
+            - name (str): The name of the artist.
         """
         return []
 
@@ -186,37 +190,45 @@ class BaseSong:
         Returns:
             list of dict: List of representations of work links. A work link is
             a dictionary containing the following keys:
-                - link_type (str): Type of link between the song and the work.
-                    Can be either:
-                        - "OP", for opening;
-                        - "ED", for ending;
-                        - "IN", for insert song;
-                        - "IS", for image song.
-                    You should read the server documentation about those terms;
-                - link_type_number (int): For link_type "OP" or "ED", add an
-                    ordinal value (e.g. in OP1, OP2);
-                - episodes (str): List of episodes where the song is used in
-                    the work (e.g. "1, 2, 5");
-                - work (dict): Representation of a work, containing the
-                    following keys:
-                        - title (str): Title of the work;
-                        - subtitle (str): Subtitle of the work;
-                        - work_type (dict): Representation of the type of a
-                            work (e.g. anime), containing the following keys:
-                                - query_name (str): Technical name of the type.
-                                    To use an existing work type, you should
-                                    use only this key;
-                                - name (str): Name of the type (not mandatory);
-                                - name_plural (str): Plural name of the type
-                                    (not mandatory);
-                                - icon_name (str): Name of the icon that
-                                    represents this work type visually (not
-                                    mandatory);
-                        - alternative_titles (list of dict): List of
-                            representations of alternative titles. An
-                            alternative title is a dictionary containing only
-                            one key:
-                                - title (str): Alternative title of the work.
+
+            - link_type (str): Type of link between the song and the work.
+                Can be either:
+
+                - "OP", for opening;
+                - "ED", for ending;
+                - "IN", for insert song;
+                - "IS", for image song.
+
+                You should read the server documentation about those terms;
+
+            - link_type_number (int): For `link_type` "OP" or "ED", add an
+                ordinal value (e.g. in OP1, OP2);
+            - episodes (str): List of episodes where the song is used in
+                the work (e.g. "1, 2, 5");
+            - work (dict): Representation of a work, containing the
+                following keys:
+
+                - title (str): Title of the work;
+                - subtitle (str): Subtitle of the work;
+                - work_type (dict): Representation of the type of a
+                    work (e.g. anime), containing the following keys:
+
+                    - query_name (str): Technical name of the type.
+                        To use an existing work type, you should
+                        use only this key;
+                    - name (str): Name of the type (not mandatory);
+                    - name_plural (str): Plural name of the type
+                        (not mandatory);
+                    - icon_name (str): Name of the icon that
+                        represents this work type visually (not
+                        mandatory);
+
+                - alternative_titles (list of dict): List of
+                    representations of alternative titles. An
+                    alternative title is a dictionary containing only
+                    one key:
+
+                    - title (str): Alternative title of the work.
         """
         return []
 
@@ -228,9 +240,11 @@ class BaseSong:
         Returns:
             list of dict: List of representations of tags. A tag is a ditionary
             containing the following keys:
-                - name (str): Name of the tag;
-                - color_hue (int): Visual hue of the tag (not mandatory);
-                - disabled (bool): True if the tag is disabled (not mandatory).
+
+            - name (str): Name of the tag;
+            - color_hue (int): Visual hue of the tag (not mandatory). Must be
+                an integer ranging from 0 to 360;
+            - disabled (bool): `True` if the tag is disabled (not mandatory).
         """
         return []
 
@@ -245,7 +259,7 @@ class BaseSong:
         return ""
 
     def get_detail(self):
-        """Get the datail.
+        """Get extra datail of the song.
 
         This method should be overriden. By default it returns an empty string.
 
@@ -255,7 +269,7 @@ class BaseSong:
         return ""
 
     def get_detail_video(self):
-        """Get the datail of the video.
+        """Get extra datail of the video.
 
         This method should be overriden. By default it returns an empty string.
 
@@ -273,8 +287,10 @@ class BaseSong:
 
         Lyrics can be extracted from the subtitle file using a parser. One
         parser is available in the project:
-            - `dakara_feeder.subtitle.parsing.Pysubs2SubtitleParser`, based on
-                Pysubs2.
+
+        - `dakara_feeder.subtitle.parsing.Pysubs2SubtitleParser`, based on
+            Pysubs2. It can read SubStation Alpha subtitle format (ASS and
+            SSA).
 
         Returns:
             str: Lyrics on the song.

@@ -23,15 +23,15 @@ class WorksFeeder:
     Args:
         config (dict): Dictionary of config.
         works_file_path (path.Path): Path to the JSON file containing works.
-        update_only (bool): If True, will not create works that do not exist on
+        update_only (bool): If `True`, will not create works that do not exist on
             the server.
-        progress (bool): If True, a progress bar is displayed during long tasks.
+        progress (bool): If `True`, a progress bar is displayed during long tasks.
 
     Attributes:
         http_client (web_client.HTTPClientDakara): Client for the Dakara server.
         bar (function): Progress bar to use.
         works_file_path (path.Path): Path to the JSON file containing works.
-        update_only (bool): If True, will not create works that do not exist on
+        update_only (bool): If `True`, will not create works that do not exist on
             the server.
     """
 
@@ -64,7 +64,7 @@ class WorksFeeder:
             work (dict): Work to stringiny, with the same structure accepted by
                 the server.
 
-        Returns
+        Returns:
             str: Stringified version of the work.
         """
         return "-".join(

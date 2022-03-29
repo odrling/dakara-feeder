@@ -6,18 +6,20 @@ import itertools
 def generate_diff(old_list, new_list):
     """Returns 3 lists of added, deleted and unchanged elements.
 
-    Added elements are elements presents in new_list but not in old_list.
-    Deleted elements are elements presents in old_list but not in new_list.
+    Added elements are elements presents in `new_list` but not in `old_list`.
+    Deleted elements are elements presents in `old_list` but not in `new_list`.
+    Unchanged elements are present in both lists.
 
     Args:
         old_list (list): Old list.
         new_list (list): New list.
 
     Returns:
-        tuple: Contains 3 elements:
-            - A list of added elements;
-            - A list of deleted elements.
-            - A list of unchanged elements.
+        tuple of list: Contains 3 lists:
+
+        1. List of added elements;
+        2. List of deleted elements;
+        3. List of unchanged elements.
     """
     old_set = set(old_list)
     new_set = set(new_list)
@@ -30,7 +32,7 @@ def generate_diff(old_list, new_list):
 
 
 def match_similar(list1, list2, compute_similarity, threshold=0.8):
-    """Match similar strings between list1 and list2 using the compute_similarity method.
+    """Match similar strings between two lists using a provided method.
 
     Args:
         list1 (list): Elements to match.
@@ -43,11 +45,11 @@ def match_similar(list1, list2, compute_similarity, threshold=0.8):
             value. Default is 0.8.
 
     Returns:
-        tuple of list: Contains 3 values.
-            first value: List of tuple with matching elements from list1 and
-                list2.
-            second value: List of unmatched elements from list1.
-            third value: List of unmatched elements from list2.
+        tuple of list: Contains 3 lists:
+
+        1. List of tuple with matching elements from `list1` and `list2`;
+        2. List of unmatched elements from `list1`;
+        3. List of unmatched elements from `list2`.
     """
     items1 = list1.copy()
     items2 = list2.copy()

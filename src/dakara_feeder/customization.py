@@ -18,9 +18,9 @@ def get_custom_song(class_module_name):
     """Get the customized Song class.
 
     Args:
-        class_module_name (str): Python name of the custom Song class to import. It
-            can designate a class in a module, or a module. In this case,
-            the guessed class name is "Song".
+        class_module_name (str): Python name of the custom `Song` class to
+            import. It can designate a class in a module, or a module. In this
+            case, the guessed class name is "Song".
 
     Returns:
         class: Customized Song class.

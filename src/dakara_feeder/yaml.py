@@ -7,7 +7,7 @@ from dakara_base.exceptions import DakaraError
 def get_yaml_file_content(file_path, key=None):
     """Load content of the given YAML file.
 
-    Arguments:
+    Args:
         file_path (path.Path): Path to the YAML file.
         key (str): If given, only this key of the YAML file will be given. If
             the key does not exist, raise an YamlContentInvalidError error.

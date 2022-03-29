@@ -13,7 +13,7 @@ def is_subtitle(filename):
     Check the admissible file extensions for pysubs2.
 
     Returns:
-        bool: True if the filename is a subtitle.
+        bool: `True` if the filename is a subtitle.
     """
     return filename.ext in pysubs2.formats.FILE_EXTENSION_TO_FORMAT_IDENTIFIER
 
@@ -65,6 +65,8 @@ class SubtitleParser(ABC):
 class TXTSubtitleParser(SubtitleParser):
     """Subtitle parser for plain txt files.
 
+    Example:
+
     >>> from Path import path
     >>> file_path = Path("path/to/file")
     >>> subtitle = TXTSubtitleParser.parse(file_path)
@@ -95,7 +97,7 @@ class TXTSubtitleParser(SubtitleParser):
             filecontent (str): Content of the file to extract lyrics from.
 
         Returns:
-            SubtitleParser: Instance of the class for the given content.
+            TXTSubtitleParser: Instance of the class for the given content.
         """
         return cls(filecontent)
 
@@ -182,7 +184,7 @@ class Pysubs2SubtitleParser(SubtitleParser):
             filecontent (str): Content of the file to extract lyrics from.
 
         Returns:
-            SubtitleParser: Instance of the class for the given content.
+            Pysubs2SubtitleParser: Instance of the class for the given content.
 
         Raises:
             SubtitleParseError: If the subtitle stream cannot be parsed.
@@ -199,6 +201,7 @@ class Pysubs2SubtitleParser(SubtitleParser):
         """Gives the cleaned text of the Event block.
 
         The text is cleaned in two ways:
+
             - All tags are removed;
             - Consecutive lines with the same content, the same start and end
                 time are merged. This prevents from getting "extra effect

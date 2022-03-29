@@ -8,10 +8,11 @@ from dakara_base.exceptions import DakaraError
 def get_json_file_content(file_path, key=None):
     """Load content of the given JSON file.
 
-    Arguments:
+    Args:
         file_path (path.Path): Path to the JSON file.
-        key (str): If given, only this key of the JSON file will be given. If
-            the key does not exist, raise an JsonContentInvalidError error.
+        key (str): If given, only this key of the JSON file will be returned.
+            If the key does not exist, raise an `JsonContentInvalidError`
+            error.
 
     Returns:
         dict: Content of the JSON file.
