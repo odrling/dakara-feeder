@@ -3,13 +3,13 @@ from types import ModuleType
 from unittest import TestCase
 from unittest.mock import patch
 
+from path import Path
+
 from dakara_feeder import customization
 from dakara_feeder.song import BaseSong
 
 
 class GetCustomSongTestCase(TestCase):
-    """Test the getter of customized song class."""
-
     @patch("dakara_feeder.customization.import_custom_object", autospec=True)
     def test_get_from_class(self, mocked_import_custom_object):
         """Test to get a valid song class from class module name."""
@@ -109,9 +109,37 @@ class GetCustomSongTestCase(TestCase):
             customization.get_custom_song("song.MySong")
 
 
-class CurrentDirInPathTestCase(TestCase):
-    """Test the helper to put current directory in Python path."""
+class SplitPathModuleTestCase(TestCase):
+    def test_split_path_and_module(self):
+        self.assertTupleEqual(
+            customization.split_path_module("path/to/file.py::object.CustomSong"),
+            (Path("path") / "to" / "file.py", "object.CustomSong"),
+        )
 
+    def test_split_path(self):
+        self.assertTupleEqual(
+            customization.split_path_module("path/to/file.py"),
+            (Path("path") / "to" / "file.py", None),
+        )
+        self.assertTupleEqual(
+            customization.split_path_module("path/to/file.py::"),
+            (Path("path") / "to" / "file.py", None),
+        )
+
+    def test_split_module(self):
+        self.assertTupleEqual(
+            customization.split_path_module("object.CustomSong"),
+            (None, "object.CustomSong"),
+        )
+
+    def test_split_nothing(self):
+        self.assertTupleEqual(
+            customization.split_path_module(""),
+            (None, None),
+        )
+
+
+class CurrentDirInPathTestCase(TestCase):
     @patch("dakara_feeder.customization.os.getcwd")
     @patch("dakara_feeder.customization.sys")
     def test_normal(self, mocked_sys, mocked_getcwd):
@@ -149,8 +177,6 @@ class CurrentDirInPathTestCase(TestCase):
 
 
 class ImportCustomObjectTestCase(TestCase):
-    """Test the importer for custom objects."""
-
     def test_import_module(self):
         """Test to import a module."""
         module = customization.import_custom_object("tests.resources.my_module")

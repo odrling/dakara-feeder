@@ -8,6 +8,7 @@ import sys
 from contextlib import contextmanager
 
 from dakara_base.exceptions import DakaraError
+from path import Path
 
 from dakara_feeder.song import BaseSong
 
@@ -63,6 +64,50 @@ def get_custom_song(class_module_name):
     logger.info("Using custom Song class: {}".format(class_module_name))
 
     return custom_class
+
+
+def split_path_module(string):
+    """Split a path and module string.
+
+    The string is in the form `path::module`, each part is optional. The
+    function splits the path from the module:
+
+    >>> split_path_module("path/to/file.py::my.module")
+    ... Path("path/to/file.py"), "my.module"
+    >>> split_path_module("path/to/file.py")
+    ... Path("path/to/file.py"), None
+    >>> split_path_module("my.module")
+    ... None, "my.module"
+
+    Args:
+        string (str): Path and module separated by `::`.
+
+    Returns:
+        tuple: Contains:
+
+        1. path.Path: The path of the file;
+        2. str: The module name.
+    """
+    # if nothing is given
+    if not string:
+        return None, None
+
+    # both path and module given
+    if "::" in string:
+        path, module = string.split("::")
+
+        # if no module is provided
+        if not module:
+            module = None
+
+        return Path(path), module
+
+    # only path given
+    if ".py" in string:
+        return Path(string), None
+
+    # assume only module given
+    return None, string
 
 
 @contextmanager
