@@ -138,7 +138,7 @@ def dir_in_path(directory):
 
     try:
         # prepend the directory in path
-        sys.path.insert(0, str(directory))
+        sys.path.insert(0, str(directory.expand()))
         yield None
 
     finally:
