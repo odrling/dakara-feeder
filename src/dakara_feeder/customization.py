@@ -18,7 +18,7 @@ def get_custom_song(string, default_class_name="Song"):
     """Get the customized Song class.
 
     See also:
-        `split_path_module` for the syntax of `string`.
+        `split_path_object` for the syntax of `string`.
 
     Args:
         string (str): Either name of a module or path to a file, containing a
@@ -34,7 +34,7 @@ def get_custom_song(string, default_class_name="Song"):
             it does not inherit from Song.
     """
     # import a file or a module
-    file_path, module_name = split_path_module(string)
+    file_path, module_name = split_path_object(string)
     if file_path is not None:
         custom_module = import_from_file(file_path)
         class_name = module_name or default_class_name
@@ -79,47 +79,47 @@ def get_custom_song(string, default_class_name="Song"):
     return custom_class
 
 
-def split_path_module(string):
-    """Split a path and module string.
+def split_path_object(string):
+    """Split string containnig a path and an object.
 
-    The string is in the form `path::module`, each part is optional. The
-    function splits the path from the module:
+    The string is in the form `path::object`, each part is optional. The
+    function splits the path from the object:
 
-    >>> split_path_module("path/to/file.py::my.module")
-    ... Path("path/to/file.py"), "my.module"
-    >>> split_path_module("path/to/file.py")
+    >>> split_path_object("path/to/file.py::my.object")
+    ... Path("path/to/file.py"), "my.object"
+    >>> split_path_object("path/to/file.py")
     ... Path("path/to/file.py"), None
-    >>> split_path_module("my.module")
-    ... None, "my.module"
+    >>> split_path_object("my.object")
+    ... None, "my.object"
 
     Args:
-        string (str): Path and module separated by `::`.
+        string (str): Path and object separated by `::`.
 
     Returns:
         tuple: Contains:
 
         1. path.Path: The path of the file;
-        2. str: The module name.
+        2. str: The object name.
     """
     # if nothing is given
     if not string:
         return None, None
 
-    # both path and module given
+    # both path and object given
     if "::" in string:
-        path, module = string.split("::")
+        path, obj = string.split("::")
 
-        # if no module is provided
-        if not module:
-            module = None
+        # if no object is provided
+        if not obj:
+            obj = None
 
-        return Path(path), module
+        return Path(path), obj
 
     # only path given
     if ".py" in string:
         return Path(string), None
 
-    # assume only module given
+    # assume only object given
     return None, string
 
 

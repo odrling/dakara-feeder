@@ -184,32 +184,32 @@ class GetCustomSongTestCase(TestCase):
         mocked_import_from_file.assert_not_called()
 
 
-class SplitPathModuleTestCase(TestCase):
+class SplitPathObjectTestCase(TestCase):
     def test_split_path_and_module(self):
         self.assertTupleEqual(
-            customization.split_path_module("path/to/file.py::object.CustomSong"),
+            customization.split_path_object("path/to/file.py::object.CustomSong"),
             (Path("path") / "to" / "file.py", "object.CustomSong"),
         )
 
     def test_split_path(self):
         self.assertTupleEqual(
-            customization.split_path_module("path/to/file.py"),
+            customization.split_path_object("path/to/file.py"),
             (Path("path") / "to" / "file.py", None),
         )
         self.assertTupleEqual(
-            customization.split_path_module("path/to/file.py::"),
+            customization.split_path_object("path/to/file.py::"),
             (Path("path") / "to" / "file.py", None),
         )
 
     def test_split_module(self):
         self.assertTupleEqual(
-            customization.split_path_module("object.CustomSong"),
+            customization.split_path_object("object.CustomSong"),
             (None, "object.CustomSong"),
         )
 
     def test_split_nothing(self):
         self.assertTupleEqual(
-            customization.split_path_module(""),
+            customization.split_path_object(""),
             (None, None),
         )
 
