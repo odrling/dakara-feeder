@@ -139,37 +139,35 @@ class SplitPathModuleTestCase(TestCase):
         )
 
 
-class CurrentDirInPathTestCase(TestCase):
-    @patch("dakara_feeder.customization.os.getcwd")
+class DirInPathTestCase(TestCase):
     @patch("dakara_feeder.customization.sys")
-    def test_normal(self, mocked_sys, mocked_getcwd):
+    def test_normal(self, mocked_sys):
         """Test the helper with no alteration of the path."""
         # setup mocks
-        mocked_getcwd.return_value = "current/directory"
         mocked_sys.path = ["some/directory"]
 
         # use the context manager
-        with customization.current_dir_in_path():
+        with customization.dir_in_path(Path("path") / "to" / "directory"):
             self.assertListEqual(
-                mocked_sys.path, ["current/directory", "some/directory"]
+                mocked_sys.path,
+                [str(Path("path") / "to" / "directory"), "some/directory"],
             )
 
         # assert the mock
         self.assertListEqual(mocked_sys.path, ["some/directory"])
 
-    @patch("dakara_feeder.customization.os.getcwd")
     @patch("dakara_feeder.customization.sys")
-    def test_alteration(self, mocked_sys, mocked_getcwd):
+    def test_alteration(self, mocked_sys):
         """Test the helper with alteration of the path."""
         # setup mocks
-        mocked_getcwd.return_value = "current/directory"
         mocked_sys.path = []
 
         # use the context manager
-        with customization.current_dir_in_path():
+        with customization.dir_in_path(Path("path") / "to" / "directory"):
             mocked_sys.path.append("other/directory")
             self.assertListEqual(
-                mocked_sys.path, ["current/directory", "other/directory"]
+                mocked_sys.path,
+                [str(Path("path") / "to" / "directory"), "other/directory"],
             )
 
         # assert the mock

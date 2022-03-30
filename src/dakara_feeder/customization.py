@@ -111,18 +111,21 @@ def split_path_module(string):
 
 
 @contextmanager
-def current_dir_in_path():
-    """Temporarily add current directory to top of the Python path.
+def dir_in_path(directory):
+    """Temporarily add a directory to the top of the Python path.
 
     Python path is reseted to its initial state when leaving the context
     manager.
+
+    Args:
+        directory (path.Path): Directory to add.
     """
     # get copy of system path
     old_path_list = sys.path.copy()
 
     try:
-        # prepend the current dir in path
-        sys.path.insert(0, os.getcwd())
+        # prepend the directory in path
+        sys.path.insert(0, str(directory))
         yield None
 
     finally:
@@ -151,7 +154,7 @@ def import_custom_object(object_module_name):
 
         # try to import the module
         try:
-            with current_dir_in_path():
+            with dir_in_path(os.getcwd()):
                 module = importlib.import_module(module_name)
 
         # if not continue with parent module
