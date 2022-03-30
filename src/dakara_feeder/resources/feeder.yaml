@@ -34,7 +34,15 @@ kara_folder: /path/to/folder
 # other), you can write your own Song class, derived from
 # `dakara_feeder.song.BaseSong`. See documentation of BaseSong for more details
 # on how to proceed.
-# Indicate the module name of the class to use.
+# You can indicate it in various ways.
+# Module only, in that case the default class name Song will be used:
+# custom_song_class: my.module
+# Module and a custom class name:
+# custom_song_class: my.module.MySong
+# File only, in that case the default class name Song will be used:
+# custom_song_class: path/to/file.py
+# File and a custom class name:
+# custom_song_class: path/to/file.py::MySong
 # Default is BaseSong, which is pretty basic.
 # custom_song_class: module_name.Song
 

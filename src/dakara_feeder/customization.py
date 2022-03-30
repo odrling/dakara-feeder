@@ -3,7 +3,6 @@
 import importlib
 import inspect
 import logging
-import os
 import sys
 from contextlib import contextmanager
 
@@ -15,13 +14,17 @@ from dakara_feeder.song import BaseSong
 logger = logging.getLogger(__name__)
 
 
-def get_custom_song(class_module_name):
+def get_custom_song(string, default_class_name="Song"):
     """Get the customized Song class.
 
+    See also:
+        `split_path_module` for the syntax of `string`.
+
     Args:
-        class_module_name (str): Python name of the custom `Song` class to
-            import. It can designate a class in a module, or a module. In this
-            case, the guessed class name is "Song".
+        string (str): Either name of a module or path to a file, containing a
+            subclass of `dakara_feeder.song.BaseSong`. If the name of the class
+            is not provided, then fallback to `default_class_name`.
+        default_class_name (str): Default song class name to use.
 
     Returns:
         class: Customized Song class.
@@ -30,38 +33,48 @@ def get_custom_song(class_module_name):
         InvalidObjectTypeError: If the designated object is not a class, or if
             it does not inherit from Song.
     """
-    custom_object = import_custom_object(class_module_name)
+    # import a file or a module
+    file_path, module_name = split_path_module(string)
+    if file_path is not None:
+        custom_module = import_from_file(file_path)
+        class_name = module_name or default_class_name
+        separator = "::"
 
-    # if the custom object is a module, get default "Song" class
-    if inspect.ismodule(custom_object):
+    elif module_name is not None:
+        custom_module = import_from_module(module_name)
+        class_name = default_class_name
+        separator = "."
+
+    else:
+        raise InvalidSongConfigError("No song class file or module provided")
+
+    # if the custom object is a module, get the song class
+    if inspect.ismodule(custom_module):
         try:
-            custom_class = getattr(custom_object, "Song")
+            custom_class = getattr(custom_module, class_name)
 
         except AttributeError as error:
             raise InvalidObjectModuleNameError(
-                "Cannot find default class Song in module {}".format(
-                    custom_object.__name__
+                "Cannot find class {} in module {}".format(
+                    class_name, custom_module.__name__
                 )
             ) from error
 
-        # append ".Song" to make the class module name equal to the actual
-        # module name of the class
-        class_module_name += ".Song"
+        # append song class name to the string
+        string += separator + class_name
 
     else:
-        custom_class = custom_object
+        custom_class = custom_module
 
     # check the custom class is a class
     if not inspect.isclass(custom_class):
-        raise InvalidObjectTypeError("{} is not a class".format(class_module_name))
+        raise InvalidObjectTypeError("{} is not a class".format(string))
 
     # check the custom Song inherits from default Song
     if not issubclass(custom_class, BaseSong):
-        raise InvalidObjectTypeError(
-            "{} is not a Song subclass".format(class_module_name)
-        )
+        raise InvalidObjectTypeError("{} is not a BaseSong subclass".format(string))
 
-    logger.info("Using custom Song class: {}".format(class_module_name))
+    logger.info("Using custom Song class: {}".format(string))
 
     return custom_class
 
@@ -133,7 +146,32 @@ def dir_in_path(directory):
         sys.path = old_path_list
 
 
-def import_custom_object(object_module_name):
+def import_from_file(file_path):
+    """Import a custom file as a module.
+
+    Args:
+        file_path (path.Path): Path to a Python file to import.
+
+    Returns:
+        type: Imported module.
+
+    Raises:
+        InvalidObjectModuleNameError: If the given module name cannot be found.
+    """
+    directory = file_path.parent
+    module_name = file_path.stem
+
+    try:
+        with dir_in_path(directory):
+            return importlib.import_module(module_name)
+
+    except ImportError:
+        raise InvalidObjectModuleNameError(
+            "No module found from file {}".format(file_path)
+        )
+
+
+def import_from_module(object_module_name):
     """Import a custom object from a given module name.
 
     Args:
@@ -154,8 +192,7 @@ def import_custom_object(object_module_name):
 
         # try to import the module
         try:
-            with dir_in_path(os.getcwd()):
-                module = importlib.import_module(module_name)
+            module = importlib.import_module(module_name)
 
         # if not continue with parent module
         except ImportError:
@@ -169,10 +206,10 @@ def import_custom_object(object_module_name):
         raise InvalidObjectModuleNameError("No module {} found".format(module_name))
 
     # get the custom object
-    custom_object = module
+    custom_module = module
     try:
         for attr in object_module_name_list[length:]:
-            custom_object = getattr(custom_object, attr)
+            custom_module = getattr(custom_module, attr)
             module_name += ".{}".format(attr)
 
     except AttributeError as error:
@@ -180,7 +217,7 @@ def import_custom_object(object_module_name):
             "No module or object {} found in {}".format(attr, module_name)
         ) from error
 
-    return custom_object
+    return custom_module
 
 
 class InvalidObjectModuleNameError(DakaraError, ImportError, AttributeError):
@@ -189,3 +226,7 @@ class InvalidObjectModuleNameError(DakaraError, ImportError, AttributeError):
 
 class InvalidObjectTypeError(DakaraError):
     """Error when the object type is unexpected."""
+
+
+class InvalidSongConfigError(DakaraError):
+    """Error when the config to get the Song file is wrong."""
