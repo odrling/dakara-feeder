@@ -41,7 +41,7 @@
 
 - Name of the command changed from `dakara-feed` to `dakara-feeder`.
 - Feed command for songs changed from `dakara-feed` to `dakara-feeder feed songs`.
-- Custom song can be indicated in config with a file name: `custom_song_class: path/to/file.py::MySong`.
+- Custom song class can be indicated in configuration file with a file name: `custom_song_class: path/to/file.py::MySong`.
 
 ## 1.7.0 - 2021-06-20
 
