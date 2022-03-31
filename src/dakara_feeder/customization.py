@@ -165,10 +165,10 @@ def import_from_file(file_path):
         with dir_in_path(directory):
             return importlib.import_module(module_name)
 
-    except ImportError:
+    except ImportError as error:
         raise InvalidObjectModuleNameError(
             "No module found from file {}".format(file_path)
-        )
+        ) from error
 
 
 def import_from_module(object_module_name):
