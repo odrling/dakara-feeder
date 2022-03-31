@@ -1,4 +1,5 @@
 import inspect
+import re
 from importlib import resources
 from types import ModuleType
 from unittest import TestCase
@@ -187,17 +188,21 @@ class GetCustomSongTestCase(TestCase):
 class SplitPathObjectTestCase(TestCase):
     def test_split_path_and_module(self):
         self.assertTupleEqual(
-            customization.split_path_object("path/to/file.py::object.CustomSong"),
+            customization.split_path_object(
+                str(Path("path") / "to" / "file.py") + "::object.CustomSong"
+            ),
             (Path("path") / "to" / "file.py", "object.CustomSong"),
         )
 
     def test_split_path(self):
         self.assertTupleEqual(
-            customization.split_path_object("path/to/file.py"),
+            customization.split_path_object(str(Path("path") / "to" / "file.py")),
             (Path("path") / "to" / "file.py", None),
         )
         self.assertTupleEqual(
-            customization.split_path_object("path/to/file.py::"),
+            customization.split_path_object(
+                str(Path("path") / "to" / "file.py") + "::"
+            ),
             (Path("path") / "to" / "file.py", None),
         )
 
@@ -261,7 +266,9 @@ class ImportFromFileTestCase(TestCase):
         """Test to import a non existing file."""
         with self.assertRaisesRegex(
             customization.InvalidObjectModuleNameError,
-            "No module found from file " + Path("path") / "to" / "nowhere.py",
+            re.escape(
+                "No module found from file " + Path("path") / "to" / "nowhere.py"
+            ),
         ):
             customization.import_from_file(Path("path") / "to" / "nowhere.py")
 
