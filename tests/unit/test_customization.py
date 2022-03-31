@@ -178,7 +178,7 @@ class GetCustomSongTestCase(TestCase):
     ):
         """Test to get a song class from nothing."""
         # call the method
-        with self.assertRaises(customization.InvalidSongConfigError):
+        with self.assertRaises(customization.InvalidSongClassConfigError):
             customization.get_custom_song("")
 
         # assert the call

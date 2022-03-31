@@ -46,7 +46,7 @@ def get_custom_song(string, default_class_name="Song"):
         separator = "."
 
     else:
-        raise InvalidSongConfigError("No song class file or module provided")
+        raise InvalidSongClassConfigError("No song class file or module provided")
 
     # if the custom object is a module, get the song class
     if inspect.ismodule(custom_module):
@@ -70,7 +70,7 @@ def get_custom_song(string, default_class_name="Song"):
     if not inspect.isclass(custom_class):
         raise InvalidObjectTypeError("{} is not a class".format(string))
 
-    # check the custom Song inherits from default Song
+    # check the custom Song inherits from BaseSong
     if not issubclass(custom_class, BaseSong):
         raise InvalidObjectTypeError("{} is not a BaseSong subclass".format(string))
 
@@ -206,10 +206,10 @@ def import_from_module(object_module_name):
         raise InvalidObjectModuleNameError("No module {} found".format(module_name))
 
     # get the custom object
-    custom_module = module
+    custom_object = module
     try:
         for attr in object_module_name_list[length:]:
-            custom_module = getattr(custom_module, attr)
+            custom_object = getattr(custom_object, attr)
             module_name += ".{}".format(attr)
 
     except AttributeError as error:
@@ -217,7 +217,7 @@ def import_from_module(object_module_name):
             "No module or object {} found in {}".format(attr, module_name)
         ) from error
 
-    return custom_module
+    return custom_object
 
 
 class InvalidObjectModuleNameError(DakaraError, ImportError, AttributeError):
@@ -228,5 +228,5 @@ class InvalidObjectTypeError(DakaraError):
     """Error when the object type is unexpected."""
 
 
-class InvalidSongConfigError(DakaraError):
+class InvalidSongClassConfigError(DakaraError):
     """Error when the config to get the Song file is wrong."""
