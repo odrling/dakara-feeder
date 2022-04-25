@@ -107,17 +107,12 @@ class Song(BaseSong):
         return [{"name": self.video_path.stem.split(" - ")[1]}]
 ```
 
-The file must be in the same directory you are calling `dakara-feeder`, or in any directory reachable by Python.
-To register your customized `Song` class, you simply enable it in the config file:
+To register your customized `Song` class, you simply indicate it in the configuration file.
+You can either indicate an importable module or a file:
 
 ```yaml
-# Custom song class to use
-# If you want to extract additional data when parsing files (video, subtitle or
-# other), you can write your own Song class, derived from
-# `dakara_feeder.song.BaseSong`. See documentation of BaseSong for more details
-# on how to proceed.
-# Indicate the module name of the class to use.
-# Default is BaseSong, which is pretty basic.
+custom_song_class: path/to/my_song.py::Song
+# or
 custom_song_class: my_song.Song
 ```
 
