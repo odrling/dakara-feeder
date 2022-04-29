@@ -94,7 +94,7 @@ class FFmpegSubtitleExtractor(SubtitleExtractor):
                 return cls()
 
             # otherwise extract content
-            return cls(output_file_path.text())
+            return cls(output_file_path.read_text())
 
 
 class FFmpegNotInstalledError(DakaraError):

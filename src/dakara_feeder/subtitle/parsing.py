@@ -87,7 +87,7 @@ class TXTSubtitleParser(SubtitleParser):
         Returns:
             TXTSubtitleParser: Instance of the class for the given file.
         """
-        return cls(filepath.text())
+        return cls(filepath.read_text())
 
     @classmethod
     def parse_string(cls, filecontent):
