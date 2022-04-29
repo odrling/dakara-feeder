@@ -22,10 +22,6 @@ environment:
     - PYTHON: "3.9"
       INTEGRATION_TEST: true
 
-# check current python version
-init:
-  - "py -%PYTHON% --version"
-
 for:
   - matrix:
       only:
