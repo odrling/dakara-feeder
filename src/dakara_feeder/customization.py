@@ -220,7 +220,7 @@ def import_from_module(object_module_name):
     return custom_object
 
 
-class InvalidObjectModuleNameError(DakaraError, ImportError, AttributeError):
+class InvalidObjectModuleNameError(DakaraError):
     """Error when the object requested does not exist."""
 
 
