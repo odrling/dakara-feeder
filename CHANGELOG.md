@@ -36,7 +36,7 @@
 - Feed tags with command `dakara-feeder feed tags`.
 - Feed work types with command `dakara-feeder feed work-types`.
 - Feed works with command `dakara-feeder feed works`.
-- Support Python 3.10.
+- Support Python 3.10 and 3.11.
 
 ### Changed
 
