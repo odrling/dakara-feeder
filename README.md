@@ -67,12 +67,30 @@ python -m dakara_feeder feed songs
 
 One instance of the Dakara server should be running.
 
-Then, `dakara-feeder feed tags` and `dakara-feeder feed work-types` will find tags and work types in a configuration file (seed [this section](#tags-and-work-types-file) for more details):
+The data extracted from songs are very limited in this package by default, as data can be stored in various ways. You are encouraged to make your own parser (see [this section](#making-a-custom-parser) for more details).
+
+Then, `dakara-feeder feed tags` and `dakara-feeder feed work-types` will find tags and work types in a YAML file (see [this section](#tags-and-work-types-file) for more details):
 
 ```sh
 dakara-feeder feed tags path/to/tags.yaml
 # or
 python -m dakara_feeder feed tags path/to/tags.yaml
+```
+
+and:
+
+```sh
+dakara-feeder feed work-types path/to/work_types.yaml
+# or
+python -m dakara_feeder feed work-types path/to/work_types.yaml
+```
+
+Also, `dakara-feeder feed works` will find works in a JSON file (see [this section](#works-file) for more details):
+
+```sh
+dakara-feeder feed works path/to/works.json
+# or
+python -m dakara_feeder feed works path/to/works.json
 ```
 
 For more help:
@@ -83,7 +101,7 @@ dakara-feeder -h
 python -m dakara_feeder -h
 ```
 
-Before calling the function, you should create a config file with:
+Before calling any command, you should create a config file with:
 
 ```sh
 dakara-feeder create-config
@@ -93,7 +111,11 @@ python -m dakara_feeder create-config
 
 and complete it with your values. The file is stored in your user space: `~/.config/dakara` on Linux, or `$APPDATA\DakaraProject\dakara` on Windows.
 
-The data extracted from songs are very limited in this package by default, as data can be stored in various ways in song files. You are encouraged to make your own parser, see next subsection.
+### Configuration
+
+The configuration is created with the previously cited command. Several aspect of the feeder can be configured with this file. Please check with the file documentation.
+
+Authentication to the server can be done with username and password, or with a token that can be copied from the web client. Please note that only a library manager can use the feeder.
 
 ### Making a custom parser
 
@@ -123,38 +145,6 @@ custom_song_class: my_song.Song
 ```
 
 Now, `dakara-feeder` will use your customized `Song` class instead of the default one.
-
-### Works file
-
-You can provide more information about works (especially alternative names) from a JSON file.
-The file should contain a dictionary where keys are work types query name and values lists of works representation:
-
-```json
-{
-  "work_type_1":
-    [
-      {
-        "title": "Work 1",
-        "subtitle": "Subtitle 1",
-        "alternative_titles": [
-          {
-            "title": "AltTitle 1"
-          },
-          {
-            "title": "AltTitle 2"
-          }
-        ]
-      },
-      {
-        "title": "Work 2",
-        "subtitle": "Subtitle 2"
-      }
-    ],
-  "work_type_2": []
-}
-```
-
-Identification with existing works on the server is made with the work type, the title and the subtitle, case insensitively.
 
 ### Tags and work types file
 
@@ -195,6 +185,38 @@ worktypes:
     name_plural: Live actions
     icon_name: film
 ```
+
+### Works file
+
+You can provide more information about works (especially alternative names) from a JSON file.
+The file should contain a dictionary where keys are work types query name and values lists of works representation:
+
+```json
+{
+  "work_type_1":
+    [
+      {
+        "title": "Work 1",
+        "subtitle": "Subtitle 1",
+        "alternative_titles": [
+          {
+            "title": "AltTitle 1"
+          },
+          {
+            "title": "AltTitle 2"
+          }
+        ]
+      },
+      {
+        "title": "Work 2",
+        "subtitle": "Subtitle 2"
+      }
+    ],
+  "work_type_2": []
+}
+```
+
+Identification with existing works on the server is made with the work type, the title and the subtitle, case insensitively.
 
 ## Development
 
