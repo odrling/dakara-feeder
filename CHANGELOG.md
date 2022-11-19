@@ -30,6 +30,19 @@
 
 ## Unreleased
 
+### Update notes
+
+The project uses now a library to manage user directories on the different operating systems, the location was modified for Windows:
+
+```cmd
+# cmd
+mkdir %APPDATA%\DakaraProject
+move %APPDATA%\Dakara %APPDATA%\DakaraProject\dakara
+# powershell
+mkdir $env:APPDATA\DakaraProject
+mv $env:APPDATA\Dakara $env:APPDATA\DakaraProject\dakara
+```
+
 ### Added
 
 - Automatically prune artists and works without songs on server.
