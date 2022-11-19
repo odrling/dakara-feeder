@@ -33,6 +33,12 @@ It is strongly recommended to use the Dakara feeder within a virtual environment
 
 ### Install
 
+Please ensure you have a recent enough version of `setuptools`:
+
+```sh
+pip install --upgrade "setuptools>=46.4.0"
+```
+
 Install the package with:
 
 ```sh
@@ -85,7 +91,7 @@ dakara-feeder create-config
 python -m dakara_feeder create-config
 ```
 
-and complete it with your values. The file is stored in your user space: `~/.config/dakara` on Linux or `$APPDATA\Dakara` on Windows.
+and complete it with your values. The file is stored in your user space: `~/.config/dakara` on Linux, or `$APPDATA\DakaraProject\dakara` on Windows.
 
 The data extracted from songs are very limited in this package by default, as data can be stored in various ways in song files. You are encouraged to make your own parser, see next subsection.
 
