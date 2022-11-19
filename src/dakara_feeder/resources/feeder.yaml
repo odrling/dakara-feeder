@@ -1,7 +1,11 @@
 # Parameters for the server
 server:
-  # Server address
+  # Server address (host and port given at the same time)
   address: 127.0.0.1:8000
+
+  # Server host and port (given distinctly)
+  # host: 127.0.0.1
+  # port: 8000
 
   # Token for server authentication
   # You can find your token in "Settings > Token" on the dakara web client
