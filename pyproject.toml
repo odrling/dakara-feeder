@@ -1,0 +1,68 @@
+[project]
+name = "dakarafeeder"
+authors = [
+        {name = "Flore", email = "flore.love@gmail.com"},
+        {name = "Neraste", email = "neraste.herr10@gmail.com"},
+]
+description = "External database feeder for the Dakara Project"
+readme = "README.md"
+license = {file = "LICENSE"}
+dynamic = ["version"]
+requires-python = ">= 3.7"
+classifiers = [
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Operating System :: OS Independent",
+        "Environment :: Console",
+        "Intended Audience :: Developers",
+]
+dependencies = [
+        "dakarabase>=1.4.2,<1.5.0",
+        "filetype>=1.2.0,<1.3.0",
+        "importlib-resources>=5.10.0,<5.11.0",
+        "path>=16.4.0,<16.5.0",
+        "pymediainfo>=5.1.0,<5.2.0",
+        "pysubs2>=1.5.0,<1.6.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/DakaraProject/dakara-feeder"
+Repository = "https://github.com/DakaraProject/dakara-feeder.git"
+Issues = "https://github.com/DakaraProject/dakara-feeder/issues"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = {attr = "dakara_feeder.version.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.optional-dependencies]
+tests = [
+        "black>=22.10.0,<22.11.0",
+        "codecov>=2.1.12,<2.2.0",
+        "isort>=5.10.1,<5.11.0",
+        "pdoc>=12.3.0,<12.4.0",
+        "pre-commit>=2.20.0,<2.21.0",
+        "pytest-cov>=4.0.0,<4.1.0",
+        "pytest>=7.2.0,<7.3.0",
+]
+
+[project.scripts]
+dakara-feeder = "dakara_feeder.__main__:main"
+
+[tool.pytest]
+addopts = "--cov=dakara_feeder"
+
+[tool.isort]
+profile = "black"
+
