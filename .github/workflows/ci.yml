@@ -59,7 +59,7 @@ jobs:
         if: matrix.os == 'macos-latest'
 
       - name: Install native dependencies (Windows)
-        run: choco install ffmpeg mediainfo-cli
+        run: choco install --no-progress ffmpeg mediainfo-cli
         if: matrix.os == 'windows-latest'
 
       - name: Print ffprobe and mediainfo versions
