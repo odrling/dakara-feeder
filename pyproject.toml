@@ -31,21 +31,6 @@ dependencies = [
         "pysubs2>=1.5.0,<1.6.0",
 ]
 
-[project.urls]
-Homepage = "https://github.com/DakaraProject/dakara-feeder"
-Repository = "https://github.com/DakaraProject/dakara-feeder.git"
-Issues = "https://github.com/DakaraProject/dakara-feeder/issues"
-
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools.dynamic]
-version = {attr = "dakara_feeder.version.__version__" }
-
-[tool.setuptools.packages.find]
-where = ["src"]
-
 [project.optional-dependencies]
 dev = [
         "black>=22.10.0,<22.11.0",
@@ -57,12 +42,27 @@ dev = [
         "pytest>=7.2.0,<7.3.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/DakaraProject/dakara-feeder"
+Repository = "https://github.com/DakaraProject/dakara-feeder.git"
+Issues = "https://github.com/DakaraProject/dakara-feeder/issues"
+Changelog = "https://github.com/DakaraProject/dakara-feeder/blob/master/CHANGELOG.md"
+
 [project.scripts]
 dakara-feeder = "dakara_feeder.__main__:main"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = {attr = "dakara_feeder.version.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.pytest]
 addopts = "--cov=dakara_feeder"
 
 [tool.isort]
 profile = "black"
-
