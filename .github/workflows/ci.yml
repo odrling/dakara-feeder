@@ -1,11 +1,16 @@
 name: Tests
 
-on: [push]
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - develop
 
 jobs:
-  check:
-
+  unit-tests:
     runs-on: ${{ matrix.os }}
+
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
@@ -13,40 +18,82 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
 
-      - name: install native dependencies (Ubuntu)
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg mediainfo
-        if: matrix.os == 'ubuntu-latest'
+      - name: Install python tests dependencies
+        run: pip install -e '.[dev]'
 
-      - name: install native dependencies (MacOS)
-        run: brew install ffmpeg mediainfo
-        if: matrix.os == 'macos-latest'
-
-      - name: install native dependencies (Windows)
-        run: choco install ffmpeg mediainfo-cli
-        if: matrix.os == 'windows-latest'
-
-      - name: print ffprobe and mediainfo versions
-        run: ffprobe -version && mediainfo --version
-
-      - name: install python tests dependencies
-        run: pip install -e '.[tests]'
-
-      - name: run tests
-        run: python -m pytest -v --cov src
-
-      - name: run isort
-        run: python -m isort . --check
-
-      - name: run black
-        run: python -m black . --check
+      - name: Run tests
+        run: python -m pytest -v --cov src tests/unit
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+  integration-tests:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: "3.11"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install native dependencies (Ubuntu)
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg mediainfo
+        if: matrix.os == 'ubuntu-latest'
+
+      - name: Install native dependencies (MacOS)
+        run: brew install ffmpeg mediainfo
+        if: matrix.os == 'macos-latest'
+
+      - name: Install native dependencies (Windows)
+        run: choco install ffmpeg mediainfo-cli
+        if: matrix.os == 'windows-latest'
+
+      - name: Print ffprobe and mediainfo versions
+        run: ffprobe -version && mediainfo --version
+
+      - name: Install python tests dependencies
+        run: pip install -e '.[dev]'
+
+      - name: Run tests
+        run: python -m pytest -v --cov src tests/integration
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+
+  static-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -e '.[dev]'
+
+      - name: Run import order checks
+        run: python -m isort . --check
+
+      - name: Run style checks
+        run: python -m black . --check
