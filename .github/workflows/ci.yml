@@ -22,10 +22,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+          cache: "pip"
 
       - name: Install python tests dependencies
-        run: pip install -e '.[dev]'
+        run: pip install -e ".[dev]"
 
       - name: Run tests
         run: python -m pytest -v --cov src tests/unit
@@ -47,26 +47,26 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-          cache: 'pip'
+          python-version: "3.11"
+          cache: "pip"
 
       - name: Install native dependencies (Ubuntu)
         run: sudo apt-get update && sudo apt-get install -y ffmpeg mediainfo
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == "ubuntu-latest"
 
       - name: Install native dependencies (MacOS)
         run: brew install ffmpeg mediainfo
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == "macos-latest"
 
       - name: Install native dependencies (Windows)
         run: choco install ffmpeg mediainfo-cli
-        if: matrix.os == 'windows-latest'
+        if: matrix.os == "windows-latest"
 
       - name: Print ffprobe and mediainfo versions
         run: ffprobe -version && mediainfo --version
 
       - name: Install python tests dependencies
-        run: pip install -e '.[dev]'
+        run: pip install -e ".[dev]"
 
       - name: Run tests
         run: python -m pytest -v --cov src tests/integration
@@ -76,7 +76,6 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-
   static-tests:
     runs-on: ubuntu-latest
 
@@ -85,11 +84,11 @@ jobs:
 
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
-          cache: 'pip'
+          python-version: "3.11"
+          cache: "pip"
 
       - name: Install dependencies
-        run: pip install -e '.[dev]'
+        run: pip install -e ".[dev]"
 
       - name: Run import order checks
         run: python -m isort . --check
