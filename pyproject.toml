@@ -29,6 +29,7 @@ dependencies = [
         "path>=16.4.0,<16.5.0",
         "pymediainfo>=5.1.0,<5.2.0",
         "pysubs2>=1.5.0,<1.6.0",
+        "setuptools>=68",
 ]
 
 [project.optional-dependencies]
