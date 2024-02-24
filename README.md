@@ -1,11 +1,13 @@
 # Dakara Feeder
 
 <!-- Badges are displayed for the develop branch -->
-[![Appveyor CI Build status](https://ci.appveyor.com/api/projects/status/8qpr1lk1kye7fkf0/branch/develop?svg=true)](https://ci.appveyor.com/project/neraste/dakara-feeder/branch/develop)
-[![Codecov coverage analysis](https://codecov.io/gh/DakaraProject/dakara-feeder/branch/develop/graph/badge.svg)](https://codecov.io/gh/DakaraProject/dakara-feeder)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 [![PyPI version](https://badge.fury.io/py/dakarafeeder.svg)](https://pypi.python.org/pypi/dakarafeeder/)
 [![PyPI Python versions](https://img.shields.io/pypi/pyversions/dakarafeeder.svg)](https://pypi.python.org/pypi/dakarafeeder/)
+[![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://pypi.python.org/pypi/dakarafeeder/)
+[![Tests status](https://github.com/DakaraProject/dakara-feeder/actions/workflows/ci.yml/badge.svg)](https://github.com/DakaraProject/dakara-feeder/actions/workflows/ci.yml)
+[![Code coverage status](https://codecov.io/gh/DakaraProject/dakara-feeder/branch/develop/graph/badge.svg)](https://codecov.io/gh/DakaraProject/dakara-feeder)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
+[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
 Allows to feed the database of the Dakara server remotely.
 
@@ -25,7 +27,7 @@ Other important parts of the project include:
 * [ffmpeg](https://www.ffmpeg.org/), to extract lyrics and extract metadata from files (preferred way);
 * [MediaInfo](https://mediaarea.net/fr/MediaInfo/), to extract metadata from files (slower, alternative way, may not work on Windows).
 
-Linux and Windows are supported.
+Linux, Windows, and MacOS are supported.
 
 ### Virtual environment
 
