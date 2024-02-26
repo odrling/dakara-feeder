@@ -33,6 +33,7 @@
 ### Added
 
 - MacOS support.
+- Added Python 3.12 support.
 
 ### Removed
 
