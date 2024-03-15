@@ -139,11 +139,11 @@ class SongPaths:
         others (list of path.Path): Paths of other files.
     """
 
-    def __init__(self, video, audio=None, subtitle=None, others=[]):
+    def __init__(self, video, audio=None, subtitle=None, others=None):
         self.video = video
         self.audio = audio
         self.subtitle = subtitle
-        self.others = others
+        self.others = [] if others is None else others
 
     def __eq__(self, other):
         return self.__hash__() == other.__hash__()

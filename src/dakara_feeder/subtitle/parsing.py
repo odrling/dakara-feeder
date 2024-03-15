@@ -26,8 +26,8 @@ class SubtitleParser(ABC):
             object or the full text of the lyrics.
     """
 
-    def __init__(self, content={}):
-        self.content = content
+    def __init__(self, content=None):
+        self.content = {} if content is None else content
 
     @classmethod
     @abstractmethod
