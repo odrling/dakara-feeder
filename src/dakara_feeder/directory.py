@@ -62,6 +62,8 @@ def get_main_type(file):
     Returns
         str: Main type if the MIME type can be extracted, `None` otherwise.
     """
+    if file.suffix == ".mka":
+        return "audio/matroska"
     kind = filetype.guess(str(file))
 
     if not kind:
